@@ -1,3 +1,5 @@
+[![wakatime](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca.svg)](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca)
+
 # sales_rep_visit_tracker_feature
 
 Your task is to build a Visits Tracker feature for a Route-to-Market (RTM) Sales Force
