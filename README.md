@@ -32,7 +32,7 @@ You may **not**:
 - Modify and distribute it
 - Deploy it in real-world systems
 
-For other uses, please contact **Bruce Omukoko**.
+For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
 
 # Dependencies used
 
