@@ -1,0 +1,20 @@
+name: sales_rep_visit_tracker_feature
+description: "Your task is to build a Visits Tracker feature for a Route-to-Market (RTM) Sales Force Automation app. Design and structure your solution as though this feature is part of a larger, scalable application."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
