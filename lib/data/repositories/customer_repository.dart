@@ -8,12 +8,14 @@ abstract class CustomerRepository {
   Future<TaskResult<List<Customer>>> getCustomers({
     required int page,
     required int pageSize,
+    required String order,
   });
 
   Future<TaskResult<List<Customer>>> searchCustomerByName({
     required String name,
     required int page,
     required int pageSize,
+    required String order,
   });
 
   Future<TaskResult<Customer>> updateCustomer({required Customer customer});

@@ -8,6 +8,7 @@ abstract class ActivityRepository {
   Future<TaskResult<List<Activity>>> getActivities({
     required int page,
     required int pageSize,
+    required String order,
   });
 
   Future<TaskResult<Activity>> updateActivity({required Activity activity});

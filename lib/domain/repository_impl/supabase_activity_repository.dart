@@ -9,13 +9,16 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 class SupabaseActivityRepository implements ActivityRepository {
   final ActivitySupabaseApi _activityApi;
 
-  SupabaseActivityRepository({required ActivitySupabaseApi activityApi}) : _activityApi = activityApi;
+  SupabaseActivityRepository({required ActivitySupabaseApi activityApi})
+      : _activityApi = activityApi;
 
   @override
-  Future<TaskResult<Activity>> createActivity({required String description}) async {
-
+  Future<TaskResult<Activity>> createActivity({
+    required String description
+  }) async {
     //Check if similar activity exists
-    var duplicateCheckResponse = await _activityApi.sendFindByDescriptionRequest(
+    var duplicateCheckResponse = await _activityApi
+        .sendFindByDescriptionRequest(
       description: description,
     );
 
@@ -37,7 +40,10 @@ class SupabaseActivityRepository implements ActivityRepository {
     }
 
     //Create new activity
-    var createResponse = await _activityApi.sendAddActivityRequest(description: description);
+    var createResponse = await _activityApi.sendAddActivityRequest(
+        description: description
+    );
+
     switch (createResponse) {
       case FailNetworkResponse():
         return ErrorResult(
@@ -46,7 +52,9 @@ class SupabaseActivityRepository implements ActivityRepository {
         );
 
       case SuccessNetworkResponse():
-        var fetchCreatedActivity = await _activityApi.sendFindByDescriptionRequest(description: description);
+        var fetchCreatedActivity = await _activityApi.sendFindByDescriptionRequest(
+            description: description
+        );
         switch (fetchCreatedActivity) {
           case FailNetworkResponse():
             return ErrorResult(
@@ -55,32 +63,95 @@ class SupabaseActivityRepository implements ActivityRepository {
             );
 
           case SuccessNetworkResponse():
-            //Cache activity by id
-            var data = (fetchCreatedActivity.data as List<dynamic>).map((e) => RemoteActivity.fromJson(e)).first;
+          //Cache activity by id
+            var data = (fetchCreatedActivity.data as List<dynamic>)
+                .map((e) => RemoteActivity.fromJson(e))
+                .first;
             return SuccessResult(
-              data: data.toDomain,
-              message: "Activity created"
+                data: data.toDomain,
+                message: "Activity created"
             );
         }
-
     }
   }
 
   @override
-  Future<TaskResult<void>> deleteActivity({required int activityId}) {
-    // TODO: implement deleteActivity
-    throw UnimplementedError();
+  Future<TaskResult<void>> deleteActivity({
+    required int activityId,
+  }) async {
+    var deleteResponse = await _activityApi.sendDeleteActivityRequest(
+      activityId: activityId,
+    );
+
+    switch (deleteResponse) {
+      case FailNetworkResponse():
+        return ErrorResult(
+          error: deleteResponse.description,
+          trace: deleteResponse.trace,
+        );
+      case SuccessNetworkResponse():
+        return SuccessResult(
+            message: "Activity deleted"
+        );
+    }
   }
 
   @override
-  Future<TaskResult<List<Activity>>> getActivities({required int page, required int pageSize}) {
-    // TODO: implement getActivities
-    throw UnimplementedError();
+  Future<TaskResult<List<Activity>>> getActivities({
+    required int page,
+    required int pageSize,
+    required String order,
+  }) async {
+    var getActivityResponse = await _activityApi.sendGetActivityRequest(
+      page: page,
+      pageSize: pageSize,
+      order: order,
+    );
+
+    switch (getActivityResponse) {
+      case FailNetworkResponse():
+        return ErrorResult(
+          error: getActivityResponse.description,
+          trace: getActivityResponse.trace,
+        );
+      case SuccessNetworkResponse():
+        var data = (getActivityResponse.data as List<dynamic>)
+            .map((e) =>
+        RemoteActivity
+            .fromJson(e)
+            .toDomain).toList();
+
+        return SuccessResult(
+          message: "${data.length} activities found",
+          data: data,
+        );
+    }
   }
 
   @override
-  Future<TaskResult<Activity>> updateActivity({required Activity activity}) {
-    // TODO: implement updateActivity
-    throw UnimplementedError();
+  Future<TaskResult<Activity>> updateActivity({
+    required Activity activity,
+  }) async {
+    var updateActivityResponse = await _activityApi.sendUpdateActivityRequest(
+      activityId: activity.id,
+      description: activity.description,
+    );
+
+    switch (updateActivityResponse) {
+      case FailNetworkResponse():
+        return ErrorResult(
+          error: updateActivityResponse.description,
+          trace: updateActivityResponse.trace,
+        );
+      case SuccessNetworkResponse():
+        var data = RemoteActivity
+            .fromJson(updateActivityResponse.data)
+            .toDomain;
+
+        return SuccessResult(
+          message: "Activity updated",
+          data: data,
+        );
+    }
   }
 }

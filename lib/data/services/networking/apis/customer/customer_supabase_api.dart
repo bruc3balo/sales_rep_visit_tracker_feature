@@ -61,6 +61,19 @@ class CustomerSupabaseApi {
     return _networkService.sendJsonRequest(request: request);
   }
 
+  Future<NetworkResponse> sendFindCustomersByNameRequest({
+    required String name,
+  }) async {
+    NetworkRequest request = NetworkRequest(
+      uri: Uri.parse(_baseUrl),
+      method: HttpMethod.get,
+      data: {
+        "name": 'eq.*$name*',
+      },
+    );
+    return _networkService.sendJsonRequest(request: request);
+  }
+
   Future<NetworkResponse> sendDeleteCustomerRequest({
     required int customerId,
   }) async {
@@ -73,7 +86,7 @@ class CustomerSupabaseApi {
 
   Future<NetworkResponse> sendUpdateCustomerRequest({
     required int customerId,
-    required int name,
+    required String name,
   }) async {
     NetworkRequest request = NetworkRequest(
       uri: Uri.parse("$_baseUrl?id=eq.$customerId"),

@@ -10,3 +10,11 @@ extension ActivityDomainMapper on RemoteActivity {
 extension ActivityRemoteMapper on Activity {
   RemoteActivity get toRemote => RemoteActivity(id: id, description: description, createdAt: createdAt);
 }
+
+extension CustomerDomainMapper on RemoteCustomer {
+  Customer get toDomain => Customer(id: id, name: name, createdAt: createdAt);
+}
+
+extension CustomerRemoteMapper on Customer {
+  RemoteCustomer get toRemote => RemoteCustomer(id: id, name: name, createdAt: createdAt);
+}

@@ -86,10 +86,10 @@ class ActivitySupabaseApi {
 
   Future<NetworkResponse> sendUpdateActivityRequest({
     required int activityId,
-    required int description,
+    required String description,
   }) async {
     NetworkRequest request =
-        NetworkRequest(uri: Uri.parse("$_baseUrl?id=eq.$activityId"), method: HttpMethod.patch, data: {"description": description});
+        NetworkRequest(uri: Uri.parse("$_baseUrl?id=eq.$activityId"), method: HttpMethod.patch, data: {"description": description},);
     return _networkService.sendJsonRequest(request: request);
   }
 }
