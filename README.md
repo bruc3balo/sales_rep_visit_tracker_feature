@@ -43,3 +43,9 @@ For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
 
 The chosen design pattern is MVVM due to it's robustness and ease of separation of UI and Data layer
 The project is divided into 3 layers for clear separation of concerns and code reusability
+
+
+# Building
+```bash
+    flutter pub run build_runner build --delete-conflicting-outputs
+```
