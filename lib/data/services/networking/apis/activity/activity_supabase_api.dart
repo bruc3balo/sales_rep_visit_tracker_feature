@@ -26,6 +26,7 @@ class ActivitySupabaseApi {
   }
 
   Future<NetworkResponse> sendGetActivityRequest({
+    List<int>? ids,
     required int page,
     required int pageSize,
     String? likeDescription,
@@ -41,6 +42,7 @@ class ActivitySupabaseApi {
             if (likeDescription != null) "description": 'ilike.*$likeDescription*',
             if (equalDescription != null) "description": 'eq.$equalDescription',
             if (order != null) "order": order,
+            if (ids != null) "id": "in.(${ids.join(",")})",
           },
         ),
       method: HttpMethod.get,

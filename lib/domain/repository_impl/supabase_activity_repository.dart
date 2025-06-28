@@ -79,12 +79,16 @@ class SupabaseActivityRepository implements ActivityRepository {
           trace: deleteResponse.trace,
         );
       case SuccessNetworkResponse():
-        return SuccessResult(message: "Activity deleted");
+        return SuccessResult(
+          data: null,
+          message: "Activity deleted",
+        );
     }
   }
 
   @override
   Future<TaskResult<List<Activity>>> getActivities({
+    List<int>? ids,
     String? likeDescription,
     String? equalDescription,
     required int page,

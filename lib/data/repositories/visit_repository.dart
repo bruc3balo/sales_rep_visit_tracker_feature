@@ -20,7 +20,7 @@ abstract class VisitRepository {
     VisitStatus? status,
     required int page,
     required int pageSize,
-    required String order,
+    String? order,
   });
 
   Future<TaskResult<Visit>> updateVisit({

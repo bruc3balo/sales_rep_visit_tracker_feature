@@ -11,11 +11,11 @@ final class ErrorResult<T> extends TaskResult<T> {
 }
 
 final class SuccessResult<T> extends TaskResult<T> {
-  final T? data;
+  final T data;
   final String message;
 
   SuccessResult({
-    this.data,
+    required this.data,
     this.message = "Success",
   });
 }

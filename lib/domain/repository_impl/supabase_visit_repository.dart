@@ -54,7 +54,10 @@ class SupabaseVisitRepository implements VisitRepository {
           trace: deletedVisit.trace,
         );
       case SuccessNetworkResponse():
-        return SuccessResult(message: "Visit deleted");
+        return SuccessResult(
+          data: null,
+          message: "Visit deleted",
+        );
     }
   }
 
@@ -113,7 +116,7 @@ class SupabaseVisitRepository implements VisitRepository {
     VisitStatus? status,
     required int page,
     required int pageSize,
-    required String order,
+    String? order,
   }) async {
     var getVisitResponse = await _visitApi.sendGetVisitsRequest(
       customerId: customerId,

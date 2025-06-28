@@ -6,6 +6,7 @@ abstract class ActivityRepository {
   Future<TaskResult<Activity>> createActivity({required String description});
 
   Future<TaskResult<List<Activity>>> getActivities({
+    List<int>? ids,
     String? likeDescription,
     String? equalDescription,
     required int page,

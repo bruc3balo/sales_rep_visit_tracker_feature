@@ -7,11 +7,11 @@ Automation app. Design and structure your solution as though this feature is par
 larger, scalable application.
 The app should allow a sales rep to:
 
-* Add a new visit by filling out a form
-* View a list of their customer visits
-* Track activities completed during the visit
-* View basic statistics related to their visits (e.g., how many completed)
-* Search or filter visits
+* Add a new visit by filling out a form ([add_a_new_visit_use_case.dart](lib/domain/use_cases/add_a_new_visit_use_case.dart))
+* View a list of their customer visits [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit_list_of_past_visits_use_case.dart)
+* Track activities completed during the visit [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit_list_of_past_visits_use_case.dart)
+* View basic statistics related to their visits (e.g., how many completed) [count_visit_statistics_use_case.dart](lib/domain/use_cases/count_visit_statistics_use_case.dart)
+* Search or filter visits [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit_list_of_past_visits_use_case.dart)
 
 # License
 

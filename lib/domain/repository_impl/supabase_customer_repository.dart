@@ -74,7 +74,10 @@ class SupabaseCustomerRepository implements CustomerRepository {
           trace: deleteResponse.trace,
         );
       case SuccessNetworkResponse():
-        return SuccessResult(message: "Customer deleted");
+        return SuccessResult(
+          data: null,
+          message: "Customer deleted",
+        );
     }
   }
 
@@ -109,7 +112,6 @@ class SupabaseCustomerRepository implements CustomerRepository {
         );
     }
   }
-
 
   @override
   Future<TaskResult<Customer>> updateCustomer({

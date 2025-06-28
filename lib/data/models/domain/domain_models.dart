@@ -50,4 +50,8 @@ enum VisitStatus {
   cancelled;
 
   String get capitalize => "${name[0].toUpperCase()}${name.substring(1)}";
+
+  static VisitStatus? findByCapitalizedString(String s) {
+    return VisitStatus.values.where((e) => e.capitalize == s).firstOrNull;
+  }
 }
