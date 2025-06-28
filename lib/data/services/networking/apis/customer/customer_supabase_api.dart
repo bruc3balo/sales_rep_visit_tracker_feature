@@ -26,50 +26,24 @@ class CustomerSupabaseApi {
   }
 
   Future<NetworkResponse> sendGetCustomersRequest({
+    String? likeName,
+    String? equalName,
     required int page,
     required int pageSize,
-    required String order,
+    String? order,
   }) async {
     NetworkRequest request = NetworkRequest(
-      uri: Uri.parse(_baseUrl),
+      uri: Uri.parse(_baseUrl)
+        ..replace(
+          queryParameters: {
+            if (likeName != null) "name": 'ilike.*$likeName*',
+            if (equalName != null) "name": 'eq.$likeName',
+            "limit": pageSize,
+            "offset": page * pageSize,
+            if (order != null) "order": order,
+          },
+        ),
       method: HttpMethod.get,
-      data: {
-        "limit": pageSize,
-        "offset": page * pageSize,
-        "order": order,
-      },
-    );
-    return _networkService.sendJsonRequest(request: request);
-  }
-
-  Future<NetworkResponse> sendSearchCustomersByNameRequest({
-    required int page,
-    required int pageSize,
-    required String order,
-    required String name,
-  }) async {
-    NetworkRequest request = NetworkRequest(
-      uri: Uri.parse(_baseUrl),
-      method: HttpMethod.get,
-      data: {
-        "limit": pageSize,
-        "offset": page * pageSize,
-        "order": order,
-        "name": 'ilike.*$name*',
-      },
-    );
-    return _networkService.sendJsonRequest(request: request);
-  }
-
-  Future<NetworkResponse> sendFindCustomersByNameRequest({
-    required String name,
-  }) async {
-    NetworkRequest request = NetworkRequest(
-      uri: Uri.parse(_baseUrl),
-      method: HttpMethod.get,
-      data: {
-        "name": 'eq.*$name*',
-      },
     );
     return _networkService.sendJsonRequest(request: request);
   }
@@ -78,7 +52,10 @@ class CustomerSupabaseApi {
     required int customerId,
   }) async {
     NetworkRequest request = NetworkRequest(
-      uri: Uri.parse("$_baseUrl?id=eq.$customerId"),
+      uri: Uri.parse(_baseUrl)
+        ..replace(
+          queryParameters: {"id": "eq.$customerId"},
+        ),
       method: HttpMethod.delete,
     );
     return _networkService.sendJsonRequest(request: request);
@@ -86,13 +63,16 @@ class CustomerSupabaseApi {
 
   Future<NetworkResponse> sendUpdateCustomerRequest({
     required int customerId,
-    required String name,
+    String? name,
   }) async {
     NetworkRequest request = NetworkRequest(
-      uri: Uri.parse("$_baseUrl?id=eq.$customerId"),
+      uri: Uri.parse(_baseUrl)
+        ..replace(
+          queryParameters: {"id": "eq.$customerId"},
+        ),
       method: HttpMethod.patch,
       data: {
-        "description": name,
+        if (name != null) "description": name,
       },
     );
     return _networkService.sendJsonRequest(request: request);

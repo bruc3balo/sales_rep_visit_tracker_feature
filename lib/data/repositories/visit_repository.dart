@@ -3,7 +3,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 abstract class VisitRepository {
 
-  Future<TaskResult<Visit>> createVisit({
+  Future<TaskResult<void>> createVisit({
     required int customerIdVisited,
     required DateTime visitDate,
     required VisitStatus status,
@@ -12,20 +12,26 @@ abstract class VisitRepository {
     required List<int> activityIdsDone,
   });
 
-  Future<TaskResult<List<Visit>>> getCustomers({
+  Future<TaskResult<List<Visit>>> getVisits({
+    int? customerId,
+    DateTime? fromDateInclusive,
+    DateTime? toDateInclusive,
+    List<int>? activityIdsDone,
+    VisitStatus? status,
     required int page,
     required int pageSize,
+    required String order,
   });
 
-  Future<TaskResult<List<Visit>>> getCustomerVisits({
-    required String customerId,
-    required int page,
-    required int pageSize,
+  Future<TaskResult<Visit>> updateVisit({
+    required int visitId,
+    int? customerId,
+    DateTime? visitDate,
+    VisitStatus? status,
+    String? location,
+    String? notes,
+    List<int>? activityIdsDone,
   });
-
-  //TODO: Add filters for data, status, activities
-
-  Future<TaskResult<Visit>> updateVisit({required Visit visit});
 
   Future<TaskResult<void>> deleteVisitById({required int visitId});
 }

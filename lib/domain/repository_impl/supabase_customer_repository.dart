@@ -1,5 +1,5 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/models/domain_remote_mapper/domain_remote_mapper.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/domain_remote_mapper.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/remote/remote_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/customer/customer_supabase_api.dart';
@@ -7,7 +7,6 @@ import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/net
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class SupabaseCustomerRepository implements CustomerRepository {
-
   final CustomerSupabaseApi _customerApi;
 
   SupabaseCustomerRepository({
@@ -15,17 +14,15 @@ class SupabaseCustomerRepository implements CustomerRepository {
   }) : _customerApi = customerApi;
 
   @override
-  Future<TaskResult<Customer>> createCustomer({
-    required String name
-  }) async {
-
+  Future<TaskResult<Customer>> createCustomer({required String name}) async {
     //Check duplicates
-    var duplicateResponse = await _customerApi.sendFindCustomersByNameRequest(
-        name: name
+    var duplicateResponse = await _customerApi.sendGetCustomersRequest(
+      equalName: name,
+      page: 0,
+      pageSize: 1,
     );
 
-    switch(duplicateResponse) {
-
+    switch (duplicateResponse) {
       case FailNetworkResponse():
         return ErrorResult(
           error: duplicateResponse.description,
@@ -43,36 +40,32 @@ class SupabaseCustomerRepository implements CustomerRepository {
 
     //Create customer
     var createResponse = await _customerApi.sendAddCustomerRequest(name: name);
-    switch(createResponse) {
-
+    switch (createResponse) {
       case FailNetworkResponse():
         return ErrorResult(
           error: createResponse.description,
           trace: createResponse.trace,
         );
       case SuccessNetworkResponse():
+        var fetchCreatedCustomer = await _customerApi.sendGetCustomersRequest(equalName: name, pageSize: 1, page: 0);
 
-        var fetchCreatedCustomer = await _customerApi.sendFindCustomersByNameRequest(
-            name: name,
-        );
-
-        switch(fetchCreatedCustomer) {
-
+        switch (fetchCreatedCustomer) {
           case FailNetworkResponse():
-            // TODO: Handle this case.
-            throw UnimplementedError();
+            return ErrorResult(
+              error: fetchCreatedCustomer.description,
+              trace: fetchCreatedCustomer.trace,
+            );
           case SuccessNetworkResponse():
-            // TODO: Handle this case.
-            throw UnimplementedError();
+            //Cache customer by id
+            var data = (fetchCreatedCustomer.data as List<dynamic>).map((e) => RemoteCustomer.fromJson(e)).first;
+            return SuccessResult(data: data.toDomain, message: "Customer created");
         }
     }
   }
 
   @override
   Future<TaskResult<void>> deleteCustomerById({required int customerId}) async {
-    var deleteResponse = await _customerApi.sendDeleteCustomerRequest(
-      customerId: customerId
-    );
+    var deleteResponse = await _customerApi.sendDeleteCustomerRequest(customerId: customerId);
 
     switch (deleteResponse) {
       case FailNetworkResponse():
@@ -81,32 +74,34 @@ class SupabaseCustomerRepository implements CustomerRepository {
           trace: deleteResponse.trace,
         );
       case SuccessNetworkResponse():
-        return SuccessResult(
-            message: "Customer deleted"
-        );
+        return SuccessResult(message: "Customer deleted");
     }
   }
 
   @override
   Future<TaskResult<List<Customer>>> getCustomers({
+    String? equalName,
+    String? likeName,
     required int page,
     required int pageSize,
-    required String order,
+    String? order,
   }) async {
     var searchCustomerResponse = await _customerApi.sendGetCustomersRequest(
-        page: page, pageSize: pageSize, order: order,
+      equalName: equalName,
+      likeName: likeName,
+      page: page,
+      pageSize: pageSize,
+      order: order,
     );
 
-    switch(searchCustomerResponse) {
-
+    switch (searchCustomerResponse) {
       case FailNetworkResponse():
         return ErrorResult(
           error: searchCustomerResponse.description,
           trace: searchCustomerResponse.trace,
         );
       case SuccessNetworkResponse():
-        var data = (searchCustomerResponse.data as List<dynamic>)
-            .map((json) => RemoteCustomer.fromJson(json).toDomain).toList();
+        var data = (searchCustomerResponse.data as List<dynamic>).map((json) => RemoteCustomer.fromJson(json).toDomain).toList();
 
         return SuccessResult(
           data: data,
@@ -115,40 +110,15 @@ class SupabaseCustomerRepository implements CustomerRepository {
     }
   }
 
+
   @override
-  Future<TaskResult<List<Customer>>> searchCustomerByName({
-    required String name,
-    required int page,
-    required int pageSize,
-    required String order,
+  Future<TaskResult<Customer>> updateCustomer({
+    required int customerId,
+    String? name,
   }) async {
-    var searchCustomerResponse = await _customerApi.sendSearchCustomersByNameRequest(
-        page: page, pageSize: pageSize, order: order, name: name
-    );
-
-    switch(searchCustomerResponse) {
-
-      case FailNetworkResponse():
-        return ErrorResult(
-          error: searchCustomerResponse.description,
-          trace: searchCustomerResponse.trace,
-        );
-      case SuccessNetworkResponse():
-        var data = (searchCustomerResponse.data as List<dynamic>)
-            .map((json) => RemoteCustomer.fromJson(json).toDomain).toList();
-
-        return SuccessResult(
-          data: data,
-          message: "${data.length} customers found",
-        );
-    }
-  }
-
-  @override
-  Future<TaskResult<Customer>> updateCustomer({required Customer customer}) async {
     var updateCustomerResponse = await _customerApi.sendUpdateCustomerRequest(
-      customerId: customer.id,
-      name: customer.name,
+      customerId: customerId,
+      name: name,
     );
 
     switch (updateCustomerResponse) {
@@ -158,12 +128,10 @@ class SupabaseCustomerRepository implements CustomerRepository {
           trace: updateCustomerResponse.trace,
         );
       case SuccessNetworkResponse():
-        var data = RemoteCustomer
-            .fromJson(updateCustomerResponse.data)
-            .toDomain;
+        var data = RemoteCustomer.fromJson(updateCustomerResponse.data).toDomain;
 
         return SuccessResult(
-          message: "Activity updated",
+          message: "Customer updated",
           data: data,
         );
     }

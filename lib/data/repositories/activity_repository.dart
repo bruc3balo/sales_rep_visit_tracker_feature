@@ -6,9 +6,11 @@ abstract class ActivityRepository {
   Future<TaskResult<Activity>> createActivity({required String description});
 
   Future<TaskResult<List<Activity>>> getActivities({
+    String? likeDescription,
+    String? equalDescription,
     required int page,
     required int pageSize,
-    required String order,
+    String? order,
   });
 
   Future<TaskResult<Activity>> updateActivity({required Activity activity});

@@ -28,57 +28,35 @@ class ActivitySupabaseApi {
   Future<NetworkResponse> sendGetActivityRequest({
     required int page,
     required int pageSize,
-    required String order,
+    String? likeDescription,
+    String? equalDescription,
+    String? order,
   }) async {
     NetworkRequest request = NetworkRequest(
-      uri: Uri.parse(_baseUrl),
+      uri: Uri.parse(_baseUrl)
+        ..replace(
+          queryParameters: {
+            "limit": pageSize,
+            "offset": page * pageSize,
+            if (likeDescription != null) "description": 'ilike.*$likeDescription*',
+            if (equalDescription != null) "description": 'eq.$equalDescription',
+            if (order != null) "order": order,
+          },
+        ),
       method: HttpMethod.get,
-      data: {
-        "limit": pageSize,
-        "offset": page * pageSize,
-        "order": order,
-      },
     );
     return _networkService.sendJsonRequest(request: request);
   }
 
-  Future<NetworkResponse> sendSearchActivityByDescriptionRequest({
-    required int page,
-    required int pageSize,
-    required String order,
-    required String description,
-  }) async {
-    NetworkRequest request = NetworkRequest(
-      uri: Uri.parse(_baseUrl),
-      method: HttpMethod.get,
-      data: {
-        "limit": pageSize,
-        "offset": page * pageSize,
-        "order": order,
-        "description": 'ilike.*$description*',
-      },
-    );
-    return _networkService.sendJsonRequest(request: request);
-  }
-
-  Future<NetworkResponse> sendFindByDescriptionRequest({
-    required String description,
-  }) async {
-    NetworkRequest request = NetworkRequest(
-      uri: Uri.parse(_baseUrl),
-      method: HttpMethod.get,
-      data: {
-        "description": description,
-      },
-    );
-    return _networkService.sendJsonRequest(request: request);
-  }
 
   Future<NetworkResponse> sendDeleteActivityRequest({
     required int activityId,
   }) async {
     NetworkRequest request = NetworkRequest(
-      uri: Uri.parse("$_baseUrl?id=eq.$activityId"),
+      uri: Uri.parse(_baseUrl)
+        ..replace(
+          queryParameters: {"id": "eq.$activityId"},
+        ),
       method: HttpMethod.delete,
     );
     return _networkService.sendJsonRequest(request: request);
@@ -88,8 +66,14 @@ class ActivitySupabaseApi {
     required int activityId,
     required String description,
   }) async {
-    NetworkRequest request =
-        NetworkRequest(uri: Uri.parse("$_baseUrl?id=eq.$activityId"), method: HttpMethod.patch, data: {"description": description},);
+    NetworkRequest request = NetworkRequest(
+      uri: Uri.parse(_baseUrl)
+        ..replace(
+          queryParameters: {"id": "eq.$activityId"},
+        ),
+      method: HttpMethod.patch,
+      data: {"description": description},
+    );
     return _networkService.sendJsonRequest(request: request);
   }
 }

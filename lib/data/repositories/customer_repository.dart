@@ -6,19 +6,17 @@ abstract class CustomerRepository {
   Future<TaskResult<Customer>> createCustomer({required String name});
 
   Future<TaskResult<List<Customer>>> getCustomers({
+    String? equalName,
+    String? likeName,
     required int page,
     required int pageSize,
-    required String order,
+    String? order,
   });
 
-  Future<TaskResult<List<Customer>>> searchCustomerByName({
-    required String name,
-    required int page,
-    required int pageSize,
-    required String order,
+  Future<TaskResult<Customer>> updateCustomer({
+    required int customerId,
+    String? name,
   });
-
-  Future<TaskResult<Customer>> updateCustomer({required Customer customer});
 
   Future<TaskResult<void>> deleteCustomerById({required int customerId});
 

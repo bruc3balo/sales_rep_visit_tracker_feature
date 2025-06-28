@@ -1,5 +1,5 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/models/domain_remote_mapper/domain_remote_mapper.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/domain_remote_mapper.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/remote/remote_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/activity/activity_supabase_api.dart';
@@ -9,18 +9,12 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 class SupabaseActivityRepository implements ActivityRepository {
   final ActivitySupabaseApi _activityApi;
 
-  SupabaseActivityRepository({required ActivitySupabaseApi activityApi})
-      : _activityApi = activityApi;
+  SupabaseActivityRepository({required ActivitySupabaseApi activityApi}) : _activityApi = activityApi;
 
   @override
-  Future<TaskResult<Activity>> createActivity({
-    required String description
-  }) async {
+  Future<TaskResult<Activity>> createActivity({required String description}) async {
     //Check if similar activity exists
-    var duplicateCheckResponse = await _activityApi
-        .sendFindByDescriptionRequest(
-      description: description,
-    );
+    var duplicateCheckResponse = await _activityApi.sendGetActivityRequest(equalDescription: description, page: 0, pageSize: 1);
 
     switch (duplicateCheckResponse) {
       case FailNetworkResponse():
@@ -40,9 +34,7 @@ class SupabaseActivityRepository implements ActivityRepository {
     }
 
     //Create new activity
-    var createResponse = await _activityApi.sendAddActivityRequest(
-        description: description
-    );
+    var createResponse = await _activityApi.sendAddActivityRequest(description: description);
 
     switch (createResponse) {
       case FailNetworkResponse():
@@ -52,8 +44,10 @@ class SupabaseActivityRepository implements ActivityRepository {
         );
 
       case SuccessNetworkResponse():
-        var fetchCreatedActivity = await _activityApi.sendFindByDescriptionRequest(
-            description: description
+        var fetchCreatedActivity = await _activityApi.sendGetActivityRequest(
+          equalDescription: description,
+          pageSize: 1,
+          page: 0,
         );
         switch (fetchCreatedActivity) {
           case FailNetworkResponse():
@@ -63,14 +57,9 @@ class SupabaseActivityRepository implements ActivityRepository {
             );
 
           case SuccessNetworkResponse():
-          //Cache activity by id
-            var data = (fetchCreatedActivity.data as List<dynamic>)
-                .map((e) => RemoteActivity.fromJson(e))
-                .first;
-            return SuccessResult(
-                data: data.toDomain,
-                message: "Activity created"
-            );
+            //Cache activity by id
+            var data = (fetchCreatedActivity.data as List<dynamic>).map((e) => RemoteActivity.fromJson(e)).first;
+            return SuccessResult(data: data.toDomain, message: "Activity created");
         }
     }
   }
@@ -90,19 +79,21 @@ class SupabaseActivityRepository implements ActivityRepository {
           trace: deleteResponse.trace,
         );
       case SuccessNetworkResponse():
-        return SuccessResult(
-            message: "Activity deleted"
-        );
+        return SuccessResult(message: "Activity deleted");
     }
   }
 
   @override
   Future<TaskResult<List<Activity>>> getActivities({
+    String? likeDescription,
+    String? equalDescription,
     required int page,
     required int pageSize,
-    required String order,
+    String? order,
   }) async {
     var getActivityResponse = await _activityApi.sendGetActivityRequest(
+      likeDescription: likeDescription,
+      equalDescription: equalDescription,
       page: page,
       pageSize: pageSize,
       order: order,
@@ -115,11 +106,7 @@ class SupabaseActivityRepository implements ActivityRepository {
           trace: getActivityResponse.trace,
         );
       case SuccessNetworkResponse():
-        var data = (getActivityResponse.data as List<dynamic>)
-            .map((e) =>
-        RemoteActivity
-            .fromJson(e)
-            .toDomain).toList();
+        var data = (getActivityResponse.data as List<dynamic>).map((e) => RemoteActivity.fromJson(e).toDomain).toList();
 
         return SuccessResult(
           message: "${data.length} activities found",
@@ -144,9 +131,7 @@ class SupabaseActivityRepository implements ActivityRepository {
           trace: updateActivityResponse.trace,
         );
       case SuccessNetworkResponse():
-        var data = RemoteActivity
-            .fromJson(updateActivityResponse.data)
-            .toDomain;
+        var data = RemoteActivity.fromJson(updateActivityResponse.data).toDomain;
 
         return SuccessResult(
           message: "Activity updated",
