@@ -1,5 +1,6 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
@@ -7,12 +8,15 @@ import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models
 class VisitListOfPastVisitsUseCase {
   final VisitRepository _visitRepository;
   final ActivityRepository _activityRepository;
+  final CustomerRepository _customerRepository;
 
   VisitListOfPastVisitsUseCase({
     required VisitRepository visitRepository,
     required ActivityRepository activityRepository,
+    required CustomerRepository customerRepository,
   })  : _visitRepository = visitRepository,
-        _activityRepository = activityRepository;
+        _activityRepository = activityRepository,
+        _customerRepository = customerRepository;
 
   Future<TaskResult<List<VisitAggregate>>> execute({
     required int page,
@@ -42,11 +46,11 @@ class VisitListOfPastVisitsUseCase {
       case SuccessResult<List<Visit>>():
         var visits = result.data;
 
-        var ids = visits.expand((e) => e.activitiesDone).toList();
+        var activityIds = visits.expand((e) => e.activitiesDone).toSet().toList();
         var getActivitiesResponse = await _activityRepository.getActivities(
           page: 0,
-          pageSize: 100,
-          ids: ids,
+          pageSize: pageSize * 100,
+          ids: activityIds,
         );
 
         switch (getActivitiesResponse) {
@@ -58,20 +62,41 @@ class VisitListOfPastVisitsUseCase {
           case SuccessResult<List<Activity>>():
             var activityMap = {for (var a in getActivitiesResponse.data) a.id: a};
 
-            var data = visits.map((v) {
-              return VisitAggregate(
-                visit: v,
-                activityMap: {
-                  for (var aId in v.activitiesDone)
-                    if (activityMap.containsKey(aId)) aId: activityMap[aId]!
-                },
-              );
-            }).toList();
+            var customerIds = visits.map((e) => e.customerId).toSet().toList();
 
-            return SuccessResult(
-              message: "${data.length} visits found",
-              data: data,
+            var getCustomersResponse = await _customerRepository.getCustomers(
+              page: 0,
+              pageSize: pageSize,
+              ids: customerIds,
             );
+
+            switch(getCustomersResponse) {
+
+              case ErrorResult<List<Customer>>():
+                return ErrorResult(
+                  error: getCustomersResponse.error,
+                  trace: getCustomersResponse.trace,
+                );
+              case SuccessResult<List<Customer>>():
+
+                var customerMap = {for (var a in getCustomersResponse.data) a.id: a};
+
+                var data = visits.map((v) {
+                  return VisitAggregate(
+                    visit: v,
+                    activityMap: {
+                      for (var aId in v.activitiesDone)
+                        if (activityMap.containsKey(aId)) aId: activityMap[aId]!
+                    },
+                    customer: customerMap[v.customerId],
+                  );
+                }).toList();
+
+                return SuccessResult(
+                  message: "${data.length} visits found",
+                  data: data,
+                );
+            }
         }
     }
   }

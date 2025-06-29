@@ -18,9 +18,9 @@ class RemoteCustomer {
   });
 
   factory RemoteCustomer.fromJson(Map<String, dynamic> json) =>
-      _$CustomerFromJson(json);
+      _$RemoteCustomerFromJson(json);
 
-  Map<String, dynamic> toJson() => _$CustomerToJson(this);
+  Map<String, dynamic> toJson() => _$RemoteCustomerToJson(this);
 }
 
 @JsonSerializable()
@@ -39,9 +39,9 @@ class RemoteActivity {
   });
 
   factory RemoteActivity.fromJson(Map<String, dynamic> json) =>
-      _$ActivityFromJson(json);
+      _$RemoteActivityFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ActivityToJson(this);
+  Map<String, dynamic> toJson() => _$RemoteActivityToJson(this);
 }
 
 @JsonSerializable()
@@ -61,7 +61,7 @@ class RemoteVisit {
   final String notes;
 
   @JsonKey(name: 'activities_done')
-  final List<int> activitiesDone;
+  final List<String> activitiesDone;
 
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
@@ -77,7 +77,7 @@ class RemoteVisit {
     required this.createdAt,
   });
 
-  factory RemoteVisit.fromJson(Map<String, dynamic> json) => _$VisitFromJson(json);
+  factory RemoteVisit.fromJson(Map<String, dynamic> json) => _$RemoteVisitFromJson(json);
 
-  Map<String, dynamic> toJson() => _$VisitToJson(this);
+  Map<String, dynamic> toJson() => _$RemoteVisitToJson(this);
 }

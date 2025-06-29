@@ -4,11 +4,14 @@ import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/net
 class SupabaseVisitApi {
   final NetworkService _networkService;
   final String _baseUrl;
+  final String _apiKey;
 
   SupabaseVisitApi({
     required NetworkService networkService,
     required String baseUrl,
+    required String apiKey,
   })  : _networkService = networkService,
+        _apiKey = apiKey,
         _baseUrl = "$baseUrl/visits";
 
   Future<NetworkResponse> sendAddVisitRequest({
@@ -23,6 +26,7 @@ class SupabaseVisitApi {
     NetworkRequest request = NetworkRequest(
       uri: Uri.parse(_baseUrl),
       method: HttpMethod.post,
+      headers: {"apiKey": _apiKey},
       data: {
         "customer_id": customerId,
         "visit_date": visitDate,
@@ -48,20 +52,20 @@ class SupabaseVisitApi {
     String? order,
   }) async {
     NetworkRequest request = NetworkRequest(
-      uri: Uri.parse(_baseUrl)
-        ..replace(
-          queryParameters: {
-            if (visitId != null) "id": "eq.$visitId",
-            if (customerId != null) "customer_id": "eq.$customerId",
-            if (activityIdsDone != null) "activities_done": "contains.$activityIdsDone",
-            if (status != null) "status": "eq.$status",
-            if (fromDateInclusive != null) "visit_date": "gte.$fromDateInclusive",
-            if (toDateInclusive != null) "visit_date": "lte.$toDateInclusive",
-            "limit": pageSize,
-            "offset": page * pageSize,
-            if (order != null) "order": order,
-          },
-        ),
+      uri: Uri.parse(_baseUrl).replace(
+        queryParameters: {
+          if (visitId != null) "id": "eq.$visitId",
+          if (customerId != null) "customer_id": "eq.$customerId",
+          if (activityIdsDone != null) "activities_done": "contains.$activityIdsDone",
+          if (status != null) "status": "eq.$status",
+          if (fromDateInclusive != null) "visit_date": "gte.$fromDateInclusive",
+          if (toDateInclusive != null) "visit_date": "lte.$toDateInclusive",
+          "limit": pageSize.toString(),
+          "offset": (page * pageSize).toString(),
+          if (order != null) "order": order,
+        },
+      ),
+      headers: {"apiKey": _apiKey},
       method: HttpMethod.get,
     );
     return _networkService.sendJsonRequest(request: request);
@@ -72,6 +76,7 @@ class SupabaseVisitApi {
   }) async {
     NetworkRequest request = NetworkRequest(
       uri: Uri.parse("$_baseUrl?id=eq.$visitId"),
+      headers: {"apiKey": _apiKey},
       method: HttpMethod.delete,
     );
     return _networkService.sendJsonRequest(request: request);
@@ -89,6 +94,7 @@ class SupabaseVisitApi {
     NetworkRequest request = NetworkRequest(
       uri: Uri.parse("$_baseUrl?id=eq.$visitId"),
       method: HttpMethod.patch,
+      headers: {"apiKey": _apiKey},
       data: {
         if (customerId != null) "customer_id": customerId,
         if (visitDate != null) "visit_date": visitDate,

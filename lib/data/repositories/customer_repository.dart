@@ -6,6 +6,7 @@ abstract class CustomerRepository {
   Future<TaskResult<Customer>> createCustomer({required String name});
 
   Future<TaskResult<List<Customer>>> getCustomers({
+    List<int>? ids,
     String? equalName,
     String? likeName,
     required int page,

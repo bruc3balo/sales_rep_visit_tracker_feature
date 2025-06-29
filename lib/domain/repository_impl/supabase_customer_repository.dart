@@ -83,6 +83,7 @@ class SupabaseCustomerRepository implements CustomerRepository {
 
   @override
   Future<TaskResult<List<Customer>>> getCustomers({
+    List<int>? ids,
     String? equalName,
     String? likeName,
     required int page,
