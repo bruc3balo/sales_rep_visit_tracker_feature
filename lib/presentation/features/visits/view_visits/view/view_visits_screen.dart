@@ -21,7 +21,6 @@ class ViewVisitsScreen extends StatelessWidget {
         builder: (context, __) {
           bool isLoading = viewVisitsViewModel.itemsState is LoadingViewVisitsState;
           var visits = viewVisitsViewModel.visits;
-
           return NotificationListener<ScrollNotification>(
             onNotification: (scrollInfo) {
               bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
@@ -47,15 +46,6 @@ class ViewVisitsScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.small(
-        onPressed: () {
-          Navigator.of(context).pushNamed(
-            AppRoutes.addVisit.path,
-          );
-        },
-        child: Icon(Icons.add),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
     );
   }
 }
@@ -71,6 +61,12 @@ class VisitTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: () {
+        Navigator.of(context).pushNamed(
+          AppRoutes.visitDetails.path,
+          arguments: visit,
+        );
+      },
       title: Text(visit.visit.id.toString()),
       subtitle: Text(visit.customer?.name ?? 'Unknown Customer'),
       trailing: CircleAvatar(

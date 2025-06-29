@@ -14,4 +14,5 @@ class HomeViewModel extends ChangeNotifier {
     _currentPage = homePages[pageIndex];
     notifyListeners();
   }
+
 }

@@ -11,16 +11,15 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/vie
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/view/view_visits_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/view_model/view_visits_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
-    required this.viewVisitStatisticsViewModel,
     required this.homeViewModel,
     super.key,
   });
 
   final HomeViewModel homeViewModel;
-  final ViewVisitStatisticsViewModel viewVisitStatisticsViewModel;
 
   @override
   Widget build(BuildContext context) {
@@ -28,28 +27,30 @@ class HomeScreen extends StatelessWidget {
       listenable: homeViewModel,
       builder: (_, __) {
         return Scaffold(
-          body: NestedScrollView(
-            headerSliverBuilder: (_, innerBoxIsScrolled) {
-              return [
-                SliverAppBar(
-                  floating: true,
-                  pinned: false,
-                  toolbarHeight: 200,
-                  title: ListTile(
-                    titleAlignment: ListTileTitleAlignment.center,
-                    title: Text(
-                      "Visit statistics",
-                      textAlign: TextAlign.center,
-                    ),
-                    subtitle: ViewVisitStatisticsScreen(
-                      statisticsViewModel: viewVisitStatisticsViewModel,
-                    ),
-                  ),
-                ),
-              ];
-            },
-            body: switch (homeViewModel.currentPage) {
-              HomePages.visits => ViewVisitsScreen(
+          appBar: AppBar(
+            title: Text(homeViewModel.currentPage.label),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  switch(homeViewModel.currentPage) {
+
+                    case HomePages.visits:
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.addVisit.path,
+                      );
+                      break;
+                    case HomePages.activities:
+                      break;
+                    case HomePages.customers:
+                      break;
+                  }
+                },
+                icon: Icon(Icons.add),
+              )
+            ],
+          ),
+          body: switch (homeViewModel.currentPage) {
+            HomePages.visits => ViewVisitsScreen(
                 viewVisitsViewModel: ViewVisitsViewModel(
                   pastVisitsUseCase: VisitListOfPastVisitsUseCase(
                     visitRepository: GetIt.I(),
@@ -58,18 +59,17 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              HomePages.activities => ViewActivitiesScreen(
+            HomePages.activities => ViewActivitiesScreen(
                 viewActivitiesViewModel: ViewActivitiesViewModel(
                   activityRepository: GetIt.I(),
                 ),
               ),
-              HomePages.customers => ViewCustomersScreen(
+            HomePages.customers => ViewCustomersScreen(
                 viewCustomersViewModel: ViewCustomersViewModel(
                   customerRepository: GetIt.I(),
                 ),
               ),
-            },
-          ),
+          },
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: homeViewModel.currentPage.index,
             onTap: homeViewModel.changePage,
@@ -79,7 +79,8 @@ class HomeScreen extends StatelessWidget {
                     icon: Icon(p.iconData),
                     label: p.label,
                   ),
-                ).toList(),
+                )
+                .toList(),
           ),
         );
       },
