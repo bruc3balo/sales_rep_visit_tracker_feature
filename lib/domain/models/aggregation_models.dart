@@ -14,6 +14,7 @@ class VisitAggregate {
 
 class VisitStatisticsModel {
   final Map<VisitStatus, int> data;
+  final DateTime calculatedAt = DateTime.now();
 
   VisitStatisticsModel({
     required this.data,

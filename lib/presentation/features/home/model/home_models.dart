@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 
 enum HomePages {
   visits(
-    iconData: Icons.history,
+    iconData: Icons.history_outlined,
     label: "Visits",
   ),
   activities(
-    iconData: Icons.task,
+    iconData: Icons.run_circle_outlined,
     label: "Activities",
   ),
   customers(
-    iconData: Icons.group,
-    label: "Customers"
+    iconData: Icons.group_outlined,
+    label: "Customers",
   );
 
   const HomePages({

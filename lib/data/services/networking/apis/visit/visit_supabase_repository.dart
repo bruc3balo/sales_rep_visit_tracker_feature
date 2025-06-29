@@ -29,12 +29,12 @@ class SupabaseVisitApi {
       headers: {"apiKey": _apiKey},
       data: {
         "customer_id": customerId,
-        "visit_date": visitDate,
+        "visit_date": visitDate.toIso8601String(),
         "status": status,
         "location": location,
         "notes": notes,
         "activities_done": activityIdsDone,
-        "created_at": createdAt,
+        "created_at": createdAt.toIso8601String(),
       },
     );
     return _networkService.sendJsonRequest(request: request);
@@ -58,8 +58,8 @@ class SupabaseVisitApi {
           if (customerId != null) "customer_id": "eq.$customerId",
           if (activityIdsDone != null) "activities_done": "contains.$activityIdsDone",
           if (status != null) "status": "eq.$status",
-          if (fromDateInclusive != null) "visit_date": "gte.$fromDateInclusive",
-          if (toDateInclusive != null) "visit_date": "lte.$toDateInclusive",
+          if (fromDateInclusive != null) "visit_date": "gte.${fromDateInclusive.toIso8601String()}",
+          if (toDateInclusive != null) "visit_date": "lte.${toDateInclusive.toIso8601String()}",
           "limit": pageSize.toString(),
           "offset": (page * pageSize).toString(),
           if (order != null) "order": order,
@@ -97,7 +97,7 @@ class SupabaseVisitApi {
       headers: {"apiKey": _apiKey},
       data: {
         if (customerId != null) "customer_id": customerId,
-        if (visitDate != null) "visit_date": visitDate,
+        if (visitDate != null) "visit_date": visitDate.toIso8601String(),
         if (status != null) "status": status,
         if (location != null) "location": location,
         if (notes != null) "notes": notes,

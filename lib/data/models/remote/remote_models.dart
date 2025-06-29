@@ -64,7 +64,7 @@ class RemoteVisit {
   final List<String> activitiesDone;
 
   @JsonKey(name: 'created_at')
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   RemoteVisit({
     required this.id,

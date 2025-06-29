@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/network_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/network_base_models.dart';
 
@@ -9,9 +10,24 @@ class DioNetworkService implements NetworkService {
   Future<NetworkResponse> sendJsonRequest({
     required NetworkRequest request,
   }) async {
-    final Dio dio = Dio(BaseOptions(
-      headers: request.headers,
-    ));
+    final Dio dio = Dio(
+      BaseOptions(
+        headers: request.headers,
+      ),
+    );
+
+    dio.interceptors.add(
+        LogInterceptor(
+          request: true,
+          requestHeader: false,
+          requestBody: true,
+          responseHeader: true,
+          responseBody: true,
+          error: true,
+          logPrint: (obj) => debugPrint(obj.toString()),
+        ),
+      );
+
     int requestCountTry = 0;
 
     while (requestCountTry <= request.retryCount) {

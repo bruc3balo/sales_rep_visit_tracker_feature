@@ -12,7 +12,7 @@ class ViewVisitsViewModel extends ChangeNotifier {
   final VisitListOfPastVisitsUseCase _pastVisitsUseCase;
   int _page = 0;
   final SplayTreeSet<VisitAggregate> _visits = SplayTreeSet(
-    (a, b) => a.visit.id.compareTo(b.visit.id),
+    (a, b) => -a.visit.visitDate.compareTo(b.visit.visitDate),
   );
   final StreamController<ToastMessage> _toastController = StreamController.broadcast();
   ViewVisitsState _itemsState = LoadedViewVisitsState();

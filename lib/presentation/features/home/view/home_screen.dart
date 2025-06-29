@@ -6,71 +6,83 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/activities
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/view_customers/view/view_customers_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/view_customers/view_model/view_customers_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/home/model/home_models.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/home/view_model/home_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view/view_visit_statistics_screen.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/view/view_visits_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/view_model/view_visits_view_model.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
+    required this.viewVisitStatisticsViewModel,
+    required this.homeViewModel,
     super.key,
   });
 
-  final List<HomePages> homePages = HomePages.values;
+  final HomeViewModel homeViewModel;
+  final ViewVisitStatisticsViewModel viewVisitStatisticsViewModel;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Home"),
-      ),
-      body: DefaultTabController(
-        length: homePages.length,
-        child: Flex(
-          direction: Axis.vertical,
-          children: [
-            Flexible(
-              child: TabBar(
-                tabs: homePages
-                    .map(
-                      (h) => Tab(
-                        text: h.label,
-                        icon: Icon(h.iconData),
-                      ),
-                    )
-                    .toList(),
+    return ListenableBuilder(
+      listenable: homeViewModel,
+      builder: (_, __) {
+        return Scaffold(
+          body: NestedScrollView(
+            headerSliverBuilder: (_, innerBoxIsScrolled) {
+              return [
+                SliverAppBar(
+                  floating: true,
+                  pinned: false,
+                  toolbarHeight: 200,
+                  title: ListTile(
+                    titleAlignment: ListTileTitleAlignment.center,
+                    title: Text(
+                      "Visit statistics",
+                      textAlign: TextAlign.center,
+                    ),
+                    subtitle: ViewVisitStatisticsScreen(
+                      statisticsViewModel: viewVisitStatisticsViewModel,
+                    ),
+                  ),
+                ),
+              ];
+            },
+            body: switch (homeViewModel.currentPage) {
+              HomePages.visits => ViewVisitsScreen(
+                viewVisitsViewModel: ViewVisitsViewModel(
+                  pastVisitsUseCase: VisitListOfPastVisitsUseCase(
+                    visitRepository: GetIt.I(),
+                    activityRepository: GetIt.I(),
+                    customerRepository: GetIt.I(),
+                  ),
+                ),
               ),
-            ),
-            Expanded(
-              child: TabBarView(
-                children: homePages.map(
-                  (h) {
-                    return switch (h) {
-                      HomePages.visits => ViewVisitsScreen(
-                          viewVisitsViewModel: ViewVisitsViewModel(
-                            pastVisitsUseCase: VisitListOfPastVisitsUseCase(
-                              visitRepository: GetIt.I(),
-                              activityRepository: GetIt.I(),
-                              customerRepository: GetIt.I(),
-                            ),
-                          ),
-                        ),
-                      HomePages.activities => ViewActivitiesScreen(
-                          viewActivitiesViewModel: ViewActivitiesViewModel(
-                            activityRepository: GetIt.I(),
-                          ),
-                        ),
-                      HomePages.customers => ViewCustomersScreen(
-                          viewCustomersViewModel: ViewCustomersViewModel(
-                            customerRepository: GetIt.I(),
-                          ),
-                        ),
-                    };
-                  },
+              HomePages.activities => ViewActivitiesScreen(
+                viewActivitiesViewModel: ViewActivitiesViewModel(
+                  activityRepository: GetIt.I(),
+                ),
+              ),
+              HomePages.customers => ViewCustomersScreen(
+                viewCustomersViewModel: ViewCustomersViewModel(
+                  customerRepository: GetIt.I(),
+                ),
+              ),
+            },
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            currentIndex: homeViewModel.currentPage.index,
+            onTap: homeViewModel.changePage,
+            items: homeViewModel.homePages
+                .map(
+                  (p) => BottomNavigationBarItem(
+                    icon: Icon(p.iconData),
+                    label: p.label,
+                  ),
                 ).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

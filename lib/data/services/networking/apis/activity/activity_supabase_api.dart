@@ -25,7 +25,7 @@ class ActivitySupabaseApi {
       },
       data: {
         "description": description,
-        "created_at": DateTime.now(),
+        "created_at": DateTime.now().toIso8601String(),
       },
     );
     return _networkService.sendJsonRequest(request: request);

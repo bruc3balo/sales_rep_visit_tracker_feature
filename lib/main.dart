@@ -12,6 +12,8 @@ import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/supabase_
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/supabase_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/supabase_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/service_impl/dio_network_service.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/count_visit_statistics_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
 void main() {
@@ -54,6 +56,16 @@ void main() {
   );
   GetIt.I.registerSingleton(visitRepository);
 
+  /// Global view models
+
+  // ViewVisitStatisticsViewModel
+  ViewVisitStatisticsViewModel statsVm = ViewVisitStatisticsViewModel(
+    countVisitStatisticsUseCase: CountVisitStatisticsUseCase(
+      visitRepository: visitRepository,
+    ),
+  );
+  GetIt.I.registerSingleton(statsVm);
+
   runApp(const SalesRepVisitTrackerApplication());
 }
 
@@ -62,11 +74,13 @@ class SalesRepVisitTrackerApplication extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Visit Tracker',
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.splashScreen.path,
-      routes: {for (var route in AppRoutes.values) route.path: route.getPage},
+    return SafeArea(
+      child: MaterialApp(
+        title: 'Visit Tracker',
+        debugShowCheckedModeBanner: false,
+        initialRoute: AppRoutes.splashScreen.path,
+        routes: {for (var route in AppRoutes.values) route.path: route.getPage},
+      ),
     );
   }
 }

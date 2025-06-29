@@ -22,7 +22,7 @@ class CustomerSupabaseApi {
       method: HttpMethod.post,
       data: {
         "name": name,
-        "created_at": DateTime.now(),
+        "created_at": DateTime.now().toIso8601String(),
       },
       headers: {
         "apiKey" : _apiKey

@@ -30,7 +30,7 @@ class Visit {
   final String location;
   final String notes;
   final List<int> activitiesDone;
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   Visit({
     required this.id,
