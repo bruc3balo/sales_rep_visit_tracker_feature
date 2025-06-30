@@ -34,4 +34,5 @@ class HiveLocalUnsyncedVisitRepository extends LocalUnsyncedVisitRepository {
   Future<TaskResult<bool>> containsUnsyncedVisitKey({required LocalVisitKey key}) {
     return _localUnSyncedLocalVisitCrud.containsUnsyncedVisitKey(key: key);
   }
+
 }

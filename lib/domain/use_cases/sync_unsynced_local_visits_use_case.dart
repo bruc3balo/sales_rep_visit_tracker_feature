@@ -10,7 +10,6 @@ class SyncUnsyncedLocalVisitsUseCase {
   final RemoteVisitRepository _remoteVisitRepository;
   final LocalUnsyncedVisitRepository _localUnsyncedVisitRepository;
 
-
   SyncUnsyncedLocalVisitsUseCase({
     required RemoteVisitRepository remoteVisitRepository,
     required LocalUnsyncedVisitRepository localUnsyncedVisitRepository,

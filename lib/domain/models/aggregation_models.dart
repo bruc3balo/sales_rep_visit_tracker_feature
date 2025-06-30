@@ -1,4 +1,5 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 
 class VisitAggregate {
   final Visit visit;
@@ -10,6 +11,44 @@ class VisitAggregate {
     required this.activityMap,
     required this.customer,
   });
+}
+
+
+
+
+class UnsyncedVisitAggregate {
+  final DateTime visitDate;
+  final VisitStatus status;
+  final String location;
+  final String notes;
+  final DateTime? createdAt;
+  final Map<int, ActivityRef> activityMap;
+  final CustomerRef? customer;
+
+  UnsyncedVisitAggregate({
+      required this.visitDate,
+      required this.status,
+      required this.location,
+      required this.notes,
+      required this.createdAt,
+      required this.activityMap,
+      required this.customer,
+  });
+
+}
+
+class ActivityRef {
+  final int id;
+  final String description;
+
+  ActivityRef(this.id, this.description);
+}
+
+class CustomerRef {
+  final int id;
+  final String name;
+
+  CustomerRef(this.id, this.name);
 }
 
 class VisitStatisticsModel {
