@@ -10,6 +10,10 @@ extension DateFormatter on DateTime {
     String time = DateFormat('h:mm a').format(this);
     return '$weekday, $dayWithSuffix $month at $time';
   }
+
+  String get readableDate => DateFormat('dd/MM/yyyy').format(this);
+  String get readableTime => DateFormat('h:mm a').format(this);
+  String get readableDateTime2Line => "$readableDate \n $readableTime";
 }
 
 extension DateSuffix on int {
