@@ -1,7 +1,8 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
-abstract class VisitRepository {
+abstract class RemoteVisitRepository {
 
   Future<TaskResult<void>> createVisit({
     required int customerIdVisited,
@@ -10,6 +11,7 @@ abstract class VisitRepository {
     required String location,
     required String notes,
     required List<int> activityIdsDone,
+    DateTime? createdAt,
   });
 
   Future<TaskResult<List<Visit>>> getVisits({
@@ -34,4 +36,5 @@ abstract class VisitRepository {
   });
 
   Future<TaskResult<void>> deleteVisitById({required int visitId});
+
 }

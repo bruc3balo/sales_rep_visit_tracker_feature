@@ -1,12 +1,12 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain_remote_mapper.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/remote/remote_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/activity_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/activity/activity_supabase_api.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/network_base_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
-class SupabaseActivityRepository implements ActivityRepository {
+class SupabaseActivityRepository implements RemoteActivityRepository {
   final ActivitySupabaseApi _activityApi;
 
   SupabaseActivityRepository({required ActivitySupabaseApi activityApi}) : _activityApi = activityApi;

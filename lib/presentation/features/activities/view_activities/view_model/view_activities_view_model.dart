@@ -3,13 +3,13 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/activity_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/model/view_activities_models.dart';
 
 class ViewActivitiesViewModel extends ChangeNotifier {
-  final ActivityRepository _activityRepository;
+  final RemoteActivityRepository _activityRepository;
   int _page = 0;
   final SplayTreeSet<Activity> _activities = SplayTreeSet(
     (a, b) => a.id.compareTo(b.id),
@@ -18,7 +18,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
   ViewActivitiesState _itemsState = LoadedViewActivitiesState();
 
   ViewActivitiesViewModel({
-    required ActivityRepository activityRepository,
+    required RemoteActivityRepository activityRepository,
   }) : _activityRepository = activityRepository {
     loadMoreItems();
   }

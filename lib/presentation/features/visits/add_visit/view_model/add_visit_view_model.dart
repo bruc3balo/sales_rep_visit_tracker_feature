@@ -19,7 +19,7 @@ class AddVisitViewModel extends ChangeNotifier {
   AddVisitState get state => _state;
 
   Future<void> addNewVisit({
-    required int customerId,
+    required Customer customer,
     required DateTime visitDate,
     required VisitStatus status,
     required String location,
@@ -33,12 +33,12 @@ class AddVisitViewModel extends ChangeNotifier {
       notifyListeners();
 
       var addResult = await _addANewVisitUseCase.execute(
-        customerId: customerId,
+        customer: customer,
         visitDate: visitDate,
         status: status,
         location: location,
         notes: notes,
-        activitiesDoneIds: activities.map((e) => e.id).toList(),
+        activitiesDone: activities,
       );
 
       switch(addResult) {

@@ -13,6 +13,7 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/vie
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_details/view_model/view_visit_details_view_model.dart';
 
 enum AppRoutes {
+
   splashScreen("/"),
   home("/home"),
   addVisit("/addVisit"),
@@ -40,6 +41,9 @@ extension RoutePage on AppRoutes {
           addVisitViewModel: AddVisitViewModel(
             addANewVisitUseCase: AddANewVisitUseCase(
               visitRepository: GetIt.I(),
+              localUnsyncedVisitRepository: GetIt.I(),
+              localCustomerRepository: GetIt.I(),
+              localActivityRepository: GetIt.I(),
             ),
           ),
         ),

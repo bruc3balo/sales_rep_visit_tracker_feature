@@ -1,7 +1,8 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
-abstract class ActivityRepository {
+abstract class RemoteActivityRepository {
 
   Future<TaskResult<Activity>> createActivity({required String description});
 

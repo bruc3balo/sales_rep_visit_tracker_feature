@@ -1,7 +1,7 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
-abstract class CustomerRepository {
+abstract class RemoteCustomerRepository {
 
   Future<TaskResult<Customer>> createCustomer({required String name});
 

@@ -1,17 +1,24 @@
+import 'dart:io';
+
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain_remote_mapper.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/remote/remote_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/services/local_database/local_database_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/visit/visit_supabase_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/network_base_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
-class SupabaseVisitRepository implements VisitRepository {
+class SupabaseVisitRepository implements RemoteVisitRepository {
   final SupabaseVisitApi _visitApi;
+  final LocalDatabaseService _localDatabaseService;
 
   SupabaseVisitRepository({
     required SupabaseVisitApi visitApi,
-  }) : _visitApi = visitApi;
+    required LocalDatabaseService localDatabaseService,
+  }) : _visitApi = visitApi, _localDatabaseService = localDatabaseService;
 
   @override
   Future<TaskResult<void>> createVisit({
@@ -21,26 +28,38 @@ class SupabaseVisitRepository implements VisitRepository {
     required String location,
     required String notes,
     required List<int> activityIdsDone,
+    DateTime? createdAt,
   }) async {
-    var newVisitResponse = await _visitApi.sendAddVisitRequest(
-      customerId: customerIdVisited,
-      visitDate: visitDate,
-      status: status.capitalize,
-      location: location,
-      notes: notes,
-      activityIdsDone: activityIdsDone,
-      createdAt: DateTime.now(),
-    );
+    try {
+      var newVisitResponse = await _visitApi.sendAddVisitRequest(
+        customerId: customerIdVisited,
+        visitDate: visitDate,
+        status: status.capitalize,
+        location: location,
+        notes: notes,
+        activityIdsDone: activityIdsDone,
+        createdAt: createdAt ?? DateTime.now(),
+      );
 
-    switch (newVisitResponse) {
-      case FailNetworkResponse():
-        return ErrorResult(
-          error: newVisitResponse.description,
-          trace: newVisitResponse.trace,
-        );
-      case SuccessNetworkResponse():
-        //TODO: Refresh visits for newly created visit
-        return SuccessResult(data: null, message: "Visit created");
+      switch (newVisitResponse) {
+        case FailNetworkResponse():
+          return ErrorResult(
+            error: newVisitResponse.description,
+            trace: newVisitResponse.trace,
+          );
+        case SuccessNetworkResponse():
+          //TODO: Refresh visits for newly created visit
+          return SuccessResult(data: null, message: "Visit created");
+      }
+    } on SocketException catch(e, trace) {
+
+      return ErrorResult(
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.noInternet,
+      );
+
+
     }
   }
 
@@ -143,4 +162,6 @@ class SupabaseVisitRepository implements VisitRepository {
         );
     }
   }
+
+
 }

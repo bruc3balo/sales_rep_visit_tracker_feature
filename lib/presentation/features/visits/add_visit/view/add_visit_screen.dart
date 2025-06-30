@@ -230,7 +230,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                     List<Activity> activities = activitiesNotifier.value;
 
                     widget.addVisitViewModel.addNewVisit(
-                      customerId: customer.id,
+                      customer: customer,
                       visitDate: visitDate,
                       status: status,
                       location: location,

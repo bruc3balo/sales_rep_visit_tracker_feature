@@ -3,18 +3,18 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/customer_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/model/search_customers_models.dart';
 
 class SearchCustomersViewModel extends ChangeNotifier {
-  final CustomerRepository _customerRepository;
+  final RemoteCustomerRepository _customerRepository;
   final StreamController<ToastMessage> _toastMessage = StreamController.broadcast();
   SearchCustomerState _state = LoadedCustomersSearchState(searchResults: LinkedHashSet());
 
   SearchCustomersViewModel({
-    required CustomerRepository customerRepository,
+    required RemoteCustomerRepository customerRepository,
   }) : _customerRepository = customerRepository;
 
   SearchCustomerState get state => _state;

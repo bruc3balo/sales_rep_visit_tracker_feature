@@ -3,20 +3,20 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/activity_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/customer_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/model/search_activities_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/model/search_customers_models.dart';
 
 class SearchActivitiesViewModel extends ChangeNotifier {
-  final ActivityRepository _activityRepository;
+  final RemoteActivityRepository _activityRepository;
   final StreamController<ToastMessage> _toastMessage = StreamController.broadcast();
   SearchActivityState _state = LoadedActivitySearchState(searchResults: LinkedHashSet());
 
   SearchActivitiesViewModel({
-    required ActivityRepository activityRepository,
+    required RemoteActivityRepository activityRepository,
   }) : _activityRepository = activityRepository;
 
   SearchActivityState get state => _state;

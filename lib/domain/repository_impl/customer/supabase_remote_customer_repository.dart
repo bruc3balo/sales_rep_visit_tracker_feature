@@ -1,12 +1,12 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain_remote_mapper.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/remote/remote_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/customer_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/customer/customer_supabase_api.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/network_base_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
-class SupabaseCustomerRepository implements CustomerRepository {
+class SupabaseCustomerRepository implements RemoteCustomerRepository {
   final CustomerSupabaseApi _customerApi;
 
   SupabaseCustomerRepository({

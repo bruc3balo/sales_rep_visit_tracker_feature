@@ -1,0 +1,4 @@
+enum FailureType {
+  noInternet,
+  unknown
+}

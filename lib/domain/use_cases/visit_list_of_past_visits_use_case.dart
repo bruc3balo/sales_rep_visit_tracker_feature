@@ -1,19 +1,19 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/activity_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/customer_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 
 class VisitListOfPastVisitsUseCase {
-  final VisitRepository _visitRepository;
-  final ActivityRepository _activityRepository;
-  final CustomerRepository _customerRepository;
+  final RemoteVisitRepository _visitRepository;
+  final RemoteActivityRepository _activityRepository;
+  final RemoteCustomerRepository _customerRepository;
 
   VisitListOfPastVisitsUseCase({
-    required VisitRepository visitRepository,
-    required ActivityRepository activityRepository,
-    required CustomerRepository customerRepository,
+    required RemoteVisitRepository visitRepository,
+    required RemoteActivityRepository activityRepository,
+    required RemoteCustomerRepository customerRepository,
   })  : _visitRepository = visitRepository,
         _activityRepository = activityRepository,
         _customerRepository = customerRepository;

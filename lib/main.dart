@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:sales_rep_visit_tracker_feature/config/config.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/activity_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/customer_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/services/local_database/local_database_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/activity/activity_supabase_api.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/customer/customer_supabase_api.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/visit/visit_supabase_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/network_service.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/supabase_activity_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/supabase_customer_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/supabase_visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/activity/supabase_remote_activity_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/customer/supabase_remote_customer_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/visit/supabase_remote_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/service_impl/dio_network_service.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/service_impl/hive_local_database_service.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/count_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
-void main() {
+Future<void> main() async {
 
   /// Services
 
@@ -24,10 +28,17 @@ void main() {
   NetworkService ns = DioNetworkService();
   GetIt.I.registerSingleton(ns);
 
+  // Database
+  await Hive.initFlutter();
+  Hive.registerAdapter(UnSyncedLocalVisitAdapter());
+
+  LocalDatabaseService db = HiveLocalDatabaseService();
+  GetIt.I.registerSingleton(db);
+
   /// Repositories
 
   // Activity
-  ActivityRepository activityRepository = SupabaseActivityRepository(
+  RemoteActivityRepository activityRepository = SupabaseActivityRepository(
     activityApi: ActivitySupabaseApi(
       networkService: ns,
       baseUrl: supabaseBaseUrl,
@@ -37,7 +48,7 @@ void main() {
   GetIt.I.registerSingleton(activityRepository);
 
   // Customer
-  CustomerRepository customerRepository = SupabaseCustomerRepository(
+  RemoteCustomerRepository customerRepository = SupabaseCustomerRepository(
     customerApi: CustomerSupabaseApi(
       networkService: ns,
       baseUrl: supabaseBaseUrl,
@@ -47,7 +58,8 @@ void main() {
   GetIt.I.registerSingleton(customerRepository);
 
   // Visit
-  VisitRepository visitRepository = SupabaseVisitRepository(
+  RemoteVisitRepository visitRepository = SupabaseVisitRepository(
+    localDatabaseService: db,
     visitApi: SupabaseVisitApi(
       networkService: ns,
       baseUrl: supabaseBaseUrl,
