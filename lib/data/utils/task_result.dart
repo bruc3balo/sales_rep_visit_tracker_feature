@@ -5,7 +5,7 @@ sealed class TaskResult<T> {}
 final class ErrorResult<T> extends TaskResult<T> {
   final String error;
   final StackTrace? trace;
-  final FailureType? failure;
+  final FailureType failure;
 
   ErrorResult({
     required this.error,

@@ -1,11 +1,11 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain_local_mapper.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/models/local/local_value_objects.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/local_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/local_unsynced_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class AddANewVisitUseCase {
@@ -46,41 +46,48 @@ class AddANewVisitUseCase {
 
      case ErrorResult<void>():
 
-       //Offline storage
-       var localSaveResult = await _localUnsyncedVisitRepository.setUnsyncedVisit(
-         visit: UnSyncedLocalVisit(
-           customerIdVisited: customer.id,
-           visitDate: visitDate,
-           status: status.capitalize,
-           location: location,
-           notes: notes,
-           activityIdsDone: activitiesDone.map((a) => a.id).toList(),
-           createdAt: DateTime.now(),
-         ),
-       );
+       //Store offline if error is no internet
+       if(FailureType.noInternet == result.failure) {
+         //Offline storage
+         var localSaveResult = await _localUnsyncedVisitRepository
+             .setUnsyncedVisit(
+           visit: UnSyncedLocalVisit(
+             customerIdVisited: customer.id,
+             visitDate: visitDate,
+             status: status.capitalize,
+             location: location,
+             notes: notes,
+             activityIdsDone: activitiesDone.map((a) => a.id).toList(),
+             createdAt: DateTime.now(),
+           ),
+         );
 
-       switch(localSaveResult) {
-
-         case ErrorResult<void>():
-           return ErrorResult(
-             error: localSaveResult.error,
-             trace: localSaveResult.trace,
-           );
-         case SuccessResult<void>():
-
+         switch (localSaveResult) {
+           case ErrorResult<void>():
+             return ErrorResult(
+               error: localSaveResult.error,
+               trace: localSaveResult.trace,
+             );
+           case SuccessResult<void>():
            //Cache activity and customer for offline resolution async
-           _localActivityRepository.setLocalActivities(
-               activities: activitiesDone.map((a) => a.toLocal).toList()
-           );
+             _localActivityRepository.setLocalActivities(
+                 activities: activitiesDone.map((a) => a.toLocal).toList()
+             );
 
-           _localCustomerRepository.setLocalCustomer(
-               customer: customer.toLocal
-           );
+             _localCustomerRepository.setLocalCustomer(
+                 customer: customer.toLocal
+             );
 
-           return SuccessResult(data: null, message: "Visit created offline, will be synced later");
-
+             return SuccessResult(data: null,
+                 message: "Visit created offline, will be synced later");
+         }
        }
 
+       return ErrorResult(
+           error: result.error,
+           trace: result.trace,
+           failure: result.failure,
+       );
      case SuccessResult<void>():
        return result;
    }

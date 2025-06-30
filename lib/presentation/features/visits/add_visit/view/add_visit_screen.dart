@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view/search_activities_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view/search_customers_screen.dart';
@@ -36,7 +38,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add visit"),
+        title: Text("New Visit"),
       ),
       body: ListenableBuilder(
         listenable: widget.addVisitViewModel,
@@ -62,126 +64,17 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                     );
                   },
                   title: Text("Customer"),
-                  subtitle: ValueListenableBuilder(
-                    valueListenable: customerNotifier,
-                    builder: (_, customer, __) {
-                      if (customer == null) return Text("Tap to select a customer");
-                      return Text(customer.name);
-                    },
-                  ),
-                ),
-              ),
-
-              // Activity search
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ValueListenableBuilder(
-                  valueListenable: activitiesNotifier,
-                  builder: (_, activities, __) {
-                    return ExpansionTile(
-                      leading: IconButton(
-                        onPressed: () {
-                          //Select activity
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              return ActivitySearchDialog(
-                                searchActivitiesViewModel: widget.searchActivitiesViewModel,
-                                onSelect: (a) {
-                                  if (activitiesNotifier.value.any((e) => e.id == a.id)) return;
-                                  activitiesNotifier.value.add(a);
-                                  activitiesNotifier.value = List.from(activitiesNotifier.value);
-                                },
-                              );
-                            },
-                          );
-                        },
-                        icon: Icon(Icons.add),
-                      ),
-                      title: Text("Activity"),
-                      subtitle: Visibility(
-                        visible: activities.isEmpty,
-                        replacement: Text("${activities.length} activities done"),
-                        child: Text("Tap to add an activity"),
-                      ),
-                      children: activities
-                          .map(
-                            (a) => ListTile(
-                              title: Text(a.description),
-                              trailing: IconButton(
-                                onPressed: () {
-                                  activitiesNotifier.value.remove(a);
-                                  activitiesNotifier.value = List.from(activitiesNotifier.value);
-                                },
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    );
-                  },
-                ),
-              ),
-
-              // Visit status
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ValueListenableBuilder(
-                  valueListenable: visitStatusNotifier,
-                  builder: (_, visitStatus, __) {
-                    return DropdownMenu<VisitStatus>(
-                      trailingIcon: SizedBox.shrink(),
-                      width: double.infinity,
-                      initialSelection: visitStatus,
-                      label: Text("Status"),
-                      hintText: "What is the status of your visit",
-                      dropdownMenuEntries: VisitStatus.values
-                          .map(
-                            (o) => DropdownMenuEntry<VisitStatus>(
-                              value: o,
-                              label: o.capitalize,
-                              style: ButtonStyle(
-                                foregroundColor: WidgetStatePropertyAll(
-                                  Colors.black,
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onSelected: (o) {
-                        visitStatusNotifier.value = o;
+                  subtitle: wrappedContainer(
+                    child: ValueListenableBuilder(
+                      valueListenable: customerNotifier,
+                      builder: (_, customer, __) {
+                        if (customer == null) {
+                          return Text("Tap to select a customer");
+                        }
+                        return Text(customer.name);
                       },
-                    );
-                  },
-                ),
-              ),
-
-              // Location
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: locationController,
-                  decoration: InputDecoration(
-                    labelText: "Location",
-                    hintText: "Where is the visit located",
+                    ),
                   ),
-                ),
-              ),
-
-              // Notes
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: notesController,
-                  decoration: InputDecoration(
-                    labelText: "Notes",
-                    hintText: "Write your findings",
-                  ),
-                  maxLines: null,
-                  minLines: 4,
                 ),
               ),
 
@@ -197,14 +90,160 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                     );
 
                     if (date == null) return;
-                    visitDateNotifier.value = date;
+                    if (!context.mounted) return;
+
+                    var time = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                    );
+
+                    if (time == null) return;
+                    if (!context.mounted) return;
+
+                    visitDateNotifier.value = date.copyWith(
+                      hour: time.hour,
+                      minute: time.minute,
+                    );
                   },
                   title: Text("Visit date"),
+                  subtitle: wrappedContainer(
+                    child: ValueListenableBuilder(
+                        valueListenable: visitDateNotifier,
+                        builder: (_, visitDate, __) {
+                         return Text(visitDate.humanReadable);
+                        },
+                    ),
+                  ),
+                ),
+              ),
+
+              // Visit status
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text("Visit status"),
                   subtitle: ValueListenableBuilder(
-                      valueListenable: visitDateNotifier,
-                      builder: (_, visitDate, __) {
-                        return Text(visitDate.toString());
-                      }),
+                    valueListenable: visitStatusNotifier,
+                    builder: (_, visitStatus, __) {
+                      return DropdownMenu<VisitStatus>(
+                        trailingIcon: SizedBox.shrink(),
+                        width: double.infinity,
+                        initialSelection: visitStatus,
+                        hintText: "What is the status of your visit",
+                        dropdownMenuEntries: VisitStatus.values
+                            .map(
+                              (o) => DropdownMenuEntry<VisitStatus>(
+                            value: o,
+                            label: o.capitalize,
+                            style: ButtonStyle(
+                              foregroundColor: WidgetStatePropertyAll(
+                                Colors.black,
+                              ),
+                            ),
+                          ),
+                        ).toList(),
+                        onSelected: (o) {
+                          visitStatusNotifier.value = o;
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              // Activity search
+              ValueListenableBuilder(
+                valueListenable: activitiesNotifier,
+                builder: (_, activities, __) {
+
+                  return ListTile(
+                    title: ListTile(
+                      title: Text("Activities"),
+                      trailing: CircleAvatar(
+                        child: IconButton(
+                            onPressed: () {
+                              //Select activity
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return ActivitySearchDialog(
+                                    searchActivitiesViewModel: widget.searchActivitiesViewModel,
+                                    onSelect: (a) {
+                                      if (activitiesNotifier.value.any((e) => e.id == a.id)) return;
+                                      activitiesNotifier.value.add(a);
+                                      activitiesNotifier.value = List.from(activitiesNotifier.value);
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            icon: Icon(Icons.add)
+                        ),
+                      ),
+                    ),
+                    subtitle: wrappedContainer(
+                        child: Visibility(
+                      visible: activities.isNotEmpty,
+                      replacement: Text("Tap to add an activity"),
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxHeight: 300,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: activities
+                              .map(
+                                (a) => ListTile(
+                              title: Text(a.description),
+                              trailing: IconButton(
+                                onPressed: () {
+                                  activitiesNotifier.value.remove(a);
+                                  activitiesNotifier.value = List.from(activitiesNotifier.value);
+                                },
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          )
+                              .toList(),
+                        ),
+                      ),
+                    ),
+                    ),
+                  );
+
+                },
+              ),
+
+              // Location
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text("Location"),
+                  subtitle: TextFormField(
+                    controller: locationController,
+                    decoration: InputDecoration(
+                      hintText: "Where is the visit located",
+                    ),
+                  ),
+                ),
+              ),
+
+              // Notes
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ListTile(
+                  title: Text("Notes"),
+                  subtitle: TextFormField(
+                    controller: notesController,
+                    decoration: InputDecoration(
+                      hintText: "Add any relevant notes",
+                    ),
+                    maxLines: null,
+                    minLines: 4,
+                  ),
                 ),
               ),
 

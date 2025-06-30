@@ -9,7 +9,7 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
 
 class ActivitySearchDialog extends StatelessWidget {
-  const ActivitySearchDialog({
+   ActivitySearchDialog({
     this.initialActivity,
     required this.searchActivitiesViewModel,
     required this.onSelect,
@@ -19,6 +19,15 @@ class ActivitySearchDialog extends StatelessWidget {
   final Activity? initialActivity;
   final SearchActivitiesViewModel searchActivitiesViewModel;
   final Function(Activity) onSelect;
+  final TextEditingController searchController = TextEditingController();
+
+  void search () {
+    String query = searchController.text;
+    searchActivitiesViewModel.searchActivities(
+      activityDescription: query,
+      pageSize: min(query.length, 20),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +39,11 @@ class ActivitySearchDialog extends StatelessWidget {
           direction: Axis.vertical,
           children: [
             TextFormField(
-              onFieldSubmitted: (s) {
-                searchActivitiesViewModel.searchActivities(
-                  activityDescription: s,
-                  pageSize: min(s.length, 20),
-                );
-              },
+              controller: searchController,
+              onFieldSubmitted: (s) => search(),
               decoration: InputDecoration(
-                hintText: "Search by customer name ...",
+                hintText: "Search by activity description ...",
+                suffix: IconButton(onPressed: search, icon: Icon(Icons.search),)
               ),
             ),
             ListenableBuilder(
