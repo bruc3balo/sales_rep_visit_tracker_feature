@@ -40,6 +40,9 @@ class HomeScreen extends StatelessWidget {
                       );
                       break;
                     case HomePages.activities:
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.addActivity.path,
+                      );
                       break;
                     case HomePages.customers:
                       break;

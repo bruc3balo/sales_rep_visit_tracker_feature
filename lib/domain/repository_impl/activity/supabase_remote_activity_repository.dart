@@ -14,7 +14,10 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
   @override
   Future<TaskResult<Activity>> createActivity({required String description}) async {
     //Check if similar activity exists
-    var duplicateCheckResponse = await _activityApi.sendGetActivityRequest(equalDescription: description, page: 0, pageSize: 1);
+    var duplicateCheckResponse = await _activityApi.sendGetActivityRequest(
+        equalDescription: description, page: 0, pageSize: 1
+    );
+
 
     switch (duplicateCheckResponse) {
       case FailNetworkResponse():
@@ -24,8 +27,9 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
         );
 
       case SuccessNetworkResponse():
+
         var data = (duplicateCheckResponse.data as List<dynamic>);
-        bool duplicateActivity = data.isEmpty;
+        bool duplicateActivity = data.isNotEmpty;
         if (duplicateActivity) {
           return ErrorResult(
             error: "Activity with description exists",

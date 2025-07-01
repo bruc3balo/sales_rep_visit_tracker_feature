@@ -38,6 +38,10 @@ class ViewActivitiesScreen extends StatelessWidget {
                 }
                 var activity = activities[index];
                 return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.grey.shade300,
+                    child: Icon(Icons.run_circle_outlined, color: Colors.black,),
+                  ),
                   title: Text(activity.description),
                 );
               },

@@ -38,6 +38,10 @@ class ViewCustomersScreen extends StatelessWidget {
                 }
                 var customer = customers[index];
                 return ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.grey.shade300,
+                    child: Icon(Icons.person, color: Colors.black,),
+                  ),
                   title: Text(customer.name),
                 );
               },
