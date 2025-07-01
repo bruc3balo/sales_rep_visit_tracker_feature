@@ -77,7 +77,21 @@ class VisitTile extends StatelessWidget {
           ),
 
           child: badges.Badge(
+            position: badges.BadgePosition.topEnd(),
+            badgeAnimation: badges.BadgeAnimation.scale(
+              toAnimate: true,
+              curve: Curves.slowMiddle,
+              loopAnimation: false,
+            ),
+            stackFit: StackFit.passthrough,
             badgeContent: Text(visit.activityMap.length.toString()),
+            badgeStyle: badges.BadgeStyle(
+              badgeColor: Colors.white,
+              borderSide: BorderSide(
+                color: Colors.cyan,
+
+              ),
+            ),
             child: Icon(Icons.business_outlined),
           ),
       ),
