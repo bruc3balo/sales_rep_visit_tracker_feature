@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit_list_of_past_visits_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/delete_activity_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/update_activity_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/view_local_activities_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/view_remote_activities_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/view/view_activities_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/view_model/view_activities_view_model.dart';
@@ -88,11 +92,23 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             HomePages.activities => ViewActivitiesScreen(
-              remoteActivityRepository: GetIt.I(),
-                viewActivitiesViewModel: ViewActivitiesViewModel(
-                  activityRepository: GetIt.I(),
-                ),
+              updateActivityUseCase: UpdateActivityUseCase(
+                remoteActivityRepository: GetIt.I(),
+                localActivityRepository: GetIt.I(),
               ),
+              viewActivitiesViewModel: ViewActivitiesViewModel(
+                  remoteActivitiesUseCase: ViewRemoteActivitiesUseCase(
+                    remoteActivityRepository: GetIt.I(),
+                  ),
+                  localActivitiesUseCase: ViewLocalActivitiesUseCase(
+                    localActivityRepository: GetIt.I(),
+                  ),
+                  deleteActivityUseCase: DeleteActivityUseCase(
+                    remoteActivityRepository: GetIt.I(),
+                    localActivityRepository: GetIt.I(),
+                  ),
+              ),
+            ),
             HomePages.customers => ViewCustomersScreen(
               remoteCustomerRepository: GetIt.I(),
                 viewCustomersViewModel: ViewCustomersViewModel(
@@ -103,14 +119,12 @@ class HomeScreen extends StatelessWidget {
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: homeViewModel.currentPage.index,
             onTap: homeViewModel.changePage,
-            items: homeViewModel.homePages
-                .map(
+            items: homeViewModel.homePages.map(
                   (p) => BottomNavigationBarItem(
                     icon: Icon(p.iconData),
                     label: p.label,
                   ),
-                )
-                .toList(),
+                ).toList(),
           ),
         );
       },

@@ -3,7 +3,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 abstract class RemoteCustomerRepository {
 
-  Future<TaskResult<Customer>> createCustomer({required String name});
+  Future<TaskResult<void>> createCustomer({required String name});
 
   Future<TaskResult<List<Customer>>> getCustomers({
     List<int>? ids,
@@ -14,7 +14,7 @@ abstract class RemoteCustomerRepository {
     String? order,
   });
 
-  Future<TaskResult<Customer>> updateCustomer({
+  Future<TaskResult<void>> updateCustomer({
     required int customerId,
     String? name,
   });

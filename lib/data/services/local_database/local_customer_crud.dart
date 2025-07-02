@@ -8,14 +8,27 @@ abstract class LocalCustomerCrud {
     required LocalCustomer customer,
   });
 
+  Future<TaskResult<void>> setLocalCustomers({
+    required List<LocalCustomer> customers,
+  });
+
   Future<TaskResult<List<LocalCustomer>>> getLocalCustomers({
     required int page,
     required int pageSize,
   });
 
+  Future<TaskResult<List<LocalCustomer>>> searchLocalCustomers({
+    required int page,
+    required int pageSize,
+    required String likeName,
+  });
+
   Future<TaskResult<Map<int, LocalCustomer>>> getLocalCustomerByIds({
     required List<int> ids,
   });
+
+  Future<TaskResult<void>> deleteLocalCustomer({required int customerId});
+
 
   Future<TaskResult<void>> clearAllLocalCustomers();
 

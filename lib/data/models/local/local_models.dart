@@ -62,11 +62,16 @@ class LocalActivity extends HiveObject {
   String description;
 
   @HiveField(2)
+  DateTime createdAt;
+
+  @HiveField(3)
   DateTime updatedAt;
+
 
   LocalActivity({
     required this.id,
     required this.description,
+    required this.createdAt,
     required this.updatedAt,
   });
 }
@@ -81,11 +86,15 @@ class LocalCustomer extends HiveObject {
   String name;
 
   @HiveField(2)
+  DateTime createdAt;
+
+  @HiveField(3)
   DateTime updatedAt;
 
   LocalCustomer({
     required this.id,
     required this.name,
+    required this.createdAt,
     required this.updatedAt,
   });
 }

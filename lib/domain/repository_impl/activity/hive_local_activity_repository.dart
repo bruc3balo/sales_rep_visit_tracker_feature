@@ -29,4 +29,28 @@ class HiveLocalActivityRepository extends LocalActivityRepository {
   Future<TaskResult<void>> setLocalActivities({required List<LocalActivity> activities}) async {
     return await _localActivityCrud.setLocalActivities(activities: activities);
   }
+
+  @override
+  Future<TaskResult<List<LocalActivity>>> fetchLocalActivities({required int page, required int pageSize}) async {
+    return await _localActivityCrud.getLocalActivities(page: page, pageSize: pageSize);
+  }
+
+  @override
+  Future<TaskResult<void>> deleteLocalActivity({required int activityId}) async {
+    return await _localActivityCrud.deleteLocalActivity(activityId: activityId);
+  }
+
+  @override
+  Future<TaskResult<List<LocalActivity>>> searchLocalActivities({
+    required String likeDescription, 
+    required int page,
+    required int pageSize,
+  }) async {
+    return await _localActivityCrud.searchLocalActivities(
+      likeDescription: likeDescription, 
+      page: page, 
+      pageSize: pageSize,
+    );
+  }
+
 }

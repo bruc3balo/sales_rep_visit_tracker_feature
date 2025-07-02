@@ -4,7 +4,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 abstract class RemoteActivityRepository {
 
-  Future<TaskResult<Activity>> createActivity({required String description});
+  Future<TaskResult<void>> createActivity({required String description});
 
   Future<TaskResult<List<Activity>>> getActivities({
     List<int>? ids,
@@ -15,7 +15,7 @@ abstract class RemoteActivityRepository {
     String? order,
   });
 
-  Future<TaskResult<Activity>> updateActivity({
+  Future<TaskResult<void>> updateActivity({
     required int activityId,
     String? description,
   });

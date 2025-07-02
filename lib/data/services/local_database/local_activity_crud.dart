@@ -17,9 +17,17 @@ abstract class LocalActivityCrud {
     required int pageSize,
   });
 
+  Future<TaskResult<List<LocalActivity>>> searchLocalActivities({
+    required String likeDescription,
+    required int page,
+    required int pageSize,
+  });
+
   Future<TaskResult<Map<int, LocalActivity>>> getLocalActivitiesByIds({
     required List<int> ids,
   });
+
+  Future<TaskResult<void>> deleteLocalActivity({required int activityId});
 
   Future<TaskResult<void>> clearAllLocalActivities();
 

@@ -190,4 +190,99 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     }
   }
 
+  @override
+  Future<TaskResult<void>> deleteLocalActivity({required int activityId}) async {
+    try {
+      var box = await openUnsyncedBox;
+      await box.delete(activityId);
+      return SuccessResult(data: null);
+    } catch(e, trace) {
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
+    }
+  }
+
+  @override
+  Future<TaskResult<List<LocalActivity>>> searchLocalActivities({
+    required String likeDescription,
+    required int page,
+    required int pageSize
+  }) async {
+    try {
+
+      var box = await openActivityBox;
+
+      var data = box.values
+          .where((e) => e.description.toLowerCase().contains(likeDescription.toLowerCase()))
+          .skip(page * pageSize)
+          .take(pageSize)
+          .toList();
+
+      return SuccessResult(data: data);
+
+    } catch(e, trace) {
+      return ErrorResult(
+          error: e.toString(),
+          trace: trace,
+          failure: FailureType.localDatabase,
+      );
+    }
+  }
+
+  @override
+  Future<TaskResult<void>> deleteLocalCustomer({
+    required int customerId
+  }) async {
+    try {
+      var box = await openCustomerBox;
+      await box.delete(customerId);
+      return SuccessResult(data: null);
+    } catch(e, trace) {
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
+    }
+  }
+
+  @override
+  Future<TaskResult<List<LocalCustomer>>> searchLocalCustomers({
+    required int page,
+    required int pageSize,
+    required String likeName,
+  }) async {
+    try {
+
+      var box = await openCustomerBox;
+
+      var data = box.values
+          .where((e) => e.name.toLowerCase().contains(likeName.toLowerCase()))
+          .skip(page * pageSize)
+          .take(pageSize)
+          .toList();
+
+      return SuccessResult(data: data);
+
+    } catch(e, trace) {
+      return ErrorResult(
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.localDatabase,
+      );
+    }
+  }
+
+  @override
+  Future<TaskResult<void>> setLocalCustomers({
+    required List<LocalCustomer> customers,
+  }) async {
+    try {
+      var box = await openCustomerBox;
+      await box.putAll({for(var a in customers) a.id : a});
+      return SuccessResult(data: null);
+    } catch(e, trace) {
+      return ErrorResult(
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.localDatabase,
+      );
+    }
+  }
+
 }

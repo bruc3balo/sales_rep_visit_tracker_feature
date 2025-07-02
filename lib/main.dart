@@ -9,6 +9,8 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/local_unsynced_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/connectivity_plus_connection_service.dart';
+import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/connectivity_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/local_database/local_database_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/activity/activity_supabase_api.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/customer/customer_supabase_api.dart';
@@ -22,7 +24,7 @@ import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/visit/hiv
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/visit/supabase_remote_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/service_impl/dio_network_service.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/service_impl/hive_local_database_service.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/count_visit_statistics_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/dark_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/light_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
@@ -42,6 +44,10 @@ Future<void> main() async {
 
   LocalDatabaseService db = HiveLocalDatabaseService();
   GetIt.I.registerSingleton(db);
+
+  // Connectivity
+  ConnectivityService connectivityService = ConnectivityPlusConnectionService();
+  GetIt.I.registerSingleton(connectivityService);
 
   /// Repositories
 

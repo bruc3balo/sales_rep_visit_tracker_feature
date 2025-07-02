@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/sync_unsynced_local_visits_use_case.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/view_unsynced_local_visits_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/view_unsynced_local_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/model/view_unsynced_visits_model.dart';
 
 class ViewUnsyncedVisitsViewModel extends ChangeNotifier {
@@ -27,6 +27,8 @@ class ViewUnsyncedVisitsViewModel extends ChangeNotifier {
         _syncUnsyncedLocalVisitsUseCase = syncUnsyncedLocalVisitsUseCase;
 
   UnsyncedVisitsState get state => _state;
+
+  List<UnsyncedVisitAggregate> get unsyncedVisits => UnmodifiableListView(_visits);
 
   Future<void> sync() async {
     if (_state is! DisplayingUnsyncedVisitState) return;

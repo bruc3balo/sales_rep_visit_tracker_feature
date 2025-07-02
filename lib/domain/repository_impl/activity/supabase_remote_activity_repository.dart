@@ -12,7 +12,7 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
   SupabaseActivityRepository({required ActivitySupabaseApi activityApi}) : _activityApi = activityApi;
 
   @override
-  Future<TaskResult<Activity>> createActivity({required String description}) async {
+  Future<TaskResult<void>> createActivity({required String description}) async {
     //Check if similar activity exists
     var duplicateCheckResponse = await _activityApi.sendGetActivityRequest(
         equalDescription: description, page: 0, pageSize: 1
@@ -48,23 +48,7 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
         );
 
       case SuccessNetworkResponse():
-        var fetchCreatedActivity = await _activityApi.sendGetActivityRequest(
-          equalDescription: description,
-          pageSize: 1,
-          page: 0,
-        );
-        switch (fetchCreatedActivity) {
-          case FailNetworkResponse():
-            return ErrorResult(
-              error: fetchCreatedActivity.description,
-              trace: fetchCreatedActivity.trace,
-            );
-
-          case SuccessNetworkResponse():
-            //Cache activity by id
-            var data = (fetchCreatedActivity.data as List<dynamic>).map((e) => RemoteActivity.fromJson(e)).first;
-            return SuccessResult(data: data.toDomain, message: "Activity created");
-        }
+       return SuccessResult(data: null, message: "Activity created");
     }
   }
 
@@ -124,7 +108,7 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
   }
 
   @override
-  Future<TaskResult<Activity>> updateActivity({
+  Future<TaskResult<void>> updateActivity({
     required int activityId,
     String? description,
   }) async {
@@ -140,24 +124,7 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
           trace: updateActivityResponse.trace,
         );
       case SuccessNetworkResponse():
-
-        var fetchUpdatedActivity = await _activityApi.sendGetActivityRequest(
-          ids: [activityId],
-          pageSize: 1,
-          page: 0,
-        );
-        switch (fetchUpdatedActivity) {
-          case FailNetworkResponse():
-            return ErrorResult(
-              error: fetchUpdatedActivity.description,
-              trace: fetchUpdatedActivity.trace,
-            );
-
-          case SuccessNetworkResponse():
-          //Cache activity by id
-            var data = (fetchUpdatedActivity.data as List<dynamic>).map((e) => RemoteActivity.fromJson(e)).first;
-            return SuccessResult(data: data.toDomain, message: "Activity updated");
-        }
+        return SuccessResult(data: null, message: "Activity updated");
     }
   }
 }

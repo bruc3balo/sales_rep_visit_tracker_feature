@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/update_activity_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/edit_activity/view/edit_activity_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/edit_activity/view_model/edit_activity_view_model.dart';
@@ -12,12 +13,12 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/activities
 class ViewActivitiesScreen extends StatelessWidget {
   const ViewActivitiesScreen({
     required this.viewActivitiesViewModel,
-    required this.remoteActivityRepository,
+    required this.updateActivityUseCase,
     super.key,
   });
 
   final ViewActivitiesViewModel viewActivitiesViewModel;
-  final RemoteActivityRepository remoteActivityRepository;
+  final UpdateActivityUseCase updateActivityUseCase;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +93,7 @@ class ViewActivitiesScreen extends StatelessWidget {
                                   builder: (context) {
                                     return EditActivityScreen(
                                       editActivityViewModel: EditActivityViewModel(
-                                        remoteActivityRepository: remoteActivityRepository,
+                                        updateActivityUseCase: updateActivityUseCase,
                                         activity: activity,
                                       ),
                                     );

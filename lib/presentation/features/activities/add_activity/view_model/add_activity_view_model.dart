@@ -2,19 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/create_activity_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/model/add_activity_models.dart';
 
 class AddActivityViewModel extends ChangeNotifier {
-  final RemoteActivityRepository _remoteActivityRepository;
+  final CreateActivityUseCase _createActivityUseCase;
   final StreamController<ToastMessage> _toastStream = StreamController.broadcast();
   AddActivityState _state = InitialAddActivityState();
 
   AddActivityViewModel({
-    required RemoteActivityRepository remoteActivityRepository
-  }) : _remoteActivityRepository = remoteActivityRepository;
+    required CreateActivityUseCase createActivityUseCase
+  }) : _createActivityUseCase = createActivityUseCase;
 
 
   AddActivityState get state => _state;
@@ -27,11 +27,9 @@ class AddActivityViewModel extends ChangeNotifier {
       _state = LoadingAddActivityState();
       notifyListeners();
 
-      var result = await _remoteActivityRepository.createActivity(
+      var result = await _createActivityUseCase.execute(
         description: description,
       );
-
-      print('$result');
 
       switch(result) {
 

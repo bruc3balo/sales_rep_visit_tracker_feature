@@ -1,7 +1,8 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/remote/remote_models.dart';
 
-extension ActivityDomainMapper on RemoteActivity {
+extension RemoteActivityDomainMapper on RemoteActivity {
   Activity get toDomain => Activity(id: id, description: description, createdAt: createdAt);
 }
 
@@ -21,4 +22,3 @@ extension VisitDomainMapper on RemoteVisit {
         createdAt: createdAt,
       );
 }
-

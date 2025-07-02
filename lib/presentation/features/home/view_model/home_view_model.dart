@@ -4,7 +4,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/count_unsynced_visit_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_unsynced_visit_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/home/model/home_models.dart';
 
 class HomeViewModel extends ChangeNotifier {

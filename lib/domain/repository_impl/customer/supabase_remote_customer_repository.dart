@@ -14,7 +14,7 @@ class SupabaseCustomerRepository implements RemoteCustomerRepository {
   }) : _customerApi = customerApi;
 
   @override
-  Future<TaskResult<Customer>> createCustomer({required String name}) async {
+  Future<TaskResult<void>> createCustomer({required String name}) async {
     //Check duplicates
     var duplicateResponse = await _customerApi.sendGetCustomersRequest(
       equalName: name,
@@ -47,19 +47,7 @@ class SupabaseCustomerRepository implements RemoteCustomerRepository {
           trace: createResponse.trace,
         );
       case SuccessNetworkResponse():
-        var fetchCreatedCustomer = await _customerApi.sendGetCustomersRequest(equalName: name, pageSize: 1, page: 0);
-
-        switch (fetchCreatedCustomer) {
-          case FailNetworkResponse():
-            return ErrorResult(
-              error: fetchCreatedCustomer.description,
-              trace: fetchCreatedCustomer.trace,
-            );
-          case SuccessNetworkResponse():
-            //Cache customer by id
-            var data = (fetchCreatedCustomer.data as List<dynamic>).map((e) => RemoteCustomer.fromJson(e)).first;
-            return SuccessResult(data: data.toDomain, message: "Customer created");
-        }
+       return SuccessResult(data: null, message: "Customer created");
     }
   }
 
@@ -115,7 +103,7 @@ class SupabaseCustomerRepository implements RemoteCustomerRepository {
   }
 
   @override
-  Future<TaskResult<Customer>> updateCustomer({
+  Future<TaskResult<void>> updateCustomer({
     required int customerId,
     String? name,
   }) async {
@@ -132,23 +120,7 @@ class SupabaseCustomerRepository implements RemoteCustomerRepository {
           trace: updateCustomerResponse.trace,
         );
       case SuccessNetworkResponse():
-        var fetchUpdatedCustomer = await _customerApi.sendGetCustomersRequest(
-            ids: [customerId],
-            page: 0,
-            pageSize: 1,
-        );
-
-        switch (fetchUpdatedCustomer) {
-          case FailNetworkResponse():
-            return ErrorResult(
-              error: fetchUpdatedCustomer.description,
-              trace: fetchUpdatedCustomer.trace,
-            );
-          case SuccessNetworkResponse():
-          //Cache customer by id
-            var data = (fetchUpdatedCustomer.data as List<dynamic>).map((e) => RemoteCustomer.fromJson(e)).first;
-            return SuccessResult(data: data.toDomain, message: "Customer updated");
-        }
+          return SuccessResult(data: null, message: "Customer updated");
     }
   }
 }

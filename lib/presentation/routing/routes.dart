@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/add_a_new_visit_use_case.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/count_unsynced_visit_use_case.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/sync_unsynced_local_visits_use_case.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/view_unsynced_local_visits_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/create_activity_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/add_a_new_visit_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_unsynced_visit_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/view_unsynced_local_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/view/add_activity_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/view_model/add_activity_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
@@ -29,6 +30,7 @@ enum AppRoutes {
   addActivity("/addActivity"),
   addCustomer("/addCustomer"),
   visitDetails("/visitDetails"),
+  unsyncedVisitDetails("/unsyncedVisitDetails"),
   visitUnsyncedVisits("/visitUnsyncedVisits");
 
   final String path;
@@ -49,7 +51,7 @@ extension RoutePage on AppRoutes {
         ),
       AppRoutes.addVisit => AddVisitScreen(
           searchActivitiesViewModel: SearchActivitiesViewModel(
-            activityRepository: GetIt.I(),
+            searchRemoteActivitiesUseCase: GetIt.I(),
           ),
           searchCustomersViewModel: SearchCustomersViewModel(
             customerRepository: GetIt.I(),
@@ -70,7 +72,10 @@ extension RoutePage on AppRoutes {
         ),
       AppRoutes.addActivity => AddActivityScreen(
           addActivityViewModel: AddActivityViewModel(
-              remoteActivityRepository: GetIt.I(),
+              createActivityUseCase: CreateActivityUseCase(
+                remoteActivityRepository: GetIt.I(),
+                localActivityRepository: GetIt.I(),
+              ),
           ),
       ),
       AppRoutes.addCustomer => AddCustomerScreen(
@@ -91,6 +96,7 @@ extension RoutePage on AppRoutes {
             ),
         ),
       ),
+      AppRoutes.unsyncedVisitDetails => Placeholder(),
     };
   }
 }

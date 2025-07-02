@@ -6,15 +6,25 @@ abstract class LocalCustomerRepository {
 
   Future<TaskResult<void>> setLocalCustomer({required LocalCustomer customer});
 
-  Future<TaskResult<List<LocalCustomer>>> getLocalCustomers({
+  Future<TaskResult<void>> setLocalCustomers({required List<LocalCustomer> customer});
+
+  Future<TaskResult<List<Customer>>> getLocalCustomers({
     required int page,
     required int pageSize,
   });
 
-  Future<TaskResult<Map<int, LocalCustomer>>> getLocalCustomersByIds({
+  Future<TaskResult<Map<int, Customer>>> getLocalCustomersByIds({
     required List<int> customerIds,
   });
 
+  Future<TaskResult<void>> deleteLocalCustomer({required int customerId});
+
   Future<TaskResult<void>> clearLocalCustomers();
+
+  Future<TaskResult<List<Customer>>> searchLocalCustomers({
+    required int page,
+    required int pageSize,
+    required String likeName,
+  });
 
 }
