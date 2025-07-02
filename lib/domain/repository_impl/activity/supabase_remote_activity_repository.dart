@@ -125,11 +125,12 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
 
   @override
   Future<TaskResult<Activity>> updateActivity({
-    required Activity activity,
+    required int activityId,
+    String? description,
   }) async {
     var updateActivityResponse = await _activityApi.sendUpdateActivityRequest(
-      activityId: activity.id,
-      description: activity.description,
+      activityId: activityId,
+      description: description,
     );
 
     switch (updateActivityResponse) {
@@ -139,12 +140,24 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
           trace: updateActivityResponse.trace,
         );
       case SuccessNetworkResponse():
-        var data = RemoteActivity.fromJson(updateActivityResponse.data).toDomain;
 
-        return SuccessResult(
-          message: "Activity updated",
-          data: data,
+        var fetchUpdatedActivity = await _activityApi.sendGetActivityRequest(
+          ids: [activityId],
+          pageSize: 1,
+          page: 0,
         );
+        switch (fetchUpdatedActivity) {
+          case FailNetworkResponse():
+            return ErrorResult(
+              error: fetchUpdatedActivity.description,
+              trace: fetchUpdatedActivity.trace,
+            );
+
+          case SuccessNetworkResponse():
+          //Cache activity by id
+            var data = (fetchUpdatedActivity.data as List<dynamic>).map((e) => RemoteActivity.fromJson(e)).first;
+            return SuccessResult(data: data.toDomain, message: "Activity updated");
+        }
     }
   }
 }

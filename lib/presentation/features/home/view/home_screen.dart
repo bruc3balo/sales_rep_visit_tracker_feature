@@ -63,6 +63,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             HomePages.activities => ViewActivitiesScreen(
+              remoteActivityRepository: GetIt.I(),
                 viewActivitiesViewModel: ViewActivitiesViewModel(
                   activityRepository: GetIt.I(),
                 ),

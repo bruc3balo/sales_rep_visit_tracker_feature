@@ -1,3 +1,5 @@
+import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
+
 class Customer {
   final int id;
   final String name;
@@ -49,9 +51,8 @@ enum VisitStatus {
   pending,
   cancelled;
 
-  String get capitalize => "${name[0].toUpperCase()}${name.substring(1)}";
 
   static VisitStatus? findByCapitalizedString(String s) {
-    return VisitStatus.values.where((e) => e.capitalize == s).firstOrNull;
+    return VisitStatus.values.where((e) => e.name.capitalize == s).firstOrNull;
   }
 }

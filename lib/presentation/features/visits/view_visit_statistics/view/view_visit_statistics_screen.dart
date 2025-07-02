@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/model/view_visit_statistics_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
@@ -54,7 +55,7 @@ class ViewVisitStatisticsScreen extends StatelessWidget {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(e.key.capitalize),
+                                Text(e.key.name.capitalize),
                                 Text(e.value.toString()),
                               ],
                             ),

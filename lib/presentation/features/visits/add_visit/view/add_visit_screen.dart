@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
@@ -134,7 +135,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                               .map(
                                 (o) => DropdownMenuEntry<VisitStatus>(
                                   value: o,
-                                  label: o.capitalize,
+                                  label: o.name.capitalize,
                                   style: ButtonStyle(
                                     foregroundColor: WidgetStatePropertyAll(
                                       Colors.black,

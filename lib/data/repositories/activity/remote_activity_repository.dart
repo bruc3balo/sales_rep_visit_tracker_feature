@@ -15,7 +15,10 @@ abstract class RemoteActivityRepository {
     String? order,
   });
 
-  Future<TaskResult<Activity>> updateActivity({required Activity activity});
+  Future<TaskResult<Activity>> updateActivity({
+    required int activityId,
+    String? description,
+  });
 
   Future<TaskResult<void>> deleteActivity({required int activityId});
 

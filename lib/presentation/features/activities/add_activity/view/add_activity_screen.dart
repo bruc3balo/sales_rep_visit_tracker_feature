@@ -10,7 +10,7 @@ class AddActivityScreen extends StatelessWidget {
   });
 
   final AddActivityViewModel addActivityViewModel;
-  final TextEditingController activityController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class AddActivityScreen extends StatelessWidget {
                       child: ListTile(
                         title: Text("Description"),
                         subtitle: TextFormField(
-                          controller: activityController,
+                          controller: descriptionController,
                           decoration: InputDecoration(
                             hintText: "e.g. Networking",
                           ),
@@ -47,7 +47,7 @@ class AddActivityScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          String description = activityController.text;
+                          String description = descriptionController.text;
                           if(description.isEmpty) return;
 
                           addActivityViewModel.addActivity(description);
@@ -66,7 +66,9 @@ class AddActivityScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("Activity added"),
+                    Text("'${state.activity.description}' added",
+                    style: Theme.of(context).textTheme.bodyLarge,
+                    ),
                     ElevatedButton(
                       onPressed: Navigator.of(context).pop,
                       child: Text("Close"),

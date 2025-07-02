@@ -16,6 +16,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
   );
   final StreamController<ToastMessage> _toastController = StreamController.broadcast();
   ViewActivitiesState _itemsState = LoadedViewActivitiesState();
+  DeleteActivityState _deleteState = InitialDeleteActivityState();
 
   ViewActivitiesViewModel({
     required RemoteActivityRepository activityRepository,
@@ -24,6 +25,9 @@ class ViewActivitiesViewModel extends ChangeNotifier {
   }
 
   ViewActivitiesState get itemsState => _itemsState;
+
+  DeleteActivityState get deleteState => _deleteState;
+
 
   List<Activity> get activities => UnmodifiableListView(_activities);
 
@@ -49,6 +53,39 @@ class ViewActivitiesViewModel extends ChangeNotifier {
       _itemsState = LoadedViewActivitiesState();
       notifyListeners();
     }
+  }
+
+
+  Future<void> deleteActivity({
+    required Activity activity,
+  }) async {
+    if (_deleteState is LoadingDeleteActivityState) return;
+
+    try {
+      _deleteState = LoadingDeleteActivityState(activity: activity);
+      notifyListeners();
+
+      var result = await _activityRepository.deleteActivity(
+          activityId: activity.id,
+      );
+
+      switch(result) {
+
+        case ErrorResult<void>():
+          _toastController.add(ErrorMessage(message: result.error));
+          break;
+
+        case SuccessResult<void>():
+          _activities.remove(activity);
+          _toastController.add(SuccessMessage(message: result.message));
+          break;
+      }
+
+    } finally {
+      _deleteState = InitialDeleteActivityState();
+      notifyListeners();
+    }
+
   }
 
   Future<void> refresh() async {

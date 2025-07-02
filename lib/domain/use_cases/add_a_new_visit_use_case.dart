@@ -6,6 +6,7 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/local_unsynced_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class AddANewVisitUseCase {
@@ -54,7 +55,7 @@ class AddANewVisitUseCase {
            visit: UnSyncedLocalVisit(
              customerIdVisited: customer.id,
              visitDate: visitDate,
-             status: status.capitalize,
+             status: status.name.capitalize,
              location: location,
              notes: notes,
              activityIdsDone: activitiesDone.map((a) => a.id).toList(),

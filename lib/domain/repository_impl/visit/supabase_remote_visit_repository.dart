@@ -9,6 +9,7 @@ import 'package:sales_rep_visit_tracker_feature/data/services/local_database/loc
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/visit/visit_supabase_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/network_base_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class SupabaseVisitRepository implements RemoteVisitRepository {
@@ -34,7 +35,7 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
       var newVisitResponse = await _visitApi.sendAddVisitRequest(
         customerId: customerIdVisited,
         visitDate: visitDate,
-        status: status.capitalize,
+        status: status.name.capitalize,
         location: location,
         notes: notes,
         activityIdsDone: activityIdsDone,
@@ -94,7 +95,7 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
       visitId: visitId,
       customerId: customerId,
       visitDate: visitDate,
-      status: status?.capitalize,
+      status: status?.name.capitalize,
       location: location,
       notes: notes,
       activityIdsDone: activityIdsDone,
@@ -142,7 +143,7 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
       fromDateInclusive: fromDateInclusive,
       toDateInclusive: toDateInclusive,
       activityIdsDone: activityIdsDone,
-      status: status?.capitalize,
+      status: status?.name.capitalize,
       page: page,
       pageSize: pageSize,
       order: order,
