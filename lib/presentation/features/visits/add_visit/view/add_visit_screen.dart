@@ -101,10 +101,17 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                       if (time == null) return;
                       if (!context.mounted) return;
 
-                      visitDateNotifier.value = date.copyWith(
+                      var newVisitDate = date.copyWith(
                         hour: time.hour,
                         minute: time.minute,
                       );
+
+                      if(newVisitDate.isAfter(DateTime.now())) {
+                        //TODO: Notify user of error
+                        return;
+                      }
+
+                      visitDateNotifier.value = newVisitDate;
                     },
                     title: Text("Visit date"),
                     subtitle: wrappedContainer(

@@ -5,6 +5,8 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 abstract class LocalUnSyncedLocalVisitCrud {
 
+  Future<TaskResult<int>> countUnsyncedVisits();
+
   Future<TaskResult<bool>> containsUnsyncedVisitKey({
     required LocalVisitKey key,
   });

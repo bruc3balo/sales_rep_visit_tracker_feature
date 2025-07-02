@@ -22,3 +22,14 @@ enum HomePages {
   final IconData iconData;
   final String label;
 }
+
+
+sealed class CountHomeVisitsState {}
+
+final class LoadingCountVisitState extends CountHomeVisitsState {}
+
+final class LoadedCountVisitState extends CountHomeVisitsState {
+  final int? unSyncedVisitCount;
+
+  LoadedCountVisitState({required this.unSyncedVisitCount});
+}

@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_value_objects.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/local_database/local_database_service.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalDatabaseService implements LocalDatabaseService {
@@ -22,7 +23,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var data=  box.values.skip(page * pageSize).take(pageSize).toList();
       return SuccessResult(data: data);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -36,7 +37,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       await box.put(hash.value, visit);
       return SuccessResult(data: hash);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -50,7 +51,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       await box.delete(hash.value);
       return SuccessResult(data: null);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -62,7 +63,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var box = await openUnsyncedBox;
       return SuccessResult(data: box.containsKey(key.value));
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -73,7 +74,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       await box.clear();
       return SuccessResult(data: null);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -84,7 +85,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       await box.clear();
       return SuccessResult(data: null);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -98,7 +99,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var data = box.values.skip(page * pageSize).take(pageSize).toList();
       return SuccessResult(data: data);
     } catch (e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -113,7 +114,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var data = {for(var d in dataList) d.id : d};
       return SuccessResult(data: data);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -128,7 +129,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var data = {for(var d in dataList) d.id : d};
       return SuccessResult(data: data);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -142,7 +143,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var data = box.values.skip(page * pageSize).take(pageSize).toList();
       return SuccessResult(data: data);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -153,7 +154,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       await box.putAll({for(var a in activities) a.id : a});
       return SuccessResult(data: null);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -164,7 +165,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       await box.put(activity.id, activity);
       return SuccessResult(data: null);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
@@ -175,7 +176,17 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       await box.put(customer.id, customer);
       return SuccessResult(data: null);
     } catch(e, trace) {
-      return ErrorResult(error: e.toString(), trace: trace);
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
+    }
+  }
+
+  @override
+  Future<TaskResult<int>> countUnsyncedVisits() async {
+    try {
+      var box = await openUnsyncedBox;
+      return SuccessResult(data: box.length);
+    } catch(e, trace) {
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
