@@ -47,7 +47,7 @@ class EditActivityScreen extends StatelessWidget {
                         subtitle: TextFormField(
                           controller: descriptionController..text = state.activity.description,
                           decoration: InputDecoration(
-                            hintText: "e.g. Networking",
+                            hintText: state.activity.description,
                           ),
                         ),
                       ),
@@ -88,7 +88,7 @@ class EditActivityScreen extends StatelessWidget {
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     ElevatedButton(
-                      onPressed: Navigator.of(context).pop,
+                      onPressed: () => Navigator.of(context).pop(state.activity),
                       child: Text("Close"),
                     ),
                   ],

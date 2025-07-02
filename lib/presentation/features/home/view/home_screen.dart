@@ -45,6 +45,9 @@ class HomeScreen extends StatelessWidget {
                       );
                       break;
                     case HomePages.customers:
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.addCustomer.path,
+                      );
                       break;
                   }
                 },
@@ -69,6 +72,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             HomePages.customers => ViewCustomersScreen(
+              remoteCustomerRepository: GetIt.I(),
                 viewCustomersViewModel: ViewCustomersViewModel(
                   customerRepository: GetIt.I(),
                 ),

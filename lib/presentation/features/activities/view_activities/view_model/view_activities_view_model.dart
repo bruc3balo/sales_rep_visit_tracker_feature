@@ -55,6 +55,11 @@ class ViewActivitiesViewModel extends ChangeNotifier {
     }
   }
 
+  void updateItem(Activity activity) {
+    _activities.removeWhere((a) => a.id == activity.id);
+    _activities.add(activity);
+    notifyListeners();
+  }
 
   Future<void> deleteActivity({
     required Activity activity,

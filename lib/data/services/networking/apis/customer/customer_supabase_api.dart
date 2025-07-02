@@ -43,7 +43,7 @@ class CustomerSupabaseApi {
       uri: Uri.parse(_baseUrl).replace(
         queryParameters: {
           if (likeName != null) "name": 'ilike.*$likeName*',
-          if (equalName != null) "name": 'eq.$likeName',
+          if (equalName != null) "name": 'eq.$equalName',
           "limit": pageSize.toString(),
           "offset": (page * pageSize).toString(),
           if (order != null) "order": order,
@@ -86,7 +86,7 @@ class CustomerSupabaseApi {
       },
       method: HttpMethod.patch,
       data: {
-        if (name != null) "description": name,
+        if (name != null) "name": name,
       },
     );
     return _networkService.sendJsonRequest(request: request);

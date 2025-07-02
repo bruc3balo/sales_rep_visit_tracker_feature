@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
@@ -77,7 +78,7 @@ class ViewActivitiesScreen extends StatelessWidget {
                         },
                         menuChildren: ActivityTileMenuItem.values
                             .map((menu) => MenuItemButton(
-                          onPressed: () {
+                          onPressed: () async {
                             switch(menu) {
 
                               case ActivityTileMenuItem.delete:
@@ -86,7 +87,7 @@ class ViewActivitiesScreen extends StatelessWidget {
                                 );
                                 break;
                               case ActivityTileMenuItem.edit:
-                                showDialog(
+                                var updatedActivity = await showDialog<Activity?>(
                                   context: context,
                                   builder: (context) {
                                     return EditActivityScreen(
@@ -97,6 +98,9 @@ class ViewActivitiesScreen extends StatelessWidget {
                                     );
                                   },
                                 );
+
+                                if(updatedActivity == null) return;
+                                viewActivitiesViewModel.updateItem(updatedActivity);
                                 break;
                             }
                           },

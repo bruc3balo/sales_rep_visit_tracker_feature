@@ -30,7 +30,7 @@ class SupabaseCustomerRepository implements RemoteCustomerRepository {
         );
       case SuccessNetworkResponse():
         var data = (duplicateResponse.data as List<dynamic>);
-        bool duplicateCustomer = data.isEmpty;
+        bool duplicateCustomer = data.isNotEmpty;
         if (duplicateCustomer) {
           return ErrorResult(
             error: "Customer with name exists",
@@ -119,6 +119,7 @@ class SupabaseCustomerRepository implements RemoteCustomerRepository {
     required int customerId,
     String? name,
   }) async {
+
     var updateCustomerResponse = await _customerApi.sendUpdateCustomerRequest(
       customerId: customerId,
       name: name,
@@ -131,12 +132,23 @@ class SupabaseCustomerRepository implements RemoteCustomerRepository {
           trace: updateCustomerResponse.trace,
         );
       case SuccessNetworkResponse():
-        var data = RemoteCustomer.fromJson(updateCustomerResponse.data).toDomain;
-
-        return SuccessResult(
-          message: "Customer updated",
-          data: data,
+        var fetchUpdatedCustomer = await _customerApi.sendGetCustomersRequest(
+            ids: [customerId],
+            page: 0,
+            pageSize: 1,
         );
+
+        switch (fetchUpdatedCustomer) {
+          case FailNetworkResponse():
+            return ErrorResult(
+              error: fetchUpdatedCustomer.description,
+              trace: fetchUpdatedCustomer.trace,
+            );
+          case SuccessNetworkResponse():
+          //Cache customer by id
+            var data = (fetchUpdatedCustomer.data as List<dynamic>).map((e) => RemoteCustomer.fromJson(e)).first;
+            return SuccessResult(data: data.toDomain, message: "Customer updated");
+        }
     }
   }
 }

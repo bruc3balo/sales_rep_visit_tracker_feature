@@ -16,6 +16,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
   );
   final StreamController<ToastMessage> _toastController = StreamController.broadcast();
   ViewCustomersState _itemsState = LoadedViewCustomerState();
+  DeleteCustomerState _deleteState = InitialDeleteCustomerState();
 
   ViewCustomersViewModel({
     required RemoteCustomerRepository customerRepository,
@@ -24,6 +25,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
   }
 
   ViewCustomersState get itemsState => _itemsState;
+  DeleteCustomerState get deleteState => _deleteState;
 
   List<Customer> get customers => UnmodifiableListView(_customers);
 
@@ -49,6 +51,44 @@ class ViewCustomersViewModel extends ChangeNotifier {
       _itemsState = LoadedViewCustomerState();
       notifyListeners();
     }
+  }
+
+  void updateItem(Customer customer) {
+    _customers.removeWhere((a) => a.id == customer.id);
+    _customers.add(customer);
+    notifyListeners();
+  }
+
+  Future<void> deleteCustomer({
+    required Customer customer,
+  }) async {
+    if (_deleteState is LoadingDeleteCustomerState) return;
+
+    try {
+      _deleteState = LoadingDeleteCustomerState(customer: customer);
+      notifyListeners();
+
+      var result = await _customerRepository.deleteCustomerById(
+        customerId: customer.id,
+      );
+
+      switch(result) {
+
+        case ErrorResult<void>():
+          _toastController.add(ErrorMessage(message: result.error));
+          break;
+
+        case SuccessResult<void>():
+          _customers.remove(customer);
+          _toastController.add(SuccessMessage(message: result.message));
+          break;
+      }
+
+    } finally {
+      _deleteState = InitialDeleteCustomerState();
+      notifyListeners();
+    }
+
   }
 
   Future<void> refresh() async {

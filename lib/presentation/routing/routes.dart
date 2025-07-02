@@ -5,6 +5,8 @@ import 'package:sales_rep_visit_tracker_feature/domain/use_cases/add_a_new_visit
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/view/add_activity_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/view_model/add_activity_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/add_customer/view/add_customer_screen.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/add_customer/view_model/add_customer_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/home/view/home_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/home/view_model/home_view_model.dart';
@@ -20,6 +22,7 @@ enum AppRoutes {
   home("/home"),
   addVisit("/addVisit"),
   addActivity("/addActivity"),
+  addCustomer("/addCustomer"),
   visitDetails("/visitDetails");
 
   final String path;
@@ -58,6 +61,11 @@ extension RoutePage on AppRoutes {
       AppRoutes.addActivity => AddActivityScreen(
           addActivityViewModel: AddActivityViewModel(
               remoteActivityRepository: GetIt.I(),
+          ),
+      ),
+      AppRoutes.addCustomer => AddCustomerScreen(
+          addCustomerViewModel: AddCustomerViewModel(
+            remoteCustomerRepository: GetIt.I(),
           ),
       ),
     };
