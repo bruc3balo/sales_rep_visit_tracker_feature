@@ -4,6 +4,9 @@ import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/delete
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/update_activity_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/view_local_activities_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/view_remote_activities_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/delete_customer_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/view_local_customers_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/view_remote_customers_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/view/view_activities_screen.dart';
@@ -16,7 +19,8 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/vie
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/view_model/view_visits_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 import 'package:badges/badges.dart' as badges;
-class HomeScreen extends StatelessWidget {
+
+class HomeScreen extends StatefulWidget{
   const HomeScreen({
     required this.homeViewModel,
     super.key,
@@ -25,41 +29,69 @@ class HomeScreen extends StatelessWidget {
   final HomeViewModel homeViewModel;
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch(state) {
+      case AppLifecycleState.resumed:
+        widget.homeViewModel.countUnsyncedVisits();
+        break;
+      default:
+        break;
+    }
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: homeViewModel,
+      listenable: widget.homeViewModel,
       builder: (_, __) {
-
-        var syncState = homeViewModel.visitCountState;
+        var syncState = widget.homeViewModel.visitCountState;
         return Scaffold(
           appBar: AppBar(
-            title: Text(homeViewModel.currentPage.label),
+            title: Text(widget.homeViewModel.currentPage.label),
             actions: [
-
-              switch(syncState) {
+              switch (syncState) {
                 LoadingCountVisitState() => InfiniteLoader(),
                 LoadedCountVisitState() => Visibility(
-                  visible: (syncState.unSyncedVisitCount ?? 0) > 0,
-                  child: badges.Badge(
-                    badgeContent: Text(syncState.unSyncedVisitCount?.toString() ?? '-'),
-                    badgeAnimation: badges.BadgeAnimation.rotation(),
-                    position: badges.BadgePosition.center(),
-                    child: IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(
-                            AppRoutes.visitUnsyncedVisits.path,
-                          );
-                        },
-                        icon: Icon(Icons.sync, size: 35,)
+                    visible: (syncState.unSyncedVisitCount ?? 0) > 0,
+                    child: badges.Badge(
+                      badgeContent: Text(syncState.unSyncedVisitCount?.toString() ?? '-'),
+                      badgeAnimation: badges.BadgeAnimation.rotation(),
+                      position: badges.BadgePosition.center(),
+                      child: IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              AppRoutes.visitUnsyncedVisits.path,
+                            );
+                          },
+                          icon: Icon(
+                            Icons.sync,
+                            size: 35,
+                          )),
                     ),
                   ),
-                ),
               },
-
               IconButton(
                 onPressed: () {
-                  switch(homeViewModel.currentPage) {
-
+                  switch (widget.homeViewModel.currentPage) {
                     case HomePages.visits:
                       Navigator.of(context).pushNamed(
                         AppRoutes.addVisit.path,
@@ -81,7 +113,7 @@ class HomeScreen extends StatelessWidget {
               )
             ],
           ),
-          body: switch (homeViewModel.currentPage) {
+          body: switch (widget.homeViewModel.currentPage) {
             HomePages.visits => ViewVisitsScreen(
                 viewVisitsViewModel: ViewVisitsViewModel(
                   pastVisitsUseCase: VisitListOfPastVisitsUseCase(
@@ -92,13 +124,15 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             HomePages.activities => ViewActivitiesScreen(
-              updateActivityUseCase: UpdateActivityUseCase(
-                remoteActivityRepository: GetIt.I(),
-                localActivityRepository: GetIt.I(),
-              ),
-              viewActivitiesViewModel: ViewActivitiesViewModel(
+                updateActivityUseCase: UpdateActivityUseCase(
+                  remoteActivityRepository: GetIt.I(),
+                  localActivityRepository: GetIt.I(),
+                ),
+                viewActivitiesViewModel: ViewActivitiesViewModel(
+                  connectivityService: GetIt.I(),
                   remoteActivitiesUseCase: ViewRemoteActivitiesUseCase(
                     remoteActivityRepository: GetIt.I(),
+                    localActivityRepository: GetIt.I(),
                   ),
                   localActivitiesUseCase: ViewLocalActivitiesUseCase(
                     localActivityRepository: GetIt.I(),
@@ -107,24 +141,38 @@ class HomeScreen extends StatelessWidget {
                     remoteActivityRepository: GetIt.I(),
                     localActivityRepository: GetIt.I(),
                   ),
+                ),
               ),
-            ),
             HomePages.customers => ViewCustomersScreen(
-              remoteCustomerRepository: GetIt.I(),
+                localCustomerRepository: GetIt.I(),
+                remoteCustomerRepository: GetIt.I(),
                 viewCustomersViewModel: ViewCustomersViewModel(
-                  customerRepository: GetIt.I(),
+                  viewRemoteCustomersUseCase: ViewRemoteCustomersUseCase(
+                    remoteCustomerRepository: GetIt.I(),
+                    localCustomerRepository: GetIt.I(),
+                  ),
+                  viewLocalCustomersUseCase: ViewLocalCustomersUseCase(
+                      localCustomerRepository: GetIt.I(),
+                  ),
+                  deleteCustomerUseCase: DeleteCustomerUseCase(
+                      remoteCustomerRepository: GetIt.I(),
+                      localCustomerRepository: GetIt.I(),
+                  ),
+                  connectivityService: GetIt.I(),
                 ),
               ),
           },
           bottomNavigationBar: BottomNavigationBar(
-            currentIndex: homeViewModel.currentPage.index,
-            onTap: homeViewModel.changePage,
-            items: homeViewModel.homePages.map(
+            currentIndex: widget.homeViewModel.currentPage.index,
+            onTap: widget.homeViewModel.changePage,
+            items: widget.homeViewModel.homePages
+                .map(
                   (p) => BottomNavigationBarItem(
                     icon: Icon(p.iconData),
                     label: p.label,
                   ),
-                ).toList(),
+                )
+                .toList(),
           ),
         );
       },

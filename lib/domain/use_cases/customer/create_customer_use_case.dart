@@ -50,7 +50,7 @@ class CreateCustomerUseCase {
             var data = fetchCreatedCustomer.data.first;
 
             //Cache activity async
-            _localCustomerRepository.setLocalCustomer(customer: data.toLocal);
+            _localCustomerRepository.setLocalCustomer(customer: data);
 
             return SuccessResult(data: data, message: "Customer created");
 

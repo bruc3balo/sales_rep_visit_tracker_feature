@@ -23,12 +23,14 @@ class SearchActivitiesViewModel extends ChangeNotifier {
     required ConnectivityService connectivityService,
   }) : _searchRemoteActivityUseCase = searchRemoteActivitiesUseCase,
        _searchLocalActivitiesUseCase = searchLocalActivitiesUseCase,
-       _connectivityService = connectivityService;
+       _connectivityService = connectivityService {
+    searchActivities();
+  }
 
   SearchActivityState get state => _state;
 
   Future<void> searchActivities({
-    required String activityDescription,
+    String? activityDescription,
     int page = 0,
     int pageSize = 20,
   }) async {
@@ -50,7 +52,7 @@ class SearchActivitiesViewModel extends ChangeNotifier {
   }
 
   Future<void> _searchRemoteActivities({
-    required String activityDescription,
+    String? activityDescription,
     int page = 0,
     int pageSize = 20,
   }) async {
@@ -84,7 +86,7 @@ class SearchActivitiesViewModel extends ChangeNotifier {
   }
 
   Future<void> _searchLocalActivities({
-    required String activityDescription,
+    String? activityDescription,
     int page = 0,
     int pageSize = 20,
   }) async {

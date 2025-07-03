@@ -70,7 +70,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
         case ErrorResult<List<Activity>>():
           _toastController.add(ErrorMessage(message: activityResult.error));
 
-          if(FailureType.noInternet == activityResult.failure) {
+          if(FailureType.network == activityResult.failure) {
             _remotePage = 0;
           }
 

@@ -5,24 +5,24 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 abstract class LocalActivityRepository {
 
   Future<TaskResult<void>> setLocalActivity({
-    required LocalActivity activity,
+    required Activity activity,
   });
 
   Future<TaskResult<void>> setLocalActivities({
-    required List<LocalActivity> activities,
+    required List<Activity> activities,
   });
 
-  Future<TaskResult<Map<int, LocalActivity>>> getLocalActivities({
+  Future<TaskResult<Map<int, Activity>>> getLocalActivities({
     required List<int> activityIds,
   });
 
-  Future<TaskResult<List<LocalActivity>>> searchLocalActivities({
+  Future<TaskResult<List<Activity>>> searchLocalActivities({
     required String likeDescription,
     required int page,
     required int pageSize,
   });
 
-  Future<TaskResult<List<LocalActivity>>> fetchLocalActivities({
+  Future<TaskResult<List<Activity>>> fetchLocalActivities({
     required int page,
     required int pageSize,
   });

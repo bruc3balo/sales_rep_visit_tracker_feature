@@ -48,7 +48,7 @@ class AddANewVisitUseCase {
      case ErrorResult<void>():
 
        //Store offline if error is no internet
-       if(FailureType.noInternet == result.failure) {
+       if(FailureType.network == result.failure) {
          //Offline storage
          var localSaveResult = await _localUnsyncedVisitRepository
              .setUnsyncedVisit(
@@ -72,11 +72,11 @@ class AddANewVisitUseCase {
            case SuccessResult<void>():
            //Cache activity and customer for offline resolution async
              _localActivityRepository.setLocalActivities(
-                 activities: activitiesDone.map((a) => a.toLocal).toList()
+                 activities: activitiesDone
              );
 
              _localCustomerRepository.setLocalCustomer(
-                 customer: customer.toLocal
+                 customer: customer
              );
 
              return SuccessResult(data: null,

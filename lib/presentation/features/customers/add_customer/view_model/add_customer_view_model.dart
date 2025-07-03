@@ -5,20 +5,19 @@ import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/create_customer_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/add_customer/model/add_customer_models.dart';
 
 class AddCustomerViewModel extends ChangeNotifier {
-  final RemoteCustomerRepository _remoteCustomerRepository;
+  final CreateCustomerUseCase _createCustomerUseCase;
   final StreamController<ToastMessage> _toastStream = StreamController.broadcast();
   AddCustomerState _state = InitialAddCustomerState();
 
   AddCustomerViewModel({
-    required RemoteCustomerRepository remoteCustomerRepository
-  }) : _remoteCustomerRepository = remoteCustomerRepository;
-
+    required CreateCustomerUseCase createCustomerUseCase
+  }) : _createCustomerUseCase = createCustomerUseCase;
 
   AddCustomerState get state => _state;
-
 
   Future<void> addCustomer(String name) async {
     if(_state is! InitialAddCustomerState) return;
@@ -27,7 +26,7 @@ class AddCustomerViewModel extends ChangeNotifier {
       _state = LoadingAddCustomerState();
       notifyListeners();
 
-      var result = await _remoteCustomerRepository.createCustomer(
+      var result = await _createCustomerUseCase.execute(
         name: name,
       );
 

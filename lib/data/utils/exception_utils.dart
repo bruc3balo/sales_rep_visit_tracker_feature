@@ -1,5 +1,5 @@
 enum FailureType {
   localDatabase,
-  noInternet,
+  network,
   unknown
 }

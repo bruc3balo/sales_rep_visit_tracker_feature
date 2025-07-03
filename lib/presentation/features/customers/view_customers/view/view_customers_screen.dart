@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/update_customer_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/edit_customer/view/edit_customer_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/edit_customer/view_model/edit_customer_view_model.dart';
@@ -11,10 +13,12 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/
 class ViewCustomersScreen extends StatelessWidget {
   const ViewCustomersScreen({
     required this.viewCustomersViewModel,
+    required this.localCustomerRepository,
     required this.remoteCustomerRepository,
     super.key,
   });
 
+  final LocalCustomerRepository localCustomerRepository;
   final RemoteCustomerRepository remoteCustomerRepository;
   final ViewCustomersViewModel viewCustomersViewModel;
 
@@ -90,8 +94,11 @@ class ViewCustomersScreen extends StatelessWidget {
                                   builder: (context) {
                                     return EditCustomerScreen(
                                       editCustomerViewModel: EditCustomerViewModel(
-                                        remoteCustomerRepository: remoteCustomerRepository,
                                         customer: customer,
+                                        updateCustomerUseCase: UpdateCustomerUseCase(
+                                            remoteCustomerRepository: remoteCustomerRepository,
+                                            localCustomerRepository: localCustomerRepository,
+                                        ),
                                       ),
                                     );
                                   },

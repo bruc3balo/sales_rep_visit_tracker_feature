@@ -8,24 +8,24 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remot
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class UpdateCustomerUseCase {
-  final RemoteCustomerRepository _remoteActivityRepository;
-  final LocalCustomerRepository _local;
+  final RemoteCustomerRepository _remoteCustomerRepository;
+  final LocalCustomerRepository _localCustomerRepository;
 
   UpdateCustomerUseCase({
-    required RemoteActivityRepository remoteActivityRepository,
-    required LocalActivityRepository localActivityRepository,
-  }) : _remoteActivityRepository = remoteActivityRepository,
-        _localActivityRepository = localActivityRepository;
+    required RemoteCustomerRepository remoteCustomerRepository,
+    required LocalCustomerRepository localCustomerRepository,
+  }) : _remoteCustomerRepository = remoteCustomerRepository,
+        _localCustomerRepository = localCustomerRepository;
 
 
-  Future<TaskResult<Activity>> execute({
-    required int activityId,
-    required String description
+  Future<TaskResult<Customer>> execute({
+    required int customerId,
+    String? name,
   }) async {
 
-    var createResult = await _remoteActivityRepository.updateActivity(
-      activityId: activityId,
-      description: description
+    var createResult = await _remoteCustomerRepository.updateCustomer(
+      customerId: customerId,
+      name: name,
     );
 
     switch(createResult) {
@@ -37,26 +37,26 @@ class UpdateCustomerUseCase {
             trace: createResult.trace,
         );
       case SuccessResult<void>():
-        var fetchUpdatedActivity = await _remoteActivityRepository.getActivities(
-          ids: [activityId],
+        var fetchUpdatedActivity = await _remoteCustomerRepository.getCustomers(
+          ids: [customerId],
           pageSize: 1,
           page: 0,
         );
         switch (fetchUpdatedActivity) {
-          case ErrorResult<List<Activity>>():
+          case ErrorResult<List<Customer>>():
             return ErrorResult(
               error: fetchUpdatedActivity.error,
               trace: fetchUpdatedActivity.trace,
               failure: fetchUpdatedActivity.failure,
             );
 
-          case SuccessResult<List<Activity>>():
+          case SuccessResult<List<Customer>>():
             var data = fetchUpdatedActivity.data.first;
 
             //Cache activity async
-            _localActivityRepository.setLocalActivity(activity: data.toLocal);
+            _localCustomerRepository.setLocalCustomer(customer: data);
 
-            return SuccessResult(data: data, message: "Activity updated");
+            return SuccessResult(data: data, message: "Customer updated");
 
         }
     }

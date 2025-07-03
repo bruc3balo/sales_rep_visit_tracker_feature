@@ -30,6 +30,8 @@ import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/light_t
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
+import 'domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
+
 Future<void> main() async {
 
   /// Services
@@ -41,6 +43,8 @@ Future<void> main() async {
   // Database
   await Hive.initFlutter();
   Hive.registerAdapter(UnSyncedLocalVisitAdapter());
+  Hive.registerAdapter(LocalCustomerAdapter());
+  Hive.registerAdapter(LocalActivityAdapter());
 
   LocalDatabaseService db = HiveLocalDatabaseService();
   GetIt.I.registerSingleton(db);
@@ -88,7 +92,6 @@ Future<void> main() async {
   // Visit
   // Remote
   RemoteVisitRepository visitRepository = SupabaseVisitRepository(
-    localDatabaseService: db,
     visitApi: SupabaseVisitApi(
       networkService: ns,
       baseUrl: supabaseBaseUrl,
@@ -112,6 +115,14 @@ Future<void> main() async {
     ),
   );
   GetIt.I.registerSingleton(statsVm);
+
+  /// Global use cases
+  SyncUnsyncedLocalVisitsUseCase syncCase = SyncUnsyncedLocalVisitsUseCase(
+    remoteVisitRepository: GetIt.I(),
+    localUnsyncedVisitRepository: GetIt.I(),
+    connectivityService: GetIt.I(),
+  );
+  GetIt.I.registerSingleton(syncCase);
 
   runApp(const SalesRepVisitTrackerApplication());
 }

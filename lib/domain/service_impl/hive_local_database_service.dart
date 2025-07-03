@@ -8,21 +8,21 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart'
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalDatabaseService implements LocalDatabaseService {
-
   Future<Box<UnSyncedLocalVisit>> get openUnsyncedBox async => await Hive.openBox('unsynced_visits');
+
   Future<Box<LocalCustomer>> get openCustomerBox async => await Hive.openBox('customers');
+
   Future<Box<LocalActivity>> get openActivityBox async => await Hive.openBox('activities');
 
   @override
-  Future<TaskResult<List<UnSyncedLocalVisit>>> getUnsyncedLocalVisits({
-    required int page,
-    required int pageSize
-  }) async {
+  Future<TaskResult<List<UnSyncedLocalVisit>>> getUnsyncedLocalVisits({required int page, required int pageSize}) async {
     try {
       var box = await openUnsyncedBox;
-      var data=  box.values.skip(page * pageSize).take(pageSize).toList();
+      if (box.isEmpty) return SuccessResult(data: []);
+
+      var data = box.values.skip(page * pageSize).take(pageSize).toList();
       return SuccessResult(data: data);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -36,7 +36,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var hash = visit.hash;
       await box.put(hash.value, visit);
       return SuccessResult(data: hash);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -50,7 +50,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var hash = visit.hash;
       await box.delete(hash.value);
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -62,7 +62,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     try {
       var box = await openUnsyncedBox;
       return SuccessResult(data: box.containsKey(key.value));
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -73,29 +73,28 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var box = await openActivityBox;
       await box.clear();
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
   @override
-  Future<TaskResult<void>> clearAllLocalCustomers()  async {
+  Future<TaskResult<void>> clearAllLocalCustomers() async {
     try {
       var box = await openCustomerBox;
       await box.clear();
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
   @override
-  Future<TaskResult<List<LocalActivity>>> getLocalActivities({
-    required int page,
-    required int pageSize
-  })  async {
+  Future<TaskResult<List<LocalActivity>>> getLocalActivities({required int page, required int pageSize}) async {
     try {
       var box = await openActivityBox;
+      if (box.isEmpty) return SuccessResult(data: []);
+
       var data = box.values.skip(page * pageSize).take(pageSize).toList();
       return SuccessResult(data: data);
     } catch (e, trace) {
@@ -106,14 +105,14 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
   @override
   Future<TaskResult<Map<int, LocalActivity>>> getLocalActivitiesByIds({
     required List<int> ids,
-  })  async {
+  }) async {
     try {
       var idSet = HashSet.from(ids);
       var box = await openActivityBox;
       var dataList = box.values.where((a) => idSet.contains(a.id)).toList();
-      var data = {for(var d in dataList) d.id : d};
+      var data = {for (var d in dataList) d.id: d};
       return SuccessResult(data: data);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -121,14 +120,14 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
   @override
   Future<TaskResult<Map<int, LocalCustomer>>> getLocalCustomerByIds({
     required List<int> ids,
-  })  async {
+  }) async {
     try {
       var idSet = HashSet.from(ids);
       var box = await openCustomerBox;
       var dataList = box.values.where((a) => idSet.contains(a.id)).toList();
-      var data = {for(var d in dataList) d.id : d};
+      var data = {for (var d in dataList) d.id: d};
       return SuccessResult(data: data);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -137,45 +136,47 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
   Future<TaskResult<List<LocalCustomer>>> getLocalCustomers({
     required int page,
     required int pageSize,
-  })  async {
+  }) async {
     try {
       var box = await openCustomerBox;
+      if (box.isEmpty) return SuccessResult(data: []);
+
       var data = box.values.skip(page * pageSize).take(pageSize).toList();
       return SuccessResult(data: data);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
   @override
-  Future<TaskResult<void>> setLocalActivities({required List<LocalActivity> activities})  async {
+  Future<TaskResult<void>> setLocalActivities({required List<LocalActivity> activities}) async {
     try {
       var box = await openActivityBox;
-      await box.putAll({for(var a in activities) a.id : a});
+      await box.putAll({for (var a in activities) a.id: a});
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
   @override
-  Future<TaskResult<void>> setLocalActivity({required LocalActivity activity})  async {
+  Future<TaskResult<void>> setLocalActivity({required LocalActivity activity}) async {
     try {
       var box = await openActivityBox;
       await box.put(activity.id, activity);
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
   @override
-  Future<TaskResult<void>> setLocalCustomer({required LocalCustomer customer})  async {
+  Future<TaskResult<void>> setLocalCustomer({required LocalCustomer customer}) async {
     try {
       var box = await openCustomerBox;
       await box.put(customer.id, customer);
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -185,7 +186,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     try {
       var box = await openUnsyncedBox;
       return SuccessResult(data: box.length);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -196,47 +197,37 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       var box = await openUnsyncedBox;
       await box.delete(activityId);
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
 
   @override
-  Future<TaskResult<List<LocalActivity>>> searchLocalActivities({
-    required String likeDescription,
-    required int page,
-    required int pageSize
-  }) async {
+  Future<TaskResult<List<LocalActivity>>> searchLocalActivities({required String likeDescription, required int page, required int pageSize}) async {
     try {
-
       var box = await openActivityBox;
+      if (box.isEmpty) return SuccessResult(data: []);
 
-      var data = box.values
-          .where((e) => e.description.toLowerCase().contains(likeDescription.toLowerCase()))
-          .skip(page * pageSize)
-          .take(pageSize)
-          .toList();
+      var data =
+          box.values.where((e) => e.description.toLowerCase().contains(likeDescription.toLowerCase())).skip(page * pageSize).take(pageSize).toList();
 
       return SuccessResult(data: data);
-
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(
-          error: e.toString(),
-          trace: trace,
-          failure: FailureType.localDatabase,
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.localDatabase,
       );
     }
   }
 
   @override
-  Future<TaskResult<void>> deleteLocalCustomer({
-    required int customerId
-  }) async {
+  Future<TaskResult<void>> deleteLocalCustomer({required int customerId}) async {
     try {
       var box = await openCustomerBox;
       await box.delete(customerId);
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
   }
@@ -248,18 +239,13 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     required String likeName,
   }) async {
     try {
-
       var box = await openCustomerBox;
+      if (box.isEmpty) return SuccessResult(data: []);
 
-      var data = box.values
-          .where((e) => e.name.toLowerCase().contains(likeName.toLowerCase()))
-          .skip(page * pageSize)
-          .take(pageSize)
-          .toList();
+      var data = box.values.where((e) => e.name.toLowerCase().contains(likeName.toLowerCase())).skip(page * pageSize).take(pageSize).toList();
 
       return SuccessResult(data: data);
-
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(
         error: e.toString(),
         trace: trace,
@@ -274,9 +260,9 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
   }) async {
     try {
       var box = await openCustomerBox;
-      await box.putAll({for(var a in customers) a.id : a});
+      await box.putAll({for (var a in customers) a.id: a});
       return SuccessResult(data: null);
-    } catch(e, trace) {
+    } catch (e, trace) {
       return ErrorResult(
         error: e.toString(),
         trace: trace,
@@ -284,5 +270,4 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
       );
     }
   }
-
 }

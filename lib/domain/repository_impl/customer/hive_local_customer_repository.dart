@@ -27,8 +27,7 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
       pageSize: pageSize,
     );
 
-    switch(results) {
-
+    switch (results) {
       case ErrorResult<List<LocalCustomer>>():
         return ErrorResult(
           error: results.error,
@@ -36,7 +35,7 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
           failure: results.failure,
         );
       case SuccessResult<List<LocalCustomer>>():
-        var data = results.data.map((e) =>e.toDomain).toList();
+        var data = results.data.map((e) => e.toDomain).toList();
         return SuccessResult(data: data, message: results.message);
     }
   }
@@ -46,11 +45,10 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
     required List<int> customerIds,
   }) async {
     var results = await _localCustomerCrud.getLocalCustomerByIds(
-        ids: customerIds,
+      ids: customerIds,
     );
 
-    switch(results) {
-
+    switch (results) {
       case ErrorResult<Map<int, LocalCustomer>>():
         return ErrorResult(
           error: results.error,
@@ -58,16 +56,16 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
           trace: results.trace,
         );
       case SuccessResult<Map<int, LocalCustomer>>():
-        var data = {for(var c in results.data.entries) c.key : c.value.toDomain};
+        var data = {for (var c in results.data.entries) c.key: c.value.toDomain};
         return SuccessResult(data: data, message: results.message);
     }
   }
 
   @override
   Future<TaskResult<void>> setLocalCustomer({
-    required LocalCustomer customer,
+    required Customer customer,
   }) async {
-    return await _localCustomerCrud.setLocalCustomer(customer: customer);
+    return await _localCustomerCrud.setLocalCustomer(customer: customer.toLocal);
   }
 
   @override
@@ -81,15 +79,13 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
     required int pageSize,
     required String likeName,
   }) async {
-
     var results = await _localCustomerCrud.searchLocalCustomers(
       page: page,
       pageSize: pageSize,
       likeName: likeName,
     );
 
-    switch(results) {
-
+    switch (results) {
       case ErrorResult<List<LocalCustomer>>():
         return ErrorResult(
           error: results.error,
@@ -100,18 +96,14 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
         var data = results.data.map((e) => e.toDomain).toList();
         return SuccessResult(data: data);
     }
-
   }
 
   @override
   Future<TaskResult<void>> setLocalCustomers({
-    required List<LocalCustomer> customer,
+    required List<Customer> customer,
   }) async {
     return await _localCustomerCrud.setLocalCustomers(
-        customers: customer,
+      customers: customer.map((c) => c.toLocal).toList(),
     );
   }
-
-
-
 }

@@ -5,10 +5,11 @@ import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/update_customer_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/edit_customer/model/edit_customer_model.dart';
 
 class EditCustomerViewModel extends ChangeNotifier {
-  final RemoteCustomerRepository _remoteCustomerRepository;
+  final UpdateCustomerUseCase _updateCustomerUseCase;
   final Customer _customer;
   final StreamController<ToastMessage> _toastStream = StreamController.broadcast();
   late EditCustomerState _state = InitialEditCustomerState(
@@ -16,29 +17,26 @@ class EditCustomerViewModel extends ChangeNotifier {
   );
 
   EditCustomerViewModel({
-    required RemoteCustomerRepository remoteCustomerRepository,
+    required UpdateCustomerUseCase updateCustomerUseCase,
     required Customer customer,
-  }) : _remoteCustomerRepository = remoteCustomerRepository, _customer = customer;
-
+  })  : _updateCustomerUseCase = updateCustomerUseCase,
+        _customer = customer;
 
   EditCustomerState get state => _state;
 
-
   Future<void> editCustomer(String name) async {
-    if(_state is! InitialEditCustomerState) return;
+    if (_state is! InitialEditCustomerState) return;
 
     try {
       _state = LoadingEditCustomerState();
       notifyListeners();
 
-      var result = await _remoteCustomerRepository.updateCustomer(
+      var result = await _updateCustomerUseCase.execute(
         customerId: _customer.id,
         name: name,
       );
 
-
-      switch(result) {
-
+      switch (result) {
         case ErrorResult<Customer>():
           _toastStream.add(ErrorMessage(message: result.error));
           _state = InitialEditCustomerState(customer: _customer);
@@ -48,7 +46,6 @@ class EditCustomerViewModel extends ChangeNotifier {
           _state = SuccessEditCustomerState(customer: result.data);
           break;
       }
-
     } finally {
       notifyListeners();
     }

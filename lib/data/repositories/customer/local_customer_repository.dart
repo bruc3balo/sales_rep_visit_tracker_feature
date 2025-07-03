@@ -4,9 +4,9 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 abstract class LocalCustomerRepository {
 
-  Future<TaskResult<void>> setLocalCustomer({required LocalCustomer customer});
+  Future<TaskResult<void>> setLocalCustomer({required Customer customer});
 
-  Future<TaskResult<void>> setLocalCustomers({required List<LocalCustomer> customer});
+  Future<TaskResult<void>> setLocalCustomers({required List<Customer> customer});
 
   Future<TaskResult<List<Customer>>> getLocalCustomers({
     required int page,

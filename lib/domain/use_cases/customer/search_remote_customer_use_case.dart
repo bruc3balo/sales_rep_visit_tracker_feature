@@ -18,7 +18,7 @@ class SearchRemoteCustomerUseCase {
         _localCustomerRepository = localCustomerRepository;
 
   Future<TaskResult<List<Customer>>> execute({
-    required String likeName,
+    String? likeName,
     required int page,
     required int pageSize,
 }) async {
@@ -32,7 +32,7 @@ class SearchRemoteCustomerUseCase {
     //cache activities async
     if(searchResult is SuccessResult<List<Customer>>) {
       _localCustomerRepository.setLocalCustomers(
-        customer: searchResult.data.map((a) => a.toLocal).toList(),
+        customer: searchResult.data,
       );
     }
 

@@ -1,11 +1,8 @@
-import 'dart:io';
 
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain_remote_mapper.dart';
-import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/remote/remote_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/data/services/local_database/local_database_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/visit/visit_supabase_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/network_base_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
@@ -14,12 +11,10 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class SupabaseVisitRepository implements RemoteVisitRepository {
   final SupabaseVisitApi _visitApi;
-  final LocalDatabaseService _localDatabaseService;
 
   SupabaseVisitRepository({
     required SupabaseVisitApi visitApi,
-    required LocalDatabaseService localDatabaseService,
-  }) : _visitApi = visitApi, _localDatabaseService = localDatabaseService;
+  })  : _visitApi = visitApi;
 
   @override
   Future<TaskResult<void>> createVisit({
@@ -47,37 +42,43 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
           return ErrorResult(
             error: newVisitResponse.description,
             trace: newVisitResponse.trace,
+            failure: newVisitResponse.failureType,
           );
         case SuccessNetworkResponse():
           //TODO: Refresh visits for newly created visit
           return SuccessResult(data: null, message: "Visit created");
       }
-    } on SocketException catch(e, trace) {
-
+    } catch (e, trace) {
       return ErrorResult(
         error: e.toString(),
         trace: trace,
-        failure: FailureType.noInternet,
+        failure: FailureType.unknown,
       );
-
-
     }
   }
 
   @override
   Future<TaskResult<void>> deleteVisitById({required int visitId}) async {
-    var deletedVisit = await _visitApi.sendDeleteVisitRequest(visitId: visitId);
-    switch (deletedVisit) {
-      case FailNetworkResponse():
-        return ErrorResult(
-          error: deletedVisit.description,
-          trace: deletedVisit.trace,
-        );
-      case SuccessNetworkResponse():
-        return SuccessResult(
-          data: null,
-          message: "Visit deleted",
-        );
+    try {
+      var deletedVisit = await _visitApi.sendDeleteVisitRequest(visitId: visitId);
+      switch (deletedVisit) {
+        case FailNetworkResponse():
+          return ErrorResult(
+            error: deletedVisit.description,
+            trace: deletedVisit.trace,
+          );
+        case SuccessNetworkResponse():
+          return SuccessResult(
+            data: null,
+            message: "Visit deleted",
+          );
+      }
+    } catch (e, trace) {
+      return ErrorResult(
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.unknown,
+      );
     }
   }
 
@@ -91,39 +92,47 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
     String? notes,
     List<int>? activityIdsDone,
   }) async {
-    var updatedVisitResponse = await _visitApi.sendUpdateVisitRequest(
-      visitId: visitId,
-      customerId: customerId,
-      visitDate: visitDate,
-      status: status?.name.capitalize,
-      location: location,
-      notes: notes,
-      activityIdsDone: activityIdsDone,
-    );
+    try {
+      var updatedVisitResponse = await _visitApi.sendUpdateVisitRequest(
+        visitId: visitId,
+        customerId: customerId,
+        visitDate: visitDate,
+        status: status?.name.capitalize,
+        location: location,
+        notes: notes,
+        activityIdsDone: activityIdsDone,
+      );
 
-    switch (updatedVisitResponse) {
-      case FailNetworkResponse():
-        return ErrorResult(
-          error: updatedVisitResponse.description,
-          trace: updatedVisitResponse.trace,
-        );
-      case SuccessNetworkResponse():
-        var getUpdatedVisitResponse = await _visitApi.sendGetVisitsRequest(
-          visitId: visitId,
-          page: 0,
-          pageSize: 1,
-        );
+      switch (updatedVisitResponse) {
+        case FailNetworkResponse():
+          return ErrorResult(
+            error: updatedVisitResponse.description,
+            trace: updatedVisitResponse.trace,
+          );
+        case SuccessNetworkResponse():
+          var getUpdatedVisitResponse = await _visitApi.sendGetVisitsRequest(
+            visitId: visitId,
+            page: 0,
+            pageSize: 1,
+          );
 
-        switch (getUpdatedVisitResponse) {
-          case FailNetworkResponse():
-            return ErrorResult(
-              error: getUpdatedVisitResponse.description,
-              trace: getUpdatedVisitResponse.trace,
-            );
-          case SuccessNetworkResponse():
-            var data = (getUpdatedVisitResponse.data as List<dynamic>).map((e) => RemoteVisit.fromJson(e)).first;
-            return SuccessResult(data: data.toDomain, message: "Visit updated");
-        }
+          switch (getUpdatedVisitResponse) {
+            case FailNetworkResponse():
+              return ErrorResult(
+                error: getUpdatedVisitResponse.description,
+                trace: getUpdatedVisitResponse.trace,
+              );
+            case SuccessNetworkResponse():
+              var data = (getUpdatedVisitResponse.data as List<dynamic>).map((e) => RemoteVisit.fromJson(e)).first;
+              return SuccessResult(data: data.toDomain, message: "Visit updated");
+          }
+      }
+    } catch (e, trace) {
+      return ErrorResult(
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.unknown,
+      );
     }
   }
 
@@ -138,31 +147,37 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
     required int pageSize,
     String? order,
   }) async {
-    var getVisitResponse = await _visitApi.sendGetVisitsRequest(
-      customerId: customerId,
-      fromDateInclusive: fromDateInclusive,
-      toDateInclusive: toDateInclusive,
-      activityIdsDone: activityIdsDone,
-      status: status?.name.capitalize,
-      page: page,
-      pageSize: pageSize,
-      order: order,
-    );
+    try {
+      var getVisitResponse = await _visitApi.sendGetVisitsRequest(
+        customerId: customerId,
+        fromDateInclusive: fromDateInclusive,
+        toDateInclusive: toDateInclusive,
+        activityIdsDone: activityIdsDone,
+        status: status?.name.capitalize,
+        page: page,
+        pageSize: pageSize,
+        order: order,
+      );
 
-    switch (getVisitResponse) {
-      case FailNetworkResponse():
-        return ErrorResult(
-          error: getVisitResponse.description,
-          trace: getVisitResponse.trace,
-        );
-      case SuccessNetworkResponse():
-        var data = (getVisitResponse.data as List<dynamic>).map((e) => RemoteVisit.fromJson(e).toDomain).toList();
-        return SuccessResult(
-          message: "${data.length} visits found",
-          data: data,
-        );
+      switch (getVisitResponse) {
+        case FailNetworkResponse():
+          return ErrorResult(
+            error: getVisitResponse.description,
+            trace: getVisitResponse.trace,
+          );
+        case SuccessNetworkResponse():
+          var data = (getVisitResponse.data as List<dynamic>).map((e) => RemoteVisit.fromJson(e).toDomain).toList();
+          return SuccessResult(
+            message: "${data.length} visits found",
+            data: data,
+          );
+      }
+    } catch (e, trace) {
+      return ErrorResult(
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.unknown,
+      );
     }
   }
-
-
 }

@@ -37,7 +37,7 @@ class ViewRemoteActivitiesUseCase {
     //Cache activities async
     if(getActivitiesResult is SuccessResult<List<Activity>>) {
         _localActivityRepository.setLocalActivities(
-            activities: getActivitiesResult.data.map((a) => a.toLocal).toList(),
+            activities: getActivitiesResult.data,
         );
     }
 

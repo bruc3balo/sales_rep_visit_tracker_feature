@@ -18,7 +18,7 @@ class SearchRemoteActivitiesUseCase {
 
 
   Future<TaskResult<List<Activity>>> execute({
-    required String likeDescription,
+    String? likeDescription,
     required int page,
     required int pageSize,
 }) async {
@@ -32,7 +32,7 @@ class SearchRemoteActivitiesUseCase {
     //cache activities async
     if(searchResult is SuccessResult<List<Activity>>) {
       _localActivityRepository.setLocalActivities(
-        activities: searchResult.data.map((a) => a.toLocal).toList(),
+        activities: searchResult.data,
       );
     }
 

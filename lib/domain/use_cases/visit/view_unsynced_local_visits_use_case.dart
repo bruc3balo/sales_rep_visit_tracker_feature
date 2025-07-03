@@ -41,8 +41,8 @@ class ViewUnsyncedLocalVisitsUseCase {
         );
       case SuccessResult<List<UnSyncedLocalVisit>>():
 
-        final Map<int, LocalCustomer> resolvedCustomerMap = {};
-        final Map<int, LocalActivity> resolvedActivityMap = {};
+        final Map<int, Customer> resolvedCustomerMap = {};
+        final Map<int, Activity> resolvedActivityMap = {};
 
         //Customers
         var customerIdsToRevolve = localResult.data.map((e) => e.customerIdVisited).toList();
@@ -50,7 +50,7 @@ class ViewUnsyncedLocalVisitsUseCase {
             customerIds: customerIdsToRevolve
         );
 
-       if (customerIdResult is SuccessResult<Map<int, LocalCustomer>>) {
+       if (customerIdResult is SuccessResult<Map<int, Customer>>) {
           resolvedCustomerMap.addAll(customerIdResult.data);
         }
 
@@ -60,7 +60,7 @@ class ViewUnsyncedLocalVisitsUseCase {
             activityIds: resolveActivitiesFuture,
         );
 
-       if (activityIdResult is SuccessResult<Map<int, LocalActivity>>) {
+       if (activityIdResult is SuccessResult<Map<int, Activity>>) {
           resolvedActivityMap.addAll(activityIdResult.data);
         }
 

@@ -1,3 +1,5 @@
+import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
+
 enum HttpMethod { delete, get, patch, post }
 
 class NetworkRequest {
@@ -24,11 +26,13 @@ final class FailNetworkResponse extends NetworkResponse {
   final int? statusCode;
   final String description;
   final StackTrace? trace;
+  final FailureType failureType;
   final dynamic data;
 
   FailNetworkResponse({
     this.statusCode,
     this.description = " Something went wrong",
+    this.failureType = FailureType.network,
     this.trace,
     this.data,
   });

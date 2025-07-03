@@ -48,7 +48,7 @@ class CreateActivityUseCase {
             var data = fetchCreatedActivity.data.first;
 
             //Cache activity async
-            _localActivityRepository.setLocalActivity(activity: data.toLocal);
+            _localActivityRepository.setLocalActivity(activity: data);
 
             return SuccessResult(data: data, message: "Activity created");
 

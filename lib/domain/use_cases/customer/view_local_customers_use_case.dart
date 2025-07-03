@@ -6,29 +6,23 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remot
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
-class SearchLocalCustomersUseCase {
+class ViewLocalCustomersUseCase {
+
   final LocalCustomerRepository _localCustomerRepository;
 
-  SearchLocalCustomersUseCase({
-    required LocalCustomerRepository localCustomerRepository,
+  ViewLocalCustomersUseCase({
+    required LocalCustomerRepository localCustomerRepository
   }) : _localCustomerRepository = localCustomerRepository;
 
+
   Future<TaskResult<List<Customer>>> execute({
-    String? likeName,
     required int page,
     required int pageSize,
-  }) async {
-    if (likeName == null) {
-      return await _localCustomerRepository.getLocalCustomers(
-        page: page,
-        pageSize: pageSize,
-      );
-    }
-
-    return await _localCustomerRepository.searchLocalCustomers(
+}) async {
+    return await _localCustomerRepository.getLocalCustomers(
       page: page,
       pageSize: pageSize,
-      likeName: likeName,
     );
   }
+
 }

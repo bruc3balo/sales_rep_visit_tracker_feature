@@ -60,3 +60,8 @@ class VisitStatisticsModel {
   });
 
 }
+
+
+enum SyncStatus {
+  success, fail
+}

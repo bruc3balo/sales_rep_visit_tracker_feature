@@ -21,6 +21,12 @@ class ViewUnsyncedVisitsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Unsynced visits"),
+        actions: [
+          IconButton(
+            onPressed: viewUnsyncedVisitsViewModel.sync,
+            icon: Icon(Icons.sync),
+          )
+        ],
       ),
       body: ListenableBuilder(
         listenable: viewUnsyncedVisitsViewModel,
@@ -57,7 +63,6 @@ class ViewUnsyncedVisitsScreen extends StatelessWidget {
   }
 }
 
-
 class UnsyncedVisit extends StatelessWidget {
   const UnsyncedVisit({
     required this.visit,
@@ -81,7 +86,6 @@ class UnsyncedVisit extends StatelessWidget {
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-
         child: badges.Badge(
           position: badges.BadgePosition.topEnd(),
           badgeAnimation: badges.BadgeAnimation.scale(
@@ -95,7 +99,6 @@ class UnsyncedVisit extends StatelessWidget {
             badgeColor: Colors.white,
             borderSide: BorderSide(
               color: Colors.cyan,
-
             ),
           ),
           child: Icon(Icons.business_outlined),
