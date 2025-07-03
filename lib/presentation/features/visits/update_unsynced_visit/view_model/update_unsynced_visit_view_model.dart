@@ -54,7 +54,7 @@ class UpdateUnsyncedVisitViewModel extends ChangeNotifier {
           break;
         case SuccessResult<UnsyncedVisitAggregate>():
           _visit = results.data;
-          GlobalToastMessage().add(SuccessMessage(message: results.message));
+          //GlobalToastMessage().add(SuccessMessage(message: results.message));
           break;
       }
     } finally {

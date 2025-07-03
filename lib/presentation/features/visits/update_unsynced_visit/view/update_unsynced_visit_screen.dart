@@ -35,7 +35,7 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("New Visit"),
+        title: Text("Update Visit"),
       ),
       body: ListenableBuilder(
         listenable: widget.updateUnsyncedVisitViewModel,
@@ -177,35 +177,38 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                         icon: Icon(Icons.add)),
                   ),
                 ),
-                subtitle: wrappedContainer(
-                  child: Visibility(
-                    visible: viewModel.visit.activityMap.isNotEmpty,
-                    replacement: Text("No activities recorded"),
-                    child: Container(
-                      constraints: BoxConstraints(
-                        maxHeight: 300,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: viewModel.visit.activityMap.values
-                            .map(
-                              (a) => ListTile(
-                                title: Text(a.description),
-                                trailing: IconButton(
-                                  onPressed: () {
-                                    viewModel.visit.activityMap.remove(a.id);
-                                    viewModel.update(
-                                      activityIdsDone: viewModel.visit.activityMap.values.map((a) => a.id).toList(),
-                                    );
-                                  },
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
+                subtitle: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: wrappedContainer(
+                    child: Visibility(
+                      visible: viewModel.visit.activityMap.isNotEmpty,
+                      replacement: Text("No activities recorded"),
+                      child: Container(
+                        constraints: BoxConstraints(
+                          maxHeight: 300,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: viewModel.visit.activityMap.values
+                              .map(
+                                (a) => ListTile(
+                                  title: Text(a.description),
+                                  trailing: IconButton(
+                                    onPressed: () {
+                                      viewModel.visit.activityMap.remove(a.id);
+                                      viewModel.update(
+                                        activityIdsDone: viewModel.visit.activityMap.values.map((a) => a.id).toList(),
+                                      );
+                                    },
+                                    icon: Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                            .toList(),
+                              )
+                              .toList(),
+                        ),
                       ),
                     ),
                   ),
