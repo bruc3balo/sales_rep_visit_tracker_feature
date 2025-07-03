@@ -1,5 +1,5 @@
 
-class LocalVisitKey {
+class LocalVisitHash {
   final String value;
-  LocalVisitKey({required this.value}) : assert(value.length == 64);
+  LocalVisitHash({required this.value}) : assert(value.length == 64);
 }

@@ -1,9 +1,13 @@
-import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
+
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 
 sealed class UnsyncedVisitsState {}
 
-class LoadingUnsyncedVisitState extends UnsyncedVisitsState {}
+class LoadingUnsyncedVisitState extends UnsyncedVisitsState {
+  final UnsyncedVisitAggregate? visit;
+
+  LoadingUnsyncedVisitState({this.visit});
+}
 
 class DisplayingUnsyncedVisitState extends UnsyncedVisitsState {}
 

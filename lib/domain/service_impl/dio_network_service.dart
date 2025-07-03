@@ -58,6 +58,7 @@ class DioNetworkService implements NetworkService {
           data: response.data,
         );
       } on SocketException catch(e, trace) {
+
         return FailNetworkResponse(
           description: e.message,
           trace: trace,

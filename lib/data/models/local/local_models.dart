@@ -9,28 +9,33 @@ part 'local_models.g.dart';
 @HiveType(typeId: 0)
 class UnSyncedLocalVisit extends HiveObject {
 
-  @HiveField(0)
-  int customerIdVisited;
-
   @HiveField(1)
-  DateTime visitDate;
+  String hash;
 
   @HiveField(2)
-  String status;
+  int customerIdVisited;
 
   @HiveField(3)
-  String location;
+  DateTime visitDate;
 
   @HiveField(4)
-  String notes;
+  String status;
 
   @HiveField(5)
-  List<int> activityIdsDone;
+  String location;
 
   @HiveField(6)
+  String notes;
+
+  @HiveField(7)
+  List<int> activityIdsDone;
+
+  @HiveField(8)
   final DateTime createdAt;
 
+
   UnSyncedLocalVisit({
+    required this.hash,
     required this.customerIdVisited,
     required this.visitDate,
     required this.status,
@@ -39,22 +44,35 @@ class UnSyncedLocalVisit extends HiveObject {
     required this.activityIdsDone,
     required this.createdAt,
   });
-
-  LocalVisitKey get hash => LocalVisitKey(
-    value: sha256.convert(utf8.encode({
-    'customerIdVisited' : customerIdVisited,
-    'visitDate' : visitDate,
-    'status' : status,
-    'location' : location,
-    'notes' : notes,
-    'activityIdsDone' : activityIdsDone,
-  }.toString())).toString(),
-  );
 }
+
+LocalVisitHash generateHash({
+  required int customerIdVisited,
+  required DateTime visitDate,
+  required String status,
+  required String location,
+  required String notes,
+  required List<int> activityIdsDone,
+}) =>
+    LocalVisitHash(
+      value: sha256
+          .convert(
+            utf8.encode(
+              {
+                'customerIdVisited': customerIdVisited,
+                'visitDate': visitDate,
+                'status': status,
+                'location': location,
+                'notes': notes,
+                'activityIdsDone': activityIdsDone,
+              }.toString(),
+            ),
+          )
+          .toString(),
+    );
 
 @HiveType(typeId: 1)
 class LocalActivity extends HiveObject {
-
   @HiveField(0)
   final int id;
 
@@ -67,7 +85,6 @@ class LocalActivity extends HiveObject {
   @HiveField(3)
   DateTime updatedAt;
 
-
   LocalActivity({
     required this.id,
     required this.description,
@@ -78,7 +95,6 @@ class LocalActivity extends HiveObject {
 
 @HiveType(typeId: 2)
 class LocalCustomer extends HiveObject {
-
   @HiveField(0)
   final int id;
 

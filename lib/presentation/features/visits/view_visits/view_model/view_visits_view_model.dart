@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
@@ -28,7 +29,7 @@ class ViewVisitsViewModel extends ChangeNotifier {
   List<VisitAggregate> get visits => UnmodifiableListView(_visits);
 
   Future<void> loadMoreItems() async {
-    if (_itemsState is! LoadedViewVisitsState) return;
+    if (_itemsState is LoadingViewVisitsState) return;
 
     try {
       _itemsState = LoadingViewVisitsState();
@@ -42,15 +43,24 @@ class ViewVisitsViewModel extends ChangeNotifier {
 
       switch (visitsResult) {
         case ErrorResult<List<VisitAggregate>>():
-          GlobalToastMessage().add(ErrorMessage(message: visitsResult.error));
+          if(visitsResult.failure == FailureType.network && _visits.isEmpty) {
+            _itemsState = OfflineViewVisitsState();
+            GlobalToastMessage().add(ErrorMessage(message: "Network error"));
+          } else {
+            _itemsState = LoadedViewVisitsState();
+            GlobalToastMessage().add(ErrorMessage(message: visitsResult.error));
+          }
+
+
           break;
         case SuccessResult<List<VisitAggregate>>():
           _visits.addAll(visitsResult.data);
           if (visitsResult.data.isNotEmpty) _page++;
+          _itemsState = LoadedViewVisitsState();
+
           break;
       }
     } finally {
-      _itemsState = LoadedViewVisitsState();
       notifyListeners();
     }
   }

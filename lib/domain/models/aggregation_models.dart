@@ -1,5 +1,6 @@
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/local/local_value_objects.dart';
 
 class VisitAggregate {
   final Visit visit;
@@ -13,10 +14,8 @@ class VisitAggregate {
   });
 }
 
-
-
-
 class UnsyncedVisitAggregate {
+  final LocalVisitHash hash;
   final DateTime visitDate;
   final VisitStatus status;
   final String location;
@@ -26,15 +25,15 @@ class UnsyncedVisitAggregate {
   final CustomerRef? customer;
 
   UnsyncedVisitAggregate({
-      required this.visitDate,
-      required this.status,
-      required this.location,
-      required this.notes,
-      required this.createdAt,
-      required this.activityMap,
-      required this.customer,
+    required this.hash,
+    required this.visitDate,
+    required this.status,
+    required this.location,
+    required this.notes,
+    required this.createdAt,
+    required this.activityMap,
+    required this.customer,
   });
-
 }
 
 class ActivityRef {
@@ -58,10 +57,6 @@ class VisitStatisticsModel {
   VisitStatisticsModel({
     required this.data,
   });
-
 }
 
-
-enum SyncStatus {
-  success, fail
-}
+enum SyncStatus { success, fail }

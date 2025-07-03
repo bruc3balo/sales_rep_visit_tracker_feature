@@ -15,45 +15,59 @@ class SearchActivitiesViewModel extends ChangeNotifier {
   final SearchRemoteActivitiesUseCase _searchRemoteActivityUseCase;
   final SearchLocalActivitiesUseCase _searchLocalActivitiesUseCase;
   final ConnectivityService _connectivityService;
-  SearchActivityState _state = LoadedActivitySearchState(searchResults: LinkedHashSet());
+  final SplayTreeSet<Activity> _activities = SplayTreeSet(
+    (a, b) => a.id.compareTo(b.id),
+  );
+  int _remotePage = 0;
+  int _localPage = 0;
+  String? _lastQuery;
+
+  SearchActivityState _state = LoadedActivitySearchState();
 
   SearchActivitiesViewModel({
     required SearchRemoteActivitiesUseCase searchRemoteActivitiesUseCase,
     required SearchLocalActivitiesUseCase searchLocalActivitiesUseCase,
     required ConnectivityService connectivityService,
-  }) : _searchRemoteActivityUseCase = searchRemoteActivitiesUseCase,
-       _searchLocalActivitiesUseCase = searchLocalActivitiesUseCase,
-       _connectivityService = connectivityService {
+  })  : _searchRemoteActivityUseCase = searchRemoteActivitiesUseCase,
+        _searchLocalActivitiesUseCase = searchLocalActivitiesUseCase,
+        _connectivityService = connectivityService {
     searchActivities();
   }
 
   SearchActivityState get state => _state;
 
+  List<Activity> get activities => UnmodifiableListView(_activities);
+
   Future<void> searchActivities({
     String? activityDescription,
-    int page = 0,
     int pageSize = 20,
   }) async {
+    if (_lastQuery != null && _lastQuery != activityDescription) {
+      _localPage = 0;
+      _remotePage = 0;
+    } else if (activityDescription != null && activityDescription != _lastQuery) {
+      _localPage = 0;
+      _remotePage = 0;
+    }
+
+    _lastQuery = activityDescription;
+
     bool hasConnectivity = await _connectivityService.hasInternetConnection();
-    if(hasConnectivity) {
+    if (hasConnectivity) {
       await _searchRemoteActivities(
         activityDescription: activityDescription,
-        page: page,
         pageSize: pageSize,
       );
     } else {
       await _searchLocalActivities(
-          activityDescription: activityDescription,
-          page: page,
-          pageSize: pageSize
+        activityDescription: activityDescription,
+        pageSize: pageSize,
       );
     }
-
   }
 
   Future<void> _searchRemoteActivities({
     String? activityDescription,
-    int page = 0,
     int pageSize = 20,
   }) async {
     if (_state is! LoadedActivitySearchState) return;
@@ -64,30 +78,28 @@ class SearchActivitiesViewModel extends ChangeNotifier {
 
       var getActivityResult = await _searchRemoteActivityUseCase.execute(
         likeDescription: activityDescription,
-        page: page,
+        page: _remotePage,
         pageSize: pageSize,
       );
 
-      switch(getActivityResult) {
-
+      switch (getActivityResult) {
         case ErrorResult<List<Activity>>():
           GlobalToastMessage().add(ErrorMessage(message: getActivityResult.error));
           _state = LoadedActivitySearchState(searchResults: LinkedHashSet());
           break;
         case SuccessResult<List<Activity>>():
+          if(getActivityResult.data.length == pageSize) _remotePage++;
+          _activities.addAll(getActivityResult.data);
           _state = LoadedActivitySearchState(searchResults: LinkedHashSet.from(getActivityResult.data));
           break;
       }
-
     } finally {
       notifyListeners();
     }
-
   }
 
   Future<void> _searchLocalActivities({
     String? activityDescription,
-    int page = 0,
     int pageSize = 20,
   }) async {
     if (_state is! LoadedActivitySearchState) return;
@@ -98,24 +110,24 @@ class SearchActivitiesViewModel extends ChangeNotifier {
 
       var getActivityResult = await _searchLocalActivitiesUseCase.execute(
         likeDescription: activityDescription,
-        page: page,
+        page: _localPage,
         pageSize: pageSize,
       );
 
-      switch(getActivityResult) {
-
+      switch (getActivityResult) {
         case ErrorResult<List<Activity>>():
+          print(getActivityResult.trace.toString());
           GlobalToastMessage().add(ErrorMessage(message: getActivityResult.error));
-          _state = LoadedActivitySearchState(searchResults: LinkedHashSet());
+          _state = LoadedActivitySearchState();
           break;
         case SuccessResult<List<Activity>>():
+          if(getActivityResult.data.length == pageSize) _localPage++;
+          _activities.addAll(getActivityResult.data);
           _state = LoadedActivitySearchState(searchResults: LinkedHashSet.from(getActivityResult.data));
           break;
       }
-
     } finally {
       notifyListeners();
     }
-
   }
 }

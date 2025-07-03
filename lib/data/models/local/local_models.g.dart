@@ -17,33 +17,36 @@ class UnSyncedLocalVisitAdapter extends TypeAdapter<UnSyncedLocalVisit> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UnSyncedLocalVisit(
-      customerIdVisited: fields[0] as int,
-      visitDate: fields[1] as DateTime,
-      status: fields[2] as String,
-      location: fields[3] as String,
-      notes: fields[4] as String,
-      activityIdsDone: (fields[5] as List).cast<int>(),
-      createdAt: fields[6] as DateTime,
+      hash: fields[1] as String,
+      customerIdVisited: fields[2] as int,
+      visitDate: fields[3] as DateTime,
+      status: fields[4] as String,
+      location: fields[5] as String,
+      notes: fields[6] as String,
+      activityIdsDone: (fields[7] as List).cast<int>(),
+      createdAt: fields[8] as DateTime,
     );
   }
 
   @override
   void write(BinaryWriter writer, UnSyncedLocalVisit obj) {
     writer
-      ..writeByte(7)
-      ..writeByte(0)
-      ..write(obj.customerIdVisited)
+      ..writeByte(8)
       ..writeByte(1)
-      ..write(obj.visitDate)
+      ..write(obj.hash)
       ..writeByte(2)
-      ..write(obj.status)
+      ..write(obj.customerIdVisited)
       ..writeByte(3)
-      ..write(obj.location)
+      ..write(obj.visitDate)
       ..writeByte(4)
-      ..write(obj.notes)
+      ..write(obj.status)
       ..writeByte(5)
-      ..write(obj.activityIdsDone)
+      ..write(obj.location)
       ..writeByte(6)
+      ..write(obj.notes)
+      ..writeByte(7)
+      ..write(obj.activityIdsDone)
+      ..writeByte(8)
       ..write(obj.createdAt);
   }
 

@@ -9,6 +9,7 @@ import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/model/view_unsynced_visits_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/view_model/view_unsynced_visits_view_model.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
 class ViewUnsyncedVisitsScreen extends StatelessWidget {
   const ViewUnsyncedVisitsScreen({
@@ -54,58 +55,88 @@ class ViewUnsyncedVisitsScreen extends StatelessWidget {
                     return InfiniteLoader();
                   }
                   var visit = visits[index];
-                  return UnsyncedVisit(visit: visit);
+                  return ListTile(
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        AppRoutes.updateUnsyncedVisits.path,
+                        arguments: visit,
+                      );
+                    },
+                    leading: Container(
+                      padding: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: badges.Badge(
+                        position: badges.BadgePosition.topEnd(),
+                        badgeAnimation: badges.BadgeAnimation.scale(
+                          toAnimate: true,
+                          curve: Curves.slowMiddle,
+                          loopAnimation: false,
+                        ),
+                        stackFit: StackFit.passthrough,
+                        badgeContent: Text(visit.activityMap.length.toString()),
+                        badgeStyle: badges.BadgeStyle(
+                          badgeColor: Colors.white,
+                          borderSide: BorderSide(
+                            color: Colors.cyan,
+                          ),
+                        ),
+                        child: Icon(Icons.business_outlined),
+                      ),
+                    ),
+                    title: Text(visit.customer?.name ?? 'Unknown Customer'),
+                    subtitle: Text(visit.status.name.capitalize),
+                    trailing: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(visit.visitDate.readableDateTime2Line),
+                        Builder(
+                          builder: (context) {
+                            if(isLoading && (visit.hash == (visit.status as LoadingUnsyncedVisitState).visit?.hash)) {
+                              return Icon(Icons.auto_delete_outlined, color: Colors.red,);
+                            }
+
+                            return MenuAnchor(
+                              builder: (_, controller, __) {
+                                return IconButton(
+                                  onPressed: () {
+                                    if (controller.isOpen) {
+                                      controller.close();
+                                      return;
+                                    }
+                                    controller.open();
+                                  },
+                                  icon: const Icon(Icons.more_vert),
+                                  tooltip: 'Activity options',
+                                );
+                              },
+                              menuChildren: [
+                                MenuItemButton(
+                                  onPressed: () async {
+                                    viewUnsyncedVisitsViewModel.delete(visit);
+                                  },
+                                  child: Text(
+                                    "Delete",
+                                    style: TextStyle(color:  Colors.black),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 },
               ),
             ),
           );
         },
       ),
-    );
-  }
-}
-
-class UnsyncedVisit extends StatelessWidget {
-  const UnsyncedVisit({
-    required this.visit,
-    super.key,
-  });
-
-  final UnsyncedVisitAggregate visit;
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-
-      },
-      leading: Container(
-        padding: EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade300,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        child: badges.Badge(
-          position: badges.BadgePosition.topEnd(),
-          badgeAnimation: badges.BadgeAnimation.scale(
-            toAnimate: true,
-            curve: Curves.slowMiddle,
-            loopAnimation: false,
-          ),
-          stackFit: StackFit.passthrough,
-          badgeContent: Text(visit.activityMap.length.toString()),
-          badgeStyle: badges.BadgeStyle(
-            badgeColor: Colors.white,
-            borderSide: BorderSide(
-              color: Colors.cyan,
-            ),
-          ),
-          child: Icon(Icons.business_outlined),
-        ),
-      ),
-      title: Text(visit.customer?.name ?? 'Unknown Customer'),
-      subtitle: Text(visit.status.name.capitalize),
-      trailing: Text(visit.visitDate.readableDateTime2Line),
     );
   }
 }

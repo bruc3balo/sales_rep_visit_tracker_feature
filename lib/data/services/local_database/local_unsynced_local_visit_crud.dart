@@ -7,11 +7,11 @@ abstract class LocalUnSyncedLocalVisitCrud {
 
   Future<TaskResult<int>> countUnsyncedVisits();
 
-  Future<TaskResult<bool>> containsUnsyncedVisitKey({
-    required LocalVisitKey key,
+  Future<TaskResult<UnSyncedLocalVisit?>> findByHash({
+    required LocalVisitHash hash,
   });
 
-  Future<TaskResult<LocalVisitKey>> setLocalVisit({
+  Future<TaskResult<LocalVisitHash>> setLocalVisit({
     required UnSyncedLocalVisit visit,
   });
 
@@ -21,6 +21,10 @@ abstract class LocalUnSyncedLocalVisitCrud {
   });
   Future<TaskResult<void>> removeLocalVisit({
     required UnSyncedLocalVisit visit,
+  });
+
+  Future<TaskResult<void>> removeLocalVisitByHash({
+    required LocalVisitHash hash,
   });
 
 }

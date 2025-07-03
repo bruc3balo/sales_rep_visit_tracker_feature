@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_value_objects.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/local_unsynced_visit_repository.dart';
@@ -5,8 +7,8 @@ import 'package:sales_rep_visit_tracker_feature/data/services/local_database/loc
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalUnsyncedVisitRepository extends LocalUnsyncedVisitRepository {
-
   final LocalUnSyncedLocalVisitCrud _localUnSyncedLocalVisitCrud;
+  final StreamController<void> _visitAddedStream = StreamController.broadcast();
 
   HiveLocalUnsyncedVisitRepository({
     required LocalUnSyncedLocalVisitCrud localUnSyncedLocalVisitCrud,
@@ -22,17 +24,25 @@ class HiveLocalUnsyncedVisitRepository extends LocalUnsyncedVisitRepository {
 
   @override
   Future<TaskResult<void>> setUnsyncedVisit({required UnSyncedLocalVisit visit}) async {
-    return await _localUnSyncedLocalVisitCrud.setLocalVisit(visit: visit);
+    var result = await _localUnSyncedLocalVisitCrud.setLocalVisit(visit: visit);
+    if (result is SuccessResult<void>) {
+      _visitAddedStream.add(null);
+    }
+    return result;
   }
 
   @override
   Future<TaskResult<void>> removeUnsyncedVisit({required UnSyncedLocalVisit visit}) async {
-    return await _localUnSyncedLocalVisitCrud.removeLocalVisit(visit: visit);
+    var result = await _localUnSyncedLocalVisitCrud.removeLocalVisit(visit: visit);
+    if (result is SuccessResult<void>) {
+      _visitAddedStream.add(null);
+    }
+    return result;
   }
 
   @override
-  Future<TaskResult<bool>> containsUnsyncedVisitKey({required LocalVisitKey key}) async {
-    return await _localUnSyncedLocalVisitCrud.containsUnsyncedVisitKey(key: key);
+  Future<TaskResult<UnSyncedLocalVisit?>> findByHash({required LocalVisitHash hash}) async {
+    return await _localUnSyncedLocalVisitCrud.findByHash(hash: hash);
   }
 
   @override
@@ -40,4 +50,15 @@ class HiveLocalUnsyncedVisitRepository extends LocalUnsyncedVisitRepository {
     return await _localUnSyncedLocalVisitCrud.countUnsyncedVisits();
   }
 
+  @override
+  Future<TaskResult<void>> removeUnsyncedVisitByHash({required LocalVisitHash hash}) async {
+    var result = await _localUnSyncedLocalVisitCrud.removeLocalVisitByHash(hash: hash);
+    if (result is SuccessResult<void>) {
+      _visitAddedStream.add(null);
+    }
+    return result;
+  }
+
+  @override
+  Stream<void> get unsyncedVisitUpdatedStream => _visitAddedStream.stream;
 }

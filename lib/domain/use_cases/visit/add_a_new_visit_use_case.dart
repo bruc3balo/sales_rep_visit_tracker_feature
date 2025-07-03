@@ -20,7 +20,7 @@ class AddANewVisitUseCase {
     required LocalUnsyncedVisitRepository localUnsyncedVisitRepository,
     required LocalCustomerRepository localCustomerRepository,
     required LocalActivityRepository localActivityRepository,
-  }) : _visitRepository = visitRepository,
+  })  : _visitRepository = visitRepository,
         _localUnsyncedVisitRepository = localUnsyncedVisitRepository,
         _localCustomerRepository = localCustomerRepository,
         _localActivityRepository = localActivityRepository;
@@ -33,8 +33,7 @@ class AddANewVisitUseCase {
     required String notes,
     required List<Activity> activitiesDone,
   }) async {
-
-   var result =  await _visitRepository.createVisit(
+    var result = await _visitRepository.createVisit(
       customerIdVisited: customer.id,
       visitDate: visitDate,
       status: status,
@@ -43,55 +42,55 @@ class AddANewVisitUseCase {
       activityIdsDone: activitiesDone.map((a) => a.id).toList(),
     );
 
-   switch(result) {
+    switch (result) {
+      case ErrorResult<void>():
+        //Store offline if error is no internet
+        if (FailureType.network == result.failure) {
+          //Offline storage
+          var key = generateHash(
+            customerIdVisited: customer.id,
+            visitDate: visitDate,
+            status: status.name.capitalize,
+            location: location,
+            notes: notes,
+            activityIdsDone: activitiesDone.map((a) => a.id).toList(),
+          );
+          var localSaveResult = await _localUnsyncedVisitRepository.setUnsyncedVisit(
+            visit: UnSyncedLocalVisit(
+              hash: key.value,
+              customerIdVisited: customer.id,
+              visitDate: visitDate,
+              status: status.name.capitalize,
+              location: location,
+              notes: notes,
+              activityIdsDone: activitiesDone.map((a) => a.id).toList(),
+              createdAt: DateTime.now(),
+            ),
+          );
 
-     case ErrorResult<void>():
+          switch (localSaveResult) {
+            case ErrorResult<void>():
+              return ErrorResult(
+                error: localSaveResult.error,
+                trace: localSaveResult.trace,
+              );
+            case SuccessResult<void>():
+              //Cache activity and customer for offline resolution async
+              _localActivityRepository.setLocalActivities(activities: activitiesDone);
 
-       //Store offline if error is no internet
-       if(FailureType.network == result.failure) {
-         //Offline storage
-         var localSaveResult = await _localUnsyncedVisitRepository
-             .setUnsyncedVisit(
-           visit: UnSyncedLocalVisit(
-             customerIdVisited: customer.id,
-             visitDate: visitDate,
-             status: status.name.capitalize,
-             location: location,
-             notes: notes,
-             activityIdsDone: activitiesDone.map((a) => a.id).toList(),
-             createdAt: DateTime.now(),
-           ),
-         );
+              _localCustomerRepository.setLocalCustomer(customer: customer);
 
-         switch (localSaveResult) {
-           case ErrorResult<void>():
-             return ErrorResult(
-               error: localSaveResult.error,
-               trace: localSaveResult.trace,
-             );
-           case SuccessResult<void>():
-           //Cache activity and customer for offline resolution async
-             _localActivityRepository.setLocalActivities(
-                 activities: activitiesDone
-             );
+              return SuccessResult(data: null, message: "Visit created offline, will be synced later");
+          }
+        }
 
-             _localCustomerRepository.setLocalCustomer(
-                 customer: customer
-             );
-
-             return SuccessResult(data: null,
-                 message: "Visit created offline, will be synced later");
-         }
-       }
-
-       return ErrorResult(
-           error: result.error,
-           trace: result.trace,
-           failure: result.failure,
-       );
-     case SuccessResult<void>():
-       return result;
-   }
-
+        return ErrorResult(
+          error: result.error,
+          trace: result.trace,
+          failure: result.failure,
+        );
+      case SuccessResult<void>():
+        return result;
+    }
   }
 }

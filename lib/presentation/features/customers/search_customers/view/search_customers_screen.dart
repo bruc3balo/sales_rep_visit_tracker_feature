@@ -7,7 +7,7 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
 
 class CustomerSearchDialog extends StatelessWidget {
-  const CustomerSearchDialog({
+   CustomerSearchDialog({
     this.initialCustomer,
     required this.searchCustomersViewModel,
     required this.onSelect,
@@ -17,6 +17,16 @@ class CustomerSearchDialog extends StatelessWidget {
   final Customer? initialCustomer;
   final SearchCustomersViewModel searchCustomersViewModel;
   final Function(Customer) onSelect;
+  final TextEditingController searchController = TextEditingController();
+
+
+  void search() {
+    String query = searchController.text;
+    searchCustomersViewModel.searchCustomers(
+      customerName: query,
+      pageSize: min(query.length, 20),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,43 +38,54 @@ class CustomerSearchDialog extends StatelessWidget {
           direction: Axis.vertical,
           children: [
             TextFormField(
-              onFieldSubmitted: (s) {
-                searchCustomersViewModel.searchCustomers(
-                  customerName: s,
-                  pageSize: min(s.length, 20),
-                );
-              },
+              controller: searchController,
+              onFieldSubmitted: (s) => search(),
               decoration: InputDecoration(
                 hintText: "Search by customer name ...",
+                suffix: IconButton(
+                  onPressed: search,
+                  icon: Icon(Icons.search),
+                ),
               ),
             ),
             ListenableBuilder(
               listenable: searchCustomersViewModel,
               builder: (_, __) {
                 var state = searchCustomersViewModel.state;
-                switch (state) {
-                  case LoadingCustomersSearchState():
-                    return InfiniteLoader();
-                  case LoadedCustomersSearchState():
-                    List<Customer> filtered = state.searchResults.toList();
-                    return Expanded(
-                      child: ListView.builder(
-                        itemCount: filtered.length,
-                        shrinkWrap: true,
-                        itemBuilder: (_, i) {
-                          Customer c = filtered[i];
-                          return ListTile(
-                            selected: c.id == initialCustomer?.id,
-                            onTap: () {
-                              Navigator.of(context).pop();
-                              onSelect(c);
-                            },
-                            title: Text(c.name),
-                          );
-                        },
-                      ),
-                    );
-                }
+                bool isLoading = state is LoadingCustomersSearchState;
+                var data = switch(state) {
+                  LoadingCustomersSearchState() => [],
+                  LoadedCustomersSearchState() => state.searchResults?.toList() ?? searchCustomersViewModel.customers,
+                };
+                return Expanded(
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (scrollInfo) {
+                      bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
+                      if (!isLoading && isAtEndOfList) {
+                        searchCustomersViewModel.searchCustomers(
+                          customerName: searchController.text,
+                          pageSize: 10,
+                        );
+                      }
+                      return true;
+                    },
+                    child: ListView.builder(
+                      itemCount: data.length,
+                      shrinkWrap: true,
+                      itemBuilder: (_, i) {
+                        Customer c = data[i];
+                        return ListTile(
+                          selected: c.id == initialCustomer?.id,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            onSelect(c);
+                          },
+                          title: Text(c.name),
+                        );
+                      },
+                    ),
+                  ),
+                );
               },
             ),
             TextButton(

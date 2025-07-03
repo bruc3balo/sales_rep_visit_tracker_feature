@@ -11,6 +11,8 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/home/model
 class HomeViewModel extends ChangeNotifier {
   final CountUnsyncedVisitsUseCase _countUnsyncedVisitsUseCase;
   final List<HomePages> homePages = UnmodifiableListView(HomePages.values);
+  late final StreamSubscription<void> _countUpdatedSubscription;
+
   HomePages _currentPage = HomePages.visits;
   CountHomeVisitsState _visitCountState = LoadedCountVisitState(
       unSyncedVisitCount: null,
@@ -19,20 +21,26 @@ class HomeViewModel extends ChangeNotifier {
   HomeViewModel({
     required CountUnsyncedVisitsUseCase countUnsyncedVisitsUseCase
   }) : _countUnsyncedVisitsUseCase = countUnsyncedVisitsUseCase {
-    countUnsyncedVisits();
+    initializeViewModel();
   }
 
 
   HomePages get currentPage => _currentPage;
   CountHomeVisitsState get visitCountState => _visitCountState;
 
+  void initializeViewModel() {
+    _countUnsyncedVisits();
+    _countUpdatedSubscription = _countUnsyncedVisitsUseCase.onUpdatedStream.listen((_) async => await _countUnsyncedVisits());
+  }
+
   void changePage(int pageIndex) {
+    _countUnsyncedVisits();
     if(homePages[pageIndex] == _currentPage) return;
     _currentPage = homePages[pageIndex];
     notifyListeners();
   }
 
-  Future<void> countUnsyncedVisits() async {
+  Future<void> _countUnsyncedVisits() async {
     if(_visitCountState is! LoadedCountVisitState) return;
 
     try {
@@ -59,6 +67,12 @@ class HomeViewModel extends ChangeNotifier {
     } finally {
       notifyListeners();
     }
+  }
+
+  @override
+  void dispose() {
+    _countUpdatedSubscription.cancel();
+    super.dispose();
   }
 
 }

@@ -42,6 +42,7 @@ class VisitListOfPastVisitsUseCase {
         return ErrorResult(
           error: result.error,
           trace: result.trace,
+          failure: result.failure,
         );
       case SuccessResult<List<Visit>>():
         var visits = result.data;

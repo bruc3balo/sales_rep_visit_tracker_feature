@@ -164,6 +164,7 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
           return ErrorResult(
             error: getVisitResponse.description,
             trace: getVisitResponse.trace,
+            failure: getVisitResponse.failureType,
           );
         case SuccessNetworkResponse():
           var data = (getVisitResponse.data as List<dynamic>).map((e) => RemoteVisit.fromJson(e).toDomain).toList();

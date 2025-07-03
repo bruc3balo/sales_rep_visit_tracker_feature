@@ -21,8 +21,10 @@ class ViewVisitsScreen extends StatelessWidget {
       body: ListenableBuilder(
         listenable: viewVisitsViewModel,
         builder: (context, __) {
-          bool isLoading = viewVisitsViewModel.itemsState is LoadingViewVisitsState;
+          var state = viewVisitsViewModel.itemsState;
+          bool isLoading = state is LoadingViewVisitsState;
           var visits = viewVisitsViewModel.visits;
+
           return NotificationListener<ScrollNotification>(
             onNotification: (scrollInfo) {
               bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
@@ -34,15 +36,21 @@ class ViewVisitsScreen extends StatelessWidget {
             },
             child: RefreshIndicator(
               onRefresh: () => viewVisitsViewModel.refresh(),
-              child: ListView.builder(
-                itemCount: viewVisitsViewModel.visits.length + (isLoading ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index >= visits.length) {
-                    return InfiniteLoader();
-                  }
-                  var visit = visits[index];
-                  return VisitTile(visit: visit);
-                },
+              child: Visibility(
+                  visible: state is! OfflineViewVisitsState,
+                  replacement: Center(
+                    child: Text("Go online to see past visits"),
+                  ),
+                  child: ListView.builder(
+                    itemCount: viewVisitsViewModel.visits.length + (isLoading ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= visits.length) {
+                        return InfiniteLoader();
+                      }
+                      var visit = visits[index];
+                      return VisitTile(visit: visit);
+                    },
+                  )
               ),
             ),
           );
@@ -71,29 +79,29 @@ class VisitTile extends StatelessWidget {
       },
       leading: Container(
         padding: EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade300,
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-          ),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade300,
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
 
-          child: badges.Badge(
-            position: badges.BadgePosition.topEnd(),
-            badgeAnimation: badges.BadgeAnimation.scale(
-              toAnimate: true,
-              curve: Curves.slowMiddle,
-              loopAnimation: false,
-            ),
-            stackFit: StackFit.passthrough,
-            badgeContent: Text(visit.activityMap.length.toString()),
-            badgeStyle: badges.BadgeStyle(
-              badgeColor: Colors.white,
-              borderSide: BorderSide(
-                color: Colors.cyan,
-
-              ),
-            ),
-            child: Icon(Icons.business_outlined),
+        child: badges.Badge(
+          position: badges.BadgePosition.topEnd(),
+          badgeAnimation: badges.BadgeAnimation.scale(
+            toAnimate: true,
+            curve: Curves.slowMiddle,
+            loopAnimation: false,
           ),
+          stackFit: StackFit.passthrough,
+          badgeContent: Text(visit.activityMap.length.toString()),
+          badgeStyle: badges.BadgeStyle(
+            badgeColor: Colors.white,
+            borderSide: BorderSide(
+              color: Colors.cyan,
+
+            ),
+          ),
+          child: Icon(Icons.business_outlined),
+        ),
       ),
       title: Text(visit.customer?.name ?? 'Unknown Customer'),
       subtitle: Text(visit.visit.status),

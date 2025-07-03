@@ -15,7 +15,13 @@ class SearchCustomersViewModel extends ChangeNotifier {
   final SearchRemoteCustomerUseCase _searchRemoteCustomerUseCase;
   final SearchLocalCustomersUseCase _searchLocalCustomersUseCase;
   final ConnectivityService _connectivityService;
-  SearchCustomerState _state = LoadedCustomersSearchState(searchResults: LinkedHashSet());
+  final SplayTreeSet<Customer> _customers = SplayTreeSet(
+    (a, b) => a.id.compareTo(b.id),
+  );
+  int _localPage = 0;
+  int _remotePage = 0;
+  String? _lastQuery;
+  SearchCustomerState _state = LoadedCustomersSearchState();
 
   SearchCustomersViewModel({
     required SearchRemoteCustomerUseCase searchRemoteCustomerUseCase,
@@ -29,22 +35,31 @@ class SearchCustomersViewModel extends ChangeNotifier {
 
   SearchCustomerState get state => _state;
 
+  List<Customer> get customers => UnmodifiableListView(_customers);
+
   Future<void> searchCustomers({
     String? customerName,
-    int page = 0,
     int pageSize = 20,
   }) async {
+    if (_lastQuery != null && _lastQuery != customerName) {
+      _localPage = 0;
+      _remotePage = 0;
+    } else if (customerName != null && customerName != _lastQuery) {
+      _localPage = 0;
+      _remotePage = 0;
+    }
+
+    _lastQuery = customerName;
+
     bool hasConnectivity = await _connectivityService.hasInternetConnection();
     if (hasConnectivity) {
       await _searchRemoteCustomers(
         customerName: customerName,
-        page: page,
         pageSize: pageSize,
       );
     } else {
       await _searchLocalCustomers(
         customerName: customerName,
-        page: page,
         pageSize: pageSize,
       );
     }
@@ -52,7 +67,6 @@ class SearchCustomersViewModel extends ChangeNotifier {
 
   Future<void> _searchLocalCustomers({
     String? customerName,
-    int page = 0,
     int pageSize = 20,
   }) async {
     if (_state is! LoadedCustomersSearchState) return;
@@ -63,16 +77,18 @@ class SearchCustomersViewModel extends ChangeNotifier {
 
       var getCustomerResult = await _searchLocalCustomersUseCase.execute(
         likeName: customerName,
-        page: page,
+        page: _localPage,
         pageSize: pageSize,
       );
 
       switch (getCustomerResult) {
         case ErrorResult<List<Customer>>():
           GlobalToastMessage().add(ErrorMessage(message: getCustomerResult.error));
-          _state = LoadedCustomersSearchState(searchResults: LinkedHashSet());
+          _state = LoadedCustomersSearchState();
           break;
         case SuccessResult<List<Customer>>():
+          if(getCustomerResult.data.length == pageSize) _localPage++;
+          _customers.addAll(getCustomerResult.data);
           _state = LoadedCustomersSearchState(searchResults: LinkedHashSet.from(getCustomerResult.data));
           break;
       }
@@ -83,7 +99,6 @@ class SearchCustomersViewModel extends ChangeNotifier {
 
   Future<void> _searchRemoteCustomers({
     String? customerName,
-    int page = 0,
     int pageSize = 20,
   }) async {
     if (_state is! LoadedCustomersSearchState) return;
@@ -94,16 +109,18 @@ class SearchCustomersViewModel extends ChangeNotifier {
 
       var getCustomerResult = await _searchRemoteCustomerUseCase.execute(
         likeName: customerName,
-        page: page,
+        page: _remotePage,
         pageSize: pageSize,
       );
 
       switch (getCustomerResult) {
         case ErrorResult<List<Customer>>():
           GlobalToastMessage().add(ErrorMessage(message: getCustomerResult.error));
-          _state = LoadedCustomersSearchState(searchResults: LinkedHashSet());
+          _state = LoadedCustomersSearchState();
           break;
         case SuccessResult<List<Customer>>():
+          if(getCustomerResult.data.length == pageSize) _remotePage++;
+          _customers.addAll(getCustomerResult.data);
           _state = LoadedCustomersSearchState(searchResults: LinkedHashSet.from(getCustomerResult.data));
           break;
       }

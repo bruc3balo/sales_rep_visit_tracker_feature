@@ -7,7 +7,7 @@ sealed class SearchActivityState {}
 class LoadingActivitySearchState extends SearchActivityState {}
 
 class LoadedActivitySearchState extends SearchActivityState {
-  final LinkedHashSet<Activity> searchResults;
+  final LinkedHashSet<Activity>? searchResults;
 
-  LoadedActivitySearchState({required this.searchResults});
+  LoadedActivitySearchState({this.searchResults});
 }

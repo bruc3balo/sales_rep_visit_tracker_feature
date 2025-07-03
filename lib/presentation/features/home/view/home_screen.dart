@@ -22,7 +22,7 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/vie
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 import 'package:badges/badges.dart' as badges;
 
-class HomeScreen extends StatefulWidget{
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     required this.homeViewModel,
     super.key,
@@ -34,31 +34,8 @@ class HomeScreen extends StatefulWidget{
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
+class _HomeScreenState extends State<HomeScreen>{
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch(state) {
-      case AppLifecycleState.resumed:
-        widget.homeViewModel.countUnsyncedVisits();
-        break;
-      default:
-        break;
-    }
-    super.didChangeAppLifecycleState(state);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,20 +56,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
                       badgeAnimation: badges.BadgeAnimation.rotation(),
                       position: badges.BadgePosition.center(),
                       child: IconButton(
-                          onPressed: () {
-                            Navigator.of(context).pushNamed(
-                              AppRoutes.visitUnsyncedVisits.path,
-                            );
-                          },
-                          icon: Icon(
-                            Icons.sync,
-                            size: 35,
-                          )),
+                        onPressed: () {
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.visitUnsyncedVisits.path,
+                          );
+                        },
+                        icon: Icon(
+                          Icons.sync,
+                          size: 40,
+                        ),
+                      ),
                     ),
                   ),
               },
               IconButton(
-                onPressed: () {
+                onPressed: ()  {
                   switch (widget.homeViewModel.currentPage) {
                     case HomePages.visits:
                       Navigator.of(context).pushNamed(
@@ -100,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
                       );
                       break;
                     case HomePages.activities:
-                      Navigator.of(context).pushNamed(
+                       Navigator.of(context).pushNamed(
                         AppRoutes.addActivity.path,
                       );
                       break;
@@ -154,11 +132,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver{
                     localCustomerRepository: GetIt.I(),
                   ),
                   viewLocalCustomersUseCase: ViewLocalCustomersUseCase(
-                      localCustomerRepository: GetIt.I(),
+                    localCustomerRepository: GetIt.I(),
                   ),
                   deleteCustomerUseCase: DeleteCustomerUseCase(
-                      remoteCustomerRepository: GetIt.I(),
-                      localCustomerRepository: GetIt.I(),
+                    remoteCustomerRepository: GetIt.I(),
+                    localCustomerRepository: GetIt.I(),
                   ),
                   connectivityService: GetIt.I(),
                 ),

@@ -9,7 +9,9 @@ import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/search
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/search_remote_customer_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/add_a_new_visit_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_unsynced_visit_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/delete_unsynced_visit_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/update_unsynced_visit_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/view_unsynced_local_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/view/add_activity_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/view_model/add_activity_view_model.dart';
@@ -22,6 +24,8 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/home/view_
 import 'package:sales_rep_visit_tracker_feature/presentation/features/splash/view/splash_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/add_visit/view/add_visit_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/add_visit/view_model/add_visit_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/update_unsynced_visit/view/update_unsynced_visit_screen.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/update_unsynced_visit/view_model/update_unsynced_visit_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/view/view_unsynced_visits_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/view_model/view_unsynced_visits_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_details/view/view_visit_details_screen.dart';
@@ -34,8 +38,8 @@ enum AppRoutes {
   addActivity("/addActivity"),
   addCustomer("/addCustomer"),
   visitDetails("/visitDetails"),
-  unsyncedVisitDetails("/unsyncedVisitDetails"),
-  visitUnsyncedVisits("/visitUnsyncedVisits");
+  visitUnsyncedVisits("/visitUnsyncedVisits"),
+  updateUnsyncedVisits("/updateUnsyncedVisits");
 
   final String path;
 
@@ -56,21 +60,21 @@ extension RoutePage on AppRoutes {
       AppRoutes.addVisit => AddVisitScreen(
           searchActivitiesViewModel: SearchActivitiesViewModel(
             searchLocalActivitiesUseCase: SearchLocalActivitiesUseCase(
-                localActivityRepository: GetIt.I(),
+              localActivityRepository: GetIt.I(),
             ),
             searchRemoteActivitiesUseCase: SearchRemoteActivitiesUseCase(
-                remoteActivityRepository: GetIt.I(),
-                localActivityRepository: GetIt.I(),
+              remoteActivityRepository: GetIt.I(),
+              localActivityRepository: GetIt.I(),
             ),
             connectivityService: GetIt.I(),
           ),
           searchCustomersViewModel: SearchCustomersViewModel(
             searchRemoteCustomerUseCase: SearchRemoteCustomerUseCase(
-                remoteCustomerRepository: GetIt.I(),
+              remoteCustomerRepository: GetIt.I(),
               localCustomerRepository: GetIt.I(),
             ),
             searchLocalCustomersUseCase: SearchLocalCustomersUseCase(
-                localCustomerRepository: GetIt.I(),
+              localCustomerRepository: GetIt.I(),
             ),
             connectivityService: GetIt.I(),
           ),
@@ -106,6 +110,9 @@ extension RoutePage on AppRoutes {
         ),
       AppRoutes.visitUnsyncedVisits => ViewUnsyncedVisitsScreen(
           viewUnsyncedVisitsViewModel: ViewUnsyncedVisitsViewModel(
+            deleteUnsyncedVisitUseCase: DeleteUnsyncedVisitUseCase(
+              localUnsyncedVisitRepository: GetIt.I(),
+            ),
             viewUnsyncedLocalVisitsUseCase: ViewUnsyncedLocalVisitsUseCase(
               localUnsyncedVisitRepository: GetIt.I(),
               localActivityRepository: GetIt.I(),
@@ -114,7 +121,36 @@ extension RoutePage on AppRoutes {
             syncUnsyncedLocalVisitsUseCase: GetIt.I(),
           ),
         ),
-      AppRoutes.unsyncedVisitDetails => Placeholder(),
+      AppRoutes.updateUnsyncedVisits => UpdateUnsyncedVisitScreen(
+          searchCustomersViewModel: SearchCustomersViewModel(
+            searchRemoteCustomerUseCase: SearchRemoteCustomerUseCase(
+              remoteCustomerRepository: GetIt.I(),
+              localCustomerRepository: GetIt.I(),
+            ),
+            searchLocalCustomersUseCase: SearchLocalCustomersUseCase(
+              localCustomerRepository: GetIt.I(),
+            ),
+            connectivityService: GetIt.I(),
+          ),
+          searchActivitiesViewModel: SearchActivitiesViewModel(
+            searchRemoteActivitiesUseCase: SearchRemoteActivitiesUseCase(
+              remoteActivityRepository: GetIt.I(),
+              localActivityRepository: GetIt.I(),
+            ),
+            searchLocalActivitiesUseCase: SearchLocalActivitiesUseCase(
+              localActivityRepository: GetIt.I(),
+            ),
+            connectivityService: GetIt.I(),
+          ),
+          updateUnsyncedVisitViewModel: UpdateUnsyncedVisitViewModel(
+            updateUnsyncedVisitUseCase: UpdateUnsyncedVisitUseCase(
+              localUnsyncedVisitRepository: GetIt.I(),
+              localActivityRepository: GetIt.I(),
+              localCustomerRepository: GetIt.I(),
+            ),
+            visit: ModalRoute.of(context)?.settings.arguments as UnsyncedVisitAggregate,
+          ),
+        ),
     };
   }
 }
