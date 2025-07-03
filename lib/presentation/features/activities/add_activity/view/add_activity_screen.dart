@@ -1,16 +1,39 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/model/add_activity_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/add_activity/view_model/add_activity_view_model.dart';
 
-class AddActivityScreen extends StatelessWidget {
-   AddActivityScreen({
+class AddActivityScreen extends StatefulWidget {
+   const AddActivityScreen({
     required this.addActivityViewModel,
     super.key,
   });
 
   final AddActivityViewModel addActivityViewModel;
+
+  @override
+  State<AddActivityScreen> createState() => _AddActivityScreenState();
+}
+
+class _AddActivityScreenState extends State<AddActivityScreen> {
   final TextEditingController descriptionController = TextEditingController();
+  late final StreamSubscription<ToastMessage> toastSubscription;
+
+  @override
+  void initState() {
+    toastSubscription = widget.addActivityViewModel.toastStream.listen((t) => t.show());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    toastSubscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +43,9 @@ class AddActivityScreen extends StatelessWidget {
       ),
       body: Center(
         child: ListenableBuilder(
-          listenable: addActivityViewModel,
+          listenable: widget.addActivityViewModel,
           builder: (_, __) {
-            var state = addActivityViewModel.state;
+            var state = widget.addActivityViewModel.state;
             switch(state) {
 
               case InitialAddActivityState():
@@ -50,7 +73,7 @@ class AddActivityScreen extends StatelessWidget {
                           String description = descriptionController.text;
                           if(description.isEmpty) return;
 
-                          addActivityViewModel.addActivity(description);
+                          widget.addActivityViewModel.addActivity(description);
                         },
                         child: Text("Create"),
                       ),

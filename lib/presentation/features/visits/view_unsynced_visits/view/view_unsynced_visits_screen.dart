@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
@@ -8,7 +11,7 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/vie
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 import 'package:badges/badges.dart' as badges;
 
-class ViewUnsyncedVisitsScreen extends StatelessWidget {
+class ViewUnsyncedVisitsScreen extends StatefulWidget {
   const ViewUnsyncedVisitsScreen({
     required this.viewUnsyncedVisitsViewModel,
     super.key,
@@ -17,36 +20,55 @@ class ViewUnsyncedVisitsScreen extends StatelessWidget {
   final ViewUnsyncedVisitsViewModel viewUnsyncedVisitsViewModel;
 
   @override
+  State<ViewUnsyncedVisitsScreen> createState() => _ViewUnsyncedVisitsScreenState();
+}
+
+class _ViewUnsyncedVisitsScreenState extends State<ViewUnsyncedVisitsScreen> {
+  late final StreamSubscription<ToastMessage> toastSubscription;
+
+  @override
+  void initState() {
+    toastSubscription = widget.viewUnsyncedVisitsViewModel.toastStream.listen((t) => t.show());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    toastSubscription.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Unsynced visits"),
         actions: [
           IconButton(
-            onPressed: viewUnsyncedVisitsViewModel.sync,
+            onPressed: widget.viewUnsyncedVisitsViewModel.sync,
             icon: Icon(Icons.sync),
           )
         ],
       ),
       body: ListenableBuilder(
-        listenable: viewUnsyncedVisitsViewModel,
+        listenable: widget.viewUnsyncedVisitsViewModel,
         builder: (_, __) {
-          bool isLoading = viewUnsyncedVisitsViewModel.state is LoadingUnsyncedVisitState;
-          var visits = viewUnsyncedVisitsViewModel.unsyncedVisits;
+          bool isLoading = widget.viewUnsyncedVisitsViewModel.state is LoadingUnsyncedVisitState;
+          var visits = widget.viewUnsyncedVisitsViewModel.unsyncedVisits;
 
           return NotificationListener<ScrollNotification>(
             onNotification: (scrollInfo) {
               bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
               if (!isLoading && isAtEndOfList) {
-                viewUnsyncedVisitsViewModel.loadMoreItems();
+                widget.viewUnsyncedVisitsViewModel.loadMoreItems();
               }
 
               return true;
             },
             child: RefreshIndicator(
-              onRefresh: () => viewUnsyncedVisitsViewModel.refresh(),
+              onRefresh: () => widget.viewUnsyncedVisitsViewModel.refresh(),
               child: ListView.builder(
-                itemCount: viewUnsyncedVisitsViewModel.unsyncedVisits.length + (isLoading ? 1 : 0),
+                itemCount: widget.viewUnsyncedVisitsViewModel.unsyncedVisits.length + (isLoading ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= visits.length) {
                     return InfiniteLoader();
@@ -75,10 +97,7 @@ class UnsyncedVisit extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: () {
-        Navigator.of(context).pushNamed(
-          AppRoutes.visitDetails.path,
-          arguments: visit,
-        );
+
       },
       leading: Container(
         padding: EdgeInsets.all(8.0),

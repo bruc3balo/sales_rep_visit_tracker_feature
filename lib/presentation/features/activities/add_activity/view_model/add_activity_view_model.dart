@@ -18,6 +18,7 @@ class AddActivityViewModel extends ChangeNotifier {
 
 
   AddActivityState get state => _state;
+  Stream<ToastMessage> get toastStream => _toastStream.stream;
 
 
   Future<void> addActivity(String description) async {
