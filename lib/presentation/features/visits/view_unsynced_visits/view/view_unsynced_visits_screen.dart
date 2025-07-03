@@ -4,14 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/model/view_unsynced_visits_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/view_model/view_unsynced_visits_view_model.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 import 'package:badges/badges.dart' as badges;
 
-class ViewUnsyncedVisitsScreen extends StatefulWidget {
+class ViewUnsyncedVisitsScreen extends StatelessWidget {
   const ViewUnsyncedVisitsScreen({
     required this.viewUnsyncedVisitsViewModel,
     super.key,
@@ -20,55 +19,36 @@ class ViewUnsyncedVisitsScreen extends StatefulWidget {
   final ViewUnsyncedVisitsViewModel viewUnsyncedVisitsViewModel;
 
   @override
-  State<ViewUnsyncedVisitsScreen> createState() => _ViewUnsyncedVisitsScreenState();
-}
-
-class _ViewUnsyncedVisitsScreenState extends State<ViewUnsyncedVisitsScreen> {
-  late final StreamSubscription<ToastMessage> toastSubscription;
-
-  @override
-  void initState() {
-    toastSubscription = widget.viewUnsyncedVisitsViewModel.toastStream.listen((t) => t.show());
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    toastSubscription.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Unsynced visits"),
         actions: [
           IconButton(
-            onPressed: widget.viewUnsyncedVisitsViewModel.sync,
+            onPressed: viewUnsyncedVisitsViewModel.sync,
             icon: Icon(Icons.sync),
           )
         ],
       ),
       body: ListenableBuilder(
-        listenable: widget.viewUnsyncedVisitsViewModel,
+        listenable: viewUnsyncedVisitsViewModel,
         builder: (_, __) {
-          bool isLoading = widget.viewUnsyncedVisitsViewModel.state is LoadingUnsyncedVisitState;
-          var visits = widget.viewUnsyncedVisitsViewModel.unsyncedVisits;
+          bool isLoading = viewUnsyncedVisitsViewModel.state is LoadingUnsyncedVisitState;
+          var visits = viewUnsyncedVisitsViewModel.unsyncedVisits;
 
           return NotificationListener<ScrollNotification>(
             onNotification: (scrollInfo) {
               bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
               if (!isLoading && isAtEndOfList) {
-                widget.viewUnsyncedVisitsViewModel.loadMoreItems();
+                viewUnsyncedVisitsViewModel.loadMoreItems();
               }
 
               return true;
             },
             child: RefreshIndicator(
-              onRefresh: () => widget.viewUnsyncedVisitsViewModel.refresh(),
+              onRefresh: () => viewUnsyncedVisitsViewModel.refresh(),
               child: ListView.builder(
-                itemCount: widget.viewUnsyncedVisitsViewModel.unsyncedVisits.length + (isLoading ? 1 : 0),
+                itemCount: viewUnsyncedVisitsViewModel.unsyncedVisits.length + (isLoading ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index >= visits.length) {
                     return InfiniteLoader();

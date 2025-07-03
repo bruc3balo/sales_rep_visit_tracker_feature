@@ -4,7 +4,7 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/update_customer_use_case.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/edit_customer/view/edit_customer_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/edit_customer/view_model/edit_customer_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/view_customers/model/view_customers_model.dart';

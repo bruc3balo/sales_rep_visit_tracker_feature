@@ -4,7 +4,7 @@ import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/update_activity_use_case.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/edit_activity/view/edit_activity_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/edit_activity/view_model/edit_activity_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/model/view_activities_models.dart';

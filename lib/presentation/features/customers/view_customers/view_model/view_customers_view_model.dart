@@ -10,6 +10,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/delete_customer_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/view_local_customers_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/view_remote_customers_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/view_customers/model/view_customers_model.dart';
 
 class ViewCustomersViewModel extends ChangeNotifier {
@@ -22,7 +23,6 @@ class ViewCustomersViewModel extends ChangeNotifier {
   final SplayTreeSet<Customer> _customers = SplayTreeSet(
     (a, b) => a.id.compareTo(b.id),
   );
-  final StreamController<ToastMessage> _toastController = StreamController.broadcast();
   ViewCustomersState _itemsState = LoadedViewCustomerState();
   DeleteCustomerState _deleteState = InitialDeleteCustomerState();
 
@@ -68,7 +68,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
 
       switch (customerResult) {
         case ErrorResult<List<Customer>>():
-          _toastController.add(ErrorMessage(message: customerResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: customerResult.error));
           break;
         case SuccessResult<List<Customer>>():
           _customers.addAll(customerResult.data);
@@ -95,7 +95,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
 
       switch (customerResult) {
         case ErrorResult<List<Customer>>():
-          _toastController.add(ErrorMessage(message: customerResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: customerResult.error));
           break;
         case SuccessResult<List<Customer>>():
           _customers.addAll(customerResult.data);
@@ -129,12 +129,12 @@ class ViewCustomersViewModel extends ChangeNotifier {
 
       switch (result) {
         case ErrorResult<void>():
-          _toastController.add(ErrorMessage(message: result.error));
+          GlobalToastMessage().add(ErrorMessage(message: result.error));
           break;
 
         case SuccessResult<void>():
           _customers.remove(customer);
-          _toastController.add(SuccessMessage(message: result.message));
+          GlobalToastMessage().add(SuccessMessage(message: result.message));
           break;
       }
 

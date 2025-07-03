@@ -5,11 +5,11 @@ import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/add_a_new_visit_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/add_visit/model/add_visit_models.dart';
 
 class AddVisitViewModel extends ChangeNotifier {
   final AddANewVisitUseCase _addANewVisitUseCase;
-  final StreamController<ToastMessage> _toastStream = StreamController.broadcast();
   AddVisitState _state = InitialAddVisitState();
 
   AddVisitViewModel({
@@ -44,11 +44,11 @@ class AddVisitViewModel extends ChangeNotifier {
       switch(addResult) {
         case ErrorResult<void>():
           _state = InitialAddVisitState();
-          _toastStream.add(ErrorMessage(message: addResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: addResult.error));
           break;
         case SuccessResult<void>():
           _state = SuccessAddingVisitState();
-          _toastStream.add(SuccessMessage(message: addResult.message));
+          GlobalToastMessage().add(SuccessMessage(message: addResult.message));
           break;
       }
 

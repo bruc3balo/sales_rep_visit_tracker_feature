@@ -5,13 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_unsynced_visit_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/home/model/home_models.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final CountUnsyncedVisitsUseCase _countUnsyncedVisitsUseCase;
   final List<HomePages> homePages = UnmodifiableListView(HomePages.values);
-  final StreamController<ToastMessage> _toastStream = StreamController.broadcast();
-
   HomePages _currentPage = HomePages.visits;
   CountHomeVisitsState _visitCountState = LoadedCountVisitState(
       unSyncedVisitCount: null,
@@ -44,7 +43,7 @@ class HomeViewModel extends ChangeNotifier {
       switch(countResult) {
 
         case ErrorResult<int>():
-          _toastStream.add(ErrorMessage(message: countResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: countResult.error));
           _visitCountState = LoadedCountVisitState(
             unSyncedVisitCount: null,
           );

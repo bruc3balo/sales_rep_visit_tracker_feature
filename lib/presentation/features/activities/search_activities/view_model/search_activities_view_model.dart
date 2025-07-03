@@ -8,13 +8,13 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/search_local_activities_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/search_remote_activities_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/model/search_activities_models.dart';
 
 class SearchActivitiesViewModel extends ChangeNotifier {
   final SearchRemoteActivitiesUseCase _searchRemoteActivityUseCase;
   final SearchLocalActivitiesUseCase _searchLocalActivitiesUseCase;
   final ConnectivityService _connectivityService;
-  final StreamController<ToastMessage> _toastMessage = StreamController.broadcast();
   SearchActivityState _state = LoadedActivitySearchState(searchResults: LinkedHashSet());
 
   SearchActivitiesViewModel({
@@ -71,7 +71,7 @@ class SearchActivitiesViewModel extends ChangeNotifier {
       switch(getActivityResult) {
 
         case ErrorResult<List<Activity>>():
-          _toastMessage.add(ErrorMessage(message: getActivityResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: getActivityResult.error));
           _state = LoadedActivitySearchState(searchResults: LinkedHashSet());
           break;
         case SuccessResult<List<Activity>>():
@@ -105,7 +105,7 @@ class SearchActivitiesViewModel extends ChangeNotifier {
       switch(getActivityResult) {
 
         case ErrorResult<List<Activity>>():
-          _toastMessage.add(ErrorMessage(message: getActivityResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: getActivityResult.error));
           _state = LoadedActivitySearchState(searchResults: LinkedHashSet());
           break;
         case SuccessResult<List<Activity>>():

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -16,6 +18,7 @@ import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/ac
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/customer/customer_supabase_api.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/apis/visit/visit_supabase_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/network_service.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/activity/hive_local_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/activity/supabase_remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/customer/hive_local_customer_repository.dart';
@@ -27,13 +30,14 @@ import 'package:sales_rep_visit_tracker_feature/domain/service_impl/hive_local_d
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/dark_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/light_theme.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
 import 'domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
 
 Future<void> main() async {
-
   /// Services
 
   // Network
@@ -102,7 +106,7 @@ Future<void> main() async {
 
   // Local
   LocalUnsyncedVisitRepository unsyncedVR = HiveLocalUnsyncedVisitRepository(
-      localUnSyncedLocalVisitCrud: db,
+    localUnSyncedLocalVisitCrud: db,
   );
   GetIt.I.registerSingleton(unsyncedVR);
 
@@ -127,8 +131,29 @@ Future<void> main() async {
   runApp(const SalesRepVisitTrackerApplication());
 }
 
-class SalesRepVisitTrackerApplication extends StatelessWidget {
+class SalesRepVisitTrackerApplication extends StatefulWidget {
   const SalesRepVisitTrackerApplication({super.key});
+
+  @override
+  State<SalesRepVisitTrackerApplication> createState() => _SalesRepVisitTrackerApplicationState();
+}
+
+class _SalesRepVisitTrackerApplicationState extends State<SalesRepVisitTrackerApplication> {
+
+  late final StreamSubscription<ToastMessage> toastStream;
+
+  @override
+  void initState() {
+    toastStream = GlobalToastMessage().toastStream.listen((toast) => toast.show());
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    toastStream.cancel();
+    GlobalToastMessage().dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,4 +171,5 @@ class SalesRepVisitTrackerApplication extends StatelessWidget {
       ),
     );
   }
+
 }

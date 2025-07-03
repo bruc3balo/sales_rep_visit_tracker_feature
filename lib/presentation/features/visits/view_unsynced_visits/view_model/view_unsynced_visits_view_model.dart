@@ -10,6 +10,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/view_unsynced_local_visits_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/model/view_unsynced_visits_model.dart';
 
 class ViewUnsyncedVisitsViewModel extends ChangeNotifier {
@@ -18,7 +19,6 @@ class ViewUnsyncedVisitsViewModel extends ChangeNotifier {
   final SplayTreeSet<UnsyncedVisitAggregate> _visits = SplayTreeSet(
     (a, b) => -a.visitDate.compareTo(b.visitDate),
   );
-  final StreamController<ToastMessage> _toastStream = StreamController.broadcast();
 
   UnsyncedVisitsState _state = DisplayingUnsyncedVisitState();
   int _page = 0;
@@ -32,7 +32,6 @@ class ViewUnsyncedVisitsViewModel extends ChangeNotifier {
   }
 
   UnsyncedVisitsState get state => _state;
-  Stream<ToastMessage> get toastStream => _toastStream.stream;
 
   List<UnsyncedVisitAggregate> get unsyncedVisits => UnmodifiableListView(_visits);
 
@@ -48,14 +47,14 @@ class ViewUnsyncedVisitsViewModel extends ChangeNotifier {
         case ErrorResult<Map<UnSyncedLocalVisit, SyncStatus>>():
           print("Sync error ${syncResult.error}");
           _state = DisplayingUnsyncedVisitState();
-          _toastStream.add(ErrorMessage(message: syncResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: syncResult.error));
           loadMoreItems();
           break;
         case SuccessResult<Map<UnSyncedLocalVisit, SyncStatus>>():
           var results = groupBy(syncResult.data.entries, (e) => e.value);
           var summary = results.entries.map((e) => "${e.key.name} - ${e.value.length}").join(", ");
           _state = (results[SyncStatus.fail]?.isEmpty ?? true) ? FinishedSyncingVisitState(results: summary) : DisplayingUnsyncedVisitState();
-          _toastStream.add(SuccessMessage(message: summary));
+          GlobalToastMessage().add(SuccessMessage(message: summary));
           results[SyncStatus.success]?.forEach(_visits.remove);
           _page = 0;
           break;
@@ -79,7 +78,7 @@ class ViewUnsyncedVisitsViewModel extends ChangeNotifier {
 
       switch (unsyncedVisitResult) {
         case ErrorResult<List<UnsyncedVisitAggregate>>():
-          _toastStream.add(ErrorMessage(message: unsyncedVisitResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: unsyncedVisitResult.error));
           break;
         case SuccessResult<List<UnsyncedVisitAggregate>>():
           _visits.addAll(unsyncedVisitResult.data);

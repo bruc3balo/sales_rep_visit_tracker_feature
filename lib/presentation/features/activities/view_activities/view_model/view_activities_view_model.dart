@@ -3,7 +3,6 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/connectivity_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
@@ -11,6 +10,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/delete_activity_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/view_local_activities_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/view_remote_activities_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/model/view_activities_models.dart';
 
 class ViewActivitiesViewModel extends ChangeNotifier {
@@ -24,7 +24,6 @@ class ViewActivitiesViewModel extends ChangeNotifier {
   final SplayTreeSet<Activity> _activities = SplayTreeSet(
     (a, b) => a.id.compareTo(b.id),
   );
-  final StreamController<ToastMessage> _toastController = StreamController.broadcast();
   ViewActivitiesState _itemsState = LoadedViewActivitiesState();
   DeleteActivityState _deleteState = InitialDeleteActivityState();
 
@@ -68,7 +67,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
 
       switch (activityResult) {
         case ErrorResult<List<Activity>>():
-          _toastController.add(ErrorMessage(message: activityResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: activityResult.error));
 
           if(FailureType.network == activityResult.failure) {
             _remotePage = 0;
@@ -99,7 +98,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
 
       switch (activityResult) {
         case ErrorResult<List<Activity>>():
-          _toastController.add(ErrorMessage(message: activityResult.error));
+          GlobalToastMessage().add(ErrorMessage(message: activityResult.error));
 
           break;
         case SuccessResult<List<Activity>>():
@@ -135,12 +134,12 @@ class ViewActivitiesViewModel extends ChangeNotifier {
       switch(result) {
 
         case ErrorResult<void>():
-          _toastController.add(ErrorMessage(message: result.error));
+          GlobalToastMessage().add(ErrorMessage(message: result.error));
           break;
 
         case SuccessResult<void>():
           _activities.remove(activity);
-          _toastController.add(SuccessMessage(message: result.message));
+          GlobalToastMessage().add(SuccessMessage(message: result.message));
           break;
       }
 

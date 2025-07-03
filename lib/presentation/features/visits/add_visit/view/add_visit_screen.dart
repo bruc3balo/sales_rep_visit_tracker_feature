@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view/search_activities_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';

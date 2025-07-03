@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/model/view_visits_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/view_model/view_visits_view_model.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/components.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/add_customer/model/add_customer_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/add_customer/view_model/add_customer_view_model.dart';
 

@@ -6,12 +6,12 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remot
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/update_customer_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/edit_customer/model/edit_customer_model.dart';
 
 class EditCustomerViewModel extends ChangeNotifier {
   final UpdateCustomerUseCase _updateCustomerUseCase;
   final Customer _customer;
-  final StreamController<ToastMessage> _toastStream = StreamController.broadcast();
   late EditCustomerState _state = InitialEditCustomerState(
     customer: _customer,
   );
@@ -38,11 +38,11 @@ class EditCustomerViewModel extends ChangeNotifier {
 
       switch (result) {
         case ErrorResult<Customer>():
-          _toastStream.add(ErrorMessage(message: result.error));
+          GlobalToastMessage().add(ErrorMessage(message: result.error));
           _state = InitialEditCustomerState(customer: _customer);
           break;
         case SuccessResult<Customer>():
-          _toastStream.add(SuccessMessage(message: result.message));
+          GlobalToastMessage().add(SuccessMessage(message: result.message));
           _state = SuccessEditCustomerState(customer: result.data);
           break;
       }
