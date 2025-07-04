@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/visit_filter/visit_filter.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/visit_filter/visit_filter_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/model/view_visits_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/view_model/view_visits_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
@@ -10,10 +14,15 @@ import 'package:badges/badges.dart' as badges;
 class ViewVisitsScreen extends StatelessWidget {
   const ViewVisitsScreen({
     required this.viewVisitsViewModel,
+    required this.searchCustomersViewModel ,
+    required this.searchActivitiesViewModel ,
     super.key,
   });
 
   final ViewVisitsViewModel viewVisitsViewModel;
+  final SearchCustomersViewModel searchCustomersViewModel;
+  final SearchActivitiesViewModel searchActivitiesViewModel;
+
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +33,7 @@ class ViewVisitsScreen extends StatelessWidget {
           var state = viewVisitsViewModel.itemsState;
           bool isLoading = state is LoadingViewVisitsState;
           var visits = viewVisitsViewModel.visits;
+          var itemCount = viewVisitsViewModel.visits.length + (isLoading ? 1 : 0);
 
           return NotificationListener<ScrollNotification>(
             onNotification: (scrollInfo) {
@@ -37,25 +47,44 @@ class ViewVisitsScreen extends StatelessWidget {
             child: RefreshIndicator(
               onRefresh: () => viewVisitsViewModel.refresh(),
               child: Visibility(
-                  visible: state is! OfflineViewVisitsState,
-                  replacement: Center(
-                    child: Text("Go online to see past visits"),
-                  ),
-                  child: ListView.builder(
-                    itemCount: viewVisitsViewModel.visits.length + (isLoading ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index >= visits.length) {
-                        return InfiniteLoader();
-                      }
-                      var visit = visits[index];
-                      return VisitTile(visit: visit);
-                    },
-                  )
+                visible: state is! OfflineViewVisitsState,
+                replacement: Center(
+                  child: Text("Go online to see past visits"),
+                ),
+                child: ListView.builder(
+                  itemCount: itemCount,
+                  itemBuilder: (context, index) {
+                    if (index >= visits.length) {
+                      return InfiniteLoader();
+                    }
+                    var visit = visits[index];
+                    var padding = (index + 1 == itemCount) ? 60.0 : 0.0;
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: padding),
+                      child: VisitTile(visit: visit),
+                    );
+                  },
+                ),
               ),
             ),
           );
         },
       ),
+      floatingActionButton: FloatingActionButton.small(
+        onPressed: () async {
+          var filters = await showVisitFilterModal(
+            context: context,
+            searchCustomersViewModel: searchCustomersViewModel,
+            searchActivitiesViewModel: searchActivitiesViewModel,
+            currentFilters: viewVisitsViewModel.filterState,
+          );
+
+          if(filters == null) return;
+          viewVisitsViewModel.updateFilter(filters);
+        },
+        child: Icon(Icons.filter_list),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
     );
   }
 }
@@ -83,7 +112,6 @@ class VisitTile extends StatelessWidget {
           color: Colors.grey.shade300,
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
-
         child: badges.Badge(
           position: badges.BadgePosition.topEnd(),
           badgeAnimation: badges.BadgeAnimation.scale(
@@ -97,7 +125,6 @@ class VisitTile extends StatelessWidget {
             badgeColor: Colors.white,
             borderSide: BorderSide(
               color: Colors.cyan,
-
             ),
           ),
           child: Icon(Icons.business_outlined),

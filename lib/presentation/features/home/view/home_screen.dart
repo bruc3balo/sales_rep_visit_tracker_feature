@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/delete_activity_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/search_local_activities_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/search_remote_activities_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/update_activity_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/view_local_activities_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/view_remote_activities_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/delete_customer_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/search_local_customers_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/search_remote_customer_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/view_local_customers_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/view_remote_customers_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/view/view_activities_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/view_model/view_activities_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/view_customers/view/view_customers_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/view_customers/view_model/view_customers_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/home/model/home_models.dart';
@@ -34,9 +38,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>{
-
-
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -70,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen>{
                   ),
               },
               IconButton(
-                onPressed: ()  {
+                onPressed: () {
                   switch (widget.homeViewModel.currentPage) {
                     case HomePages.visits:
                       Navigator.of(context).pushNamed(
@@ -78,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen>{
                       );
                       break;
                     case HomePages.activities:
-                       Navigator.of(context).pushNamed(
+                      Navigator.of(context).pushNamed(
                         AppRoutes.addActivity.path,
                       );
                       break;
@@ -95,6 +97,26 @@ class _HomeScreenState extends State<HomeScreen>{
           ),
           body: switch (widget.homeViewModel.currentPage) {
             HomePages.visits => ViewVisitsScreen(
+                searchActivitiesViewModel: SearchActivitiesViewModel(
+                  searchRemoteActivitiesUseCase: SearchRemoteActivitiesUseCase(
+                    remoteActivityRepository: GetIt.I(),
+                    localActivityRepository: GetIt.I(),
+                  ),
+                  searchLocalActivitiesUseCase: SearchLocalActivitiesUseCase(
+                    localActivityRepository: GetIt.I(),
+                  ),
+                  connectivityService: GetIt.I(),
+                ),
+                searchCustomersViewModel: SearchCustomersViewModel(
+                  searchRemoteCustomerUseCase: SearchRemoteCustomerUseCase(
+                    remoteCustomerRepository: GetIt.I(),
+                    localCustomerRepository: GetIt.I(),
+                  ),
+                  searchLocalCustomersUseCase: SearchLocalCustomersUseCase(
+                    localCustomerRepository: GetIt.I(),
+                  ),
+                  connectivityService: GetIt.I(),
+                ),
                 viewVisitsViewModel: ViewVisitsViewModel(
                   pastVisitsUseCase: VisitListOfPastVisitsUseCase(
                     visitRepository: GetIt.I(),
@@ -145,14 +167,12 @@ class _HomeScreenState extends State<HomeScreen>{
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: widget.homeViewModel.currentPage.index,
             onTap: widget.homeViewModel.changePage,
-            items: widget.homeViewModel.homePages
-                .map(
+            items: widget.homeViewModel.homePages.map(
                   (p) => BottomNavigationBarItem(
                     icon: Icon(p.iconData),
                     label: p.label,
                   ),
-                )
-                .toList(),
+                ).toList(),
           ),
         );
       },
