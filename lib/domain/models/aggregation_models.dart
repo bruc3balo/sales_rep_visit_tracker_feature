@@ -41,7 +41,19 @@ class ActivityRef {
   final String description;
 
   ActivityRef(this.id, this.description);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is ActivityRef &&
+        other.id == id &&
+        other.description == description;
+  }
+
+  @override
+  int get hashCode => id.hashCode ^ description.hashCode;
 }
+
 
 class CustomerRef {
   final int id;

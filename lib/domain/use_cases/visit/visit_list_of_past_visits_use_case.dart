@@ -21,13 +21,15 @@ class VisitListOfPastVisitsUseCase {
   Future<TaskResult<List<VisitAggregate>>> execute({
     required int page,
     required int pageSize,
+    int? customerId,
     DateTime? fromDateInclusive,
     DateTime? toDateInclusive,
-    List<int>? activityIdsDone,
+    List<String>? activityIdsDone,
     VisitStatus? status,
     String? order,
   }) async {
     var result = await _visitRepository.getVisits(
+      customerId: customerId,
       page: page,
       pageSize: pageSize,
       fromDateInclusive: fromDateInclusive,

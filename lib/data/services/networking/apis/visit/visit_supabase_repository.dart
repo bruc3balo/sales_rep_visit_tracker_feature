@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/network_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/network_base_models.dart';
 
@@ -45,7 +47,7 @@ class SupabaseVisitApi {
     int? customerId,
     DateTime? fromDateInclusive,
     DateTime? toDateInclusive,
-    List<int>? activityIdsDone,
+    List<String>? activityIdsDone,
     String? status,
     required int page,
     required int pageSize,
@@ -56,7 +58,7 @@ class SupabaseVisitApi {
         queryParameters: {
           if (visitId != null) "id": "eq.$visitId",
           if (customerId != null) "customer_id": "eq.$customerId",
-          if (activityIdsDone != null) "activities_done": "contains.$activityIdsDone",
+          if (activityIdsDone != null)  "activities_done": "contains.${jsonEncode(activityIdsDone)}",
           if (status != null) "status": "eq.$status",
           if (fromDateInclusive != null) "visit_date": "gte.${fromDateInclusive.toIso8601String()}",
           if (toDateInclusive != null) "visit_date": "lte.${toDateInclusive.toIso8601String()}",
@@ -89,7 +91,7 @@ class SupabaseVisitApi {
     String? status,
     String? location,
     String? notes,
-    List<int>? activityIdsDone,
+    List<String>? activityIdsDone,
   }) async {
     NetworkRequest request = NetworkRequest(
       uri: Uri.parse("$_baseUrl?id=eq.$visitId"),

@@ -90,7 +90,7 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
     VisitStatus? status,
     String? location,
     String? notes,
-    List<int>? activityIdsDone,
+    List<String>? activityIdsDone,
   }) async {
     try {
       var updatedVisitResponse = await _visitApi.sendUpdateVisitRequest(
@@ -141,7 +141,7 @@ class SupabaseVisitRepository implements RemoteVisitRepository {
     int? customerId,
     DateTime? fromDateInclusive,
     DateTime? toDateInclusive,
-    List<int>? activityIdsDone,
+    List<String>? activityIdsDone,
     VisitStatus? status,
     required int page,
     required int pageSize,

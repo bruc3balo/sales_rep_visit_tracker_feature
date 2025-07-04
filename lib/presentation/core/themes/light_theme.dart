@@ -4,13 +4,14 @@ import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_
 
 ThemeData get lightTheme {
   return ThemeData(
+    colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
     appBarTheme: AppBarTheme(
       centerTitle: true,
     ),
     inputDecorationTheme: defaultInputDecoration,
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: defaultButtonTheme.style?.copyWith(
-        backgroundColor: WidgetStatePropertyAll(Colors.blue),
+        backgroundColor: WidgetStatePropertyAll(Colors.deepPurple),
         foregroundColor: WidgetStatePropertyAll(Colors.white),
       )
     ),

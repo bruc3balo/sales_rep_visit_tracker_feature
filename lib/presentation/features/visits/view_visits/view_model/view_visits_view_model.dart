@@ -8,7 +8,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/visit_filter/visit_filter_models.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/visit_filter/model/visit_filter_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visits/model/view_visits_models.dart';
 
 class ViewVisitsViewModel extends ChangeNotifier {
@@ -34,7 +34,7 @@ class ViewVisitsViewModel extends ChangeNotifier {
 
   void updateFilter(VisitFilterState updatedFilter) {
     _filterState = updatedFilter;
-    notifyListeners();
+    refresh();
   }
 
   Future<void> loadMoreItems() async {
@@ -48,10 +48,11 @@ class ViewVisitsViewModel extends ChangeNotifier {
       var visitsResult = await _pastVisitsUseCase.execute(
         page: _page,
         pageSize: 20,
-        order: "${_filterState.sortBy.sort}.${_filterState.orderBy.order}",
+        customerId: _filterState.customer?.id,
+        order: "${_filterState.orderBy.order}.${_filterState.sortBy.sort}",
         fromDateInclusive: _filterState.fromDateInclusive,
         toDateInclusive: _filterState.toDateInclusive,
-        activityIdsDone: _filterState.activities.isEmpty ? null : _filterState.activities.map((e) => e.id).toList(),
+        activityIdsDone: _filterState.activities.isEmpty ? null : _filterState.activities.map((e) => e.id.toString()).toList(),
         status: _filterState.visitStatus,
       );
 

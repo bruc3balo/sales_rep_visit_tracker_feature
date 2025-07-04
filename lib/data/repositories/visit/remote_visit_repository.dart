@@ -18,7 +18,7 @@ abstract class RemoteVisitRepository {
     int? customerId,
     DateTime? fromDateInclusive,
     DateTime? toDateInclusive,
-    List<int>? activityIdsDone,
+    List<String>? activityIdsDone,
     VisitStatus? status,
     required int page,
     required int pageSize,
@@ -32,7 +32,7 @@ abstract class RemoteVisitRepository {
     VisitStatus? status,
     String? location,
     String? notes,
-    List<int>? activityIdsDone,
+    List<String>? activityIdsDone,
   });
 
   Future<TaskResult<void>> deleteVisitById({required int visitId});

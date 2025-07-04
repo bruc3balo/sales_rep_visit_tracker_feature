@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/visit_filter/visit_filter.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/visit_filter/visit_filter_models.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/visit_filter/view/visit_filter_screen.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/visit_filter/model/visit_filter_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
@@ -72,11 +72,11 @@ class ViewVisitsScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.small(
         onPressed: () async {
-          var filters = await showVisitFilterModal(
+          var filters = await showVisitFilterBottomSheet(
             context: context,
             searchCustomersViewModel: searchCustomersViewModel,
             searchActivitiesViewModel: searchActivitiesViewModel,
-            currentFilters: viewVisitsViewModel.filterState,
+            initialFilter: viewVisitsViewModel.filterState,
           );
 
           if(filters == null) return;
