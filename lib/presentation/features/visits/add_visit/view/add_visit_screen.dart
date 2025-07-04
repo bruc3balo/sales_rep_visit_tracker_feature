@@ -67,7 +67,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                         );
                       },
                       title: Text("Customer"),
-                      subtitle: wrappedContainer(
+                      subtitle: borderedContainer(
                         child: ValueListenableBuilder(
                           valueListenable: customerNotifier,
                           builder: (_, customer, __) {
@@ -116,7 +116,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                         visitDateNotifier.value = newVisitDate;
                       },
                       title: Text("Visit date"),
-                      subtitle: wrappedContainer(
+                      subtitle: borderedContainer(
                         child: ValueListenableBuilder(
                           valueListenable: visitDateNotifier,
                           builder: (_, visitDate, __) {
@@ -190,7 +190,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                                 icon: Icon(Icons.add)),
                           ),
                         ),
-                        subtitle: wrappedContainer(
+                        subtitle: borderedContainer(
                           child: Visibility(
                             visible: activities.isNotEmpty,
                             replacement: Text("No activities recorded"),

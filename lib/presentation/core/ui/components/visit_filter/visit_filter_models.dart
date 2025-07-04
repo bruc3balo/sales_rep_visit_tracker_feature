@@ -1,107 +1,85 @@
-
-
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 
-enum VisitFilters {
-  fromDate(label: "Start date"),
-  toDate(label: "End date"),
-  activity(label: "Activity"),
-  customer(label: "Customer"),
-  status(label: "Status"),
-  order(label: "Order");
+enum VisitOrderBy {
+  visitDate(label: "Visit date"),
+  status(label: "Visit status");
 
   final String label;
 
-  const VisitFilters({required this.label});
+  const VisitOrderBy({required this.label});
 }
 
-class ActiveFilters {
-  final VisitFilters type;
-  final dynamic value;
+enum VisitSortBy {
+  ascending,
+  descending;
 
-  ActiveFilters({
-    required this.type,
-    required this.value,
-  });
+  String get label => name.capitalize;
+}
+
+extension SupabaseOrderTranslator on VisitOrderBy {
+  String get order => switch (this) {
+        VisitOrderBy.visitDate => "visit_date",
+        VisitOrderBy.status => "status",
+      };
+}
+
+extension SupabaseSortTranslator on VisitSortBy {
+  String get sort => switch (this) {
+        VisitSortBy.ascending => "asc",
+        VisitSortBy.descending => "desc",
+      };
 }
 
 class VisitFilterState {
-  final Map<VisitFilters, List<dynamic>> filters = {};
+  final DateTime? fromDateInclusive;
+  final DateTime? toDateInclusive;
+  final List<ActivityRef> activities;
+  final CustomerRef? customer;
+  final VisitOrderBy orderBy;
+  final VisitSortBy sortBy;
+  final VisitStatus? visitStatus;
 
-  VisitFilterState();
+  VisitFilterState({
+    this.fromDateInclusive,
+    this.toDateInclusive,
+    this.activities = const [],
+    this.customer,
+    this.sortBy = VisitSortBy.descending,
+    this.orderBy = VisitOrderBy.visitDate,
+    this.visitStatus,
+  });
 
-  void setOrder(bool ascending) {
-    filters[VisitFilters.order] = [ascending ? "asc" : "desc"];
+  VisitFilterState changeVisitStatus({
+    VisitStatus? visitStatus,
+  }) {
+    return VisitFilterState(
+      fromDateInclusive: fromDateInclusive,
+      toDateInclusive: toDateInclusive,
+      activities: activities,
+      customer: customer,
+      sortBy: sortBy ,
+      visitStatus: visitStatus,
+    );
   }
 
-  void setStatus(VisitStatus? status) {
-    if (status == null) {
-      filters[VisitFilters.status]?.clear();
-    } else {
-      filters[VisitFilters.status] = [status];
-    }
-  }
-
-  void setFromDate(DateTime? fromDate) {
-    if (fromDate == null) {
-      filters[VisitFilters.fromDate]?.clear();
-    } else {
-      filters[VisitFilters.fromDate] = [fromDate];
-    }
-  }
-
-  void setToDate(DateTime? toDate) {
-    if (toDate == null) {
-      filters[VisitFilters.toDate]?.clear();
-    } else {
-      filters[VisitFilters.toDate] = [toDate];
-    }
-  }
-
-  void addActivity(ActivityRef activity) {
-    List<ActivityRef> activities = (filters[VisitFilters.activity] as List<ActivityRef>?) ?? [];
-    activities.add(activity);
-    filters[VisitFilters.activity] = List.from(activities);
-  }
-
-  void removeActivity(ActivityRef activity) {
-    List<ActivityRef> activities = (filters[VisitFilters.activity] as List<ActivityRef>?) ?? [];
-    activities.removeWhere((a) => a.id == activity.id);
-    filters[VisitFilters.activity] = List.from(activities);
-  }
-
-  void addCustomer(CustomerRef customer) {
-    List<CustomerRef> customers = (filters[VisitFilters.customer] as List<CustomerRef>?) ?? [];
-    customers.add(customer);
-    filters[VisitFilters.customer] = List.from(customers);
-  }
-
-  void removeCustomer(CustomerRef customer) {
-    List<CustomerRef> customers = (filters[VisitFilters.customer] as List<CustomerRef>?) ?? [];
-    customers.removeWhere((a) => a.id == customer.id);
-    filters[VisitFilters.customer] = List.from(customers);
-  }
-
-  List<ActiveFilters> get activeFilters {
-    List<ActiveFilters> f = [];
-    if (filters[VisitFilters.order] != null) {
-      f.add(ActiveFilters(type: VisitFilters.order, value: filters[VisitFilters.order]));
-    }
-    if (filters[VisitFilters.status] != null) {
-      f.add(ActiveFilters(type: VisitFilters.status, value: filters[VisitFilters.status]));
-    }
-    if (filters[VisitFilters.fromDate] != null) {
-      f.add(ActiveFilters(type: VisitFilters.fromDate, value: filters[VisitFilters.fromDate]));
-    }
-    if (filters[VisitFilters.toDate] != null) {
-      f.add(ActiveFilters(type: VisitFilters.toDate, value: filters[VisitFilters.toDate]));
-    }
-    if (filters[VisitFilters.activity] != null) {
-      for (var a in (filters[VisitFilters.activity] as List<ActivityRef>)) {
-        f.add(ActiveFilters(type: VisitFilters.activity, value: a));
-      }
-    }
-    return f;
+  VisitFilterState copyWith({
+    DateTime? fromDateInclusive,
+    DateTime? toDateInclusive,
+    List<ActivityRef>? activities,
+    CustomerRef? customer,
+    VisitOrderBy? orderBy,
+    VisitSortBy? sortBy,
+  }) {
+    return VisitFilterState(
+      fromDateInclusive: fromDateInclusive ?? this.fromDateInclusive,
+      toDateInclusive: toDateInclusive ?? this.toDateInclusive,
+      activities: activities ?? this.activities,
+      customer: customer ?? this.customer,
+      sortBy: sortBy ?? this.sortBy,
+      orderBy: orderBy ?? this.orderBy,
+      visitStatus: visitStatus,
+    );
   }
 }

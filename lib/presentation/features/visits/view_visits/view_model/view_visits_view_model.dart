@@ -44,22 +44,26 @@ class ViewVisitsViewModel extends ChangeNotifier {
       _itemsState = LoadingViewVisitsState();
       notifyListeners();
 
+
       var visitsResult = await _pastVisitsUseCase.execute(
         page: _page,
         pageSize: 20,
-        order: "visit_date.desc",
+        order: "${_filterState.sortBy.sort}.${_filterState.orderBy.order}",
+        fromDateInclusive: _filterState.fromDateInclusive,
+        toDateInclusive: _filterState.toDateInclusive,
+        activityIdsDone: _filterState.activities.isEmpty ? null : _filterState.activities.map((e) => e.id).toList(),
+        status: _filterState.visitStatus,
       );
 
       switch (visitsResult) {
         case ErrorResult<List<VisitAggregate>>():
-          if(visitsResult.failure == FailureType.network && _visits.isEmpty) {
+          if (visitsResult.failure == FailureType.network && _visits.isEmpty) {
             _itemsState = OfflineViewVisitsState();
             GlobalToastMessage().add(ErrorMessage(message: "Network error"));
           } else {
             _itemsState = LoadedViewVisitsState();
             GlobalToastMessage().add(ErrorMessage(message: visitsResult.error));
           }
-
 
           break;
         case SuccessResult<List<VisitAggregate>>():

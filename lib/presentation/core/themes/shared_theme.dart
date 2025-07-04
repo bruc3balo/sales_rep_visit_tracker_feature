@@ -56,7 +56,7 @@ ElevatedButtonThemeData get defaultButtonTheme {
   );
 }
 
-Container wrappedContainer({
+Container borderedContainer({
   required Widget child,
 }) {
   return Container(

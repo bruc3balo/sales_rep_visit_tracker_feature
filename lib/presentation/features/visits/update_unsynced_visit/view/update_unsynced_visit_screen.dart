@@ -63,7 +63,7 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                     );
                   },
                   title: Text("Customer"),
-                  subtitle: wrappedContainer(
+                  subtitle: borderedContainer(
                     child: Text(viewModel.visit.customer?.name ?? "Tap to select a customer"),
                   ),
                 ),
@@ -106,7 +106,7 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                     );
                   },
                   title: Text("Visit date"),
-                  subtitle: wrappedContainer(
+                  subtitle: borderedContainer(
                     child: Text(viewModel.visit.visitDate.humanReadable),
                   ),
                 ),
@@ -179,7 +179,7 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: wrappedContainer(
+                  child: borderedContainer(
                     child: Visibility(
                       visible: viewModel.visit.activityMap.isNotEmpty,
                       replacement: Text("No activities recorded"),
