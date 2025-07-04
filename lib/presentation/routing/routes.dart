@@ -9,7 +9,9 @@ import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/search
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/search_remote_customer_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/add_a_new_visit_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_unsynced_visit_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/delete_unsynced_visit_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/get_local_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/update_unsynced_visit_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/view_unsynced_local_visits_use_case.dart';
@@ -30,6 +32,8 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/vie
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_unsynced_visits/view_model/view_unsynced_visits_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_details/view/view_visit_details_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_details/view_model/view_visit_details_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view/view_visit_statistics_screen.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
 
 enum AppRoutes {
   splashScreen("/"),
@@ -39,7 +43,8 @@ enum AppRoutes {
   addCustomer("/addCustomer"),
   visitDetails("/visitDetails"),
   visitUnsyncedVisits("/visitUnsyncedVisits"),
-  updateUnsyncedVisits("/updateUnsyncedVisits");
+  updateUnsyncedVisits("/updateUnsyncedVisits"),
+  viewVisitStatistics("/visitStatistics");
 
   final String path;
 
@@ -149,6 +154,17 @@ extension RoutePage on AppRoutes {
               localCustomerRepository: GetIt.I(),
             ),
             visit: ModalRoute.of(context)?.settings.arguments as UnsyncedVisitAggregate,
+          ),
+        ),
+      AppRoutes.viewVisitStatistics => ViewVisitStatisticsScreen(
+          statisticsViewModel: ViewVisitStatisticsViewModel(
+            getLocalVisitStatisticsUseCase: GetLocalVisitStatisticsUseCase(
+              localVisitStatisticsRepository: GetIt.I(),
+            ),
+            countVisitStatisticsUseCase: CountVisitStatisticsUseCase(
+              visitRepository: GetIt.I(),
+              localVisitStatisticsRepository: GetIt.I(),
+            ),
           ),
         ),
     };

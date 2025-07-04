@@ -64,11 +64,14 @@ class CustomerRef {
 
 class VisitStatisticsModel {
   final Map<VisitStatus, int> data;
-  final DateTime calculatedAt = DateTime.now();
+  final DateTime calculatedAt;
 
   VisitStatisticsModel({
     required this.data,
+    required this.calculatedAt,
   });
+
+  int get total => data.values.fold(0, (prev, curr) => prev + curr);
 }
 
 enum SyncStatus { success, fail }

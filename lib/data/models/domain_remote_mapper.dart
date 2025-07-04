@@ -22,3 +22,4 @@ extension VisitDomainMapper on RemoteVisit {
         createdAt: createdAt,
       );
 }
+

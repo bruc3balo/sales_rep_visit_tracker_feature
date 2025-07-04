@@ -24,7 +24,7 @@ class VisitListOfPastVisitsUseCase {
     int? customerId,
     DateTime? fromDateInclusive,
     DateTime? toDateInclusive,
-    List<String>? activityIdsDone,
+    List<int>? activityIdsDone,
     VisitStatus? status,
     String? order,
   }) async {

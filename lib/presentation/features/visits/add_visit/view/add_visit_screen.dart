@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
@@ -58,6 +60,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                           context: context,
                           builder: (context) {
                             return CustomerSearchDialog(
+                              customerIdsToIgnore: HashSet.from([customerNotifier.value?.id].where((e) => e != null)),
                               searchCustomersViewModel: widget.searchCustomersViewModel,
                               onSelect: (c) {
                                 customerNotifier.value = c;
@@ -177,6 +180,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                                     context: context,
                                     builder: (context) {
                                       return ActivitySearchDialog(
+                                        activitiesToIgnore: HashSet.from(activitiesNotifier.value.map((e) => e.id)),
                                         searchActivitiesViewModel: widget.searchActivitiesViewModel,
                                         onSelect: (a) {
                                           if (activitiesNotifier.value.any((e) => e.id == a.id)) return;

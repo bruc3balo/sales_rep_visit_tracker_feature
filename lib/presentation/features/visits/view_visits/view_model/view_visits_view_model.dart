@@ -52,7 +52,7 @@ class ViewVisitsViewModel extends ChangeNotifier {
         order: "${_filterState.orderBy.order}.${_filterState.sortBy.sort}",
         fromDateInclusive: _filterState.fromDateInclusive,
         toDateInclusive: _filterState.toDateInclusive,
-        activityIdsDone: _filterState.activities.isEmpty ? null : _filterState.activities.map((e) => e.id.toString()).toList(),
+        activityIdsDone: _filterState.activities.isEmpty ? null : _filterState.activities.map((e) => e.id).toList(),
         status: _filterState.visitStatus,
       );
 

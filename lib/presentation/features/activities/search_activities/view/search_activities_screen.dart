@@ -1,22 +1,22 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/model/search_activities_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/model/search_customers_models.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
 
 class ActivitySearchDialog extends StatelessWidget {
   ActivitySearchDialog({
     this.initialActivity,
+    required this.activitiesToIgnore,
     required this.searchActivitiesViewModel,
     required this.onSelect,
     super.key,
   });
 
   final Activity? initialActivity;
+  final HashSet<int> activitiesToIgnore;
   final SearchActivitiesViewModel searchActivitiesViewModel;
   final Function(Activity) onSelect;
   final TextEditingController searchController = TextEditingController();
@@ -58,6 +58,9 @@ class ActivitySearchDialog extends StatelessWidget {
                   LoadedActivitySearchState() => state.searchResults?.toList() ?? searchActivitiesViewModel.activities,
                 };
                 bool isLoading = state is LoadingActivitySearchState;
+
+                data.removeWhere((e) => activitiesToIgnore.contains(e.id));
+
                 return Expanded(
                   child: NotificationListener<ScrollNotification>(
                     onNotification: (scrollInfo) {

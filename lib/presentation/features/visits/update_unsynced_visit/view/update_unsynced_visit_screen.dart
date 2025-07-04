@@ -1,15 +1,15 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view/search_activities_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view/search_customers_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/update_unsynced_visit/model/update_unsynced_visit_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/update_unsynced_visit/view_model/update_unsynced_visit_view_model.dart';
 
 class UpdateUnsyncedVisitScreen extends StatefulWidget {
@@ -52,6 +52,7 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                       context: context,
                       builder: (context) {
                         return CustomerSearchDialog(
+                          customerIdsToIgnore: HashSet.from([viewModel.visit.customer?.id].where((e) => e != null)),
                           searchCustomersViewModel: widget.searchCustomersViewModel,
                           onSelect: (c) {
                             viewModel.update(
@@ -156,6 +157,7 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                             context: context,
                             builder: (context) {
                               return ActivitySearchDialog(
+                                activitiesToIgnore: HashSet.from(viewModel.visit.activityMap.keys),
                                 searchActivitiesViewModel: widget.searchActivitiesViewModel,
                                 onSelect: (a) {
                                   if (viewModel.visit.activityMap.containsKey(a.id)) return;

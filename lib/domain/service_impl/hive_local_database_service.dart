@@ -14,6 +14,8 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
 
   Future<Box<LocalActivity>> get openActivityBox async => await Hive.openBox('activities');
 
+  Future<Box<LocalVisitStatistics>> get openVisitStatisticsBox async => await Hive.openBox('visit_statistics');
+
   @override
   Future<TaskResult<List<UnSyncedLocalVisit>>> getUnsyncedLocalVisits({required int page, required int pageSize}) async {
     try {
@@ -278,13 +280,46 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
   }) async {
     try {
       var box = await openUnsyncedBox;
-      if(!box.containsKey(hash.value)) {
+      if (!box.containsKey(hash.value)) {
         return ErrorResult(
           error: "Visit key not found",
           failure: FailureType.localDatabase,
         );
       }
       await box.delete(hash.value);
+      return SuccessResult(data: null);
+    } catch (e, trace) {
+      return ErrorResult(
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.localDatabase,
+      );
+    }
+  }
+
+  @override
+  Future<TaskResult<LocalVisitStatistics?>> getStatistics() async {
+    try {
+      var box = await openVisitStatisticsBox;
+      var data = box.values.firstOrNull;
+      return SuccessResult(data: data);
+    } catch (e, trace) {
+      return ErrorResult(
+        error: e.toString(),
+        trace: trace,
+        failure: FailureType.localDatabase,
+      );
+    }
+  }
+
+  @override
+  Future<TaskResult<void>> setStatistics({
+    required LocalVisitStatistics stats,
+  }) async {
+    try {
+      var box = await openVisitStatisticsBox;
+      await box.clear();
+      await box.add(stats);
       return SuccessResult(data: null);
     } catch (e, trace) {
       return ErrorResult(

@@ -1,20 +1,22 @@
+import 'dart:collection';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/model/search_customers_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
 
 class CustomerSearchDialog extends StatelessWidget {
    CustomerSearchDialog({
     this.initialCustomer,
+    required this.customerIdsToIgnore,
     required this.searchCustomersViewModel,
     required this.onSelect,
     super.key,
   });
 
   final Customer? initialCustomer;
+  final HashSet<int> customerIdsToIgnore;
   final SearchCustomersViewModel searchCustomersViewModel;
   final Function(Customer) onSelect;
   final TextEditingController searchController = TextEditingController();
@@ -57,6 +59,10 @@ class CustomerSearchDialog extends StatelessWidget {
                   LoadingCustomersSearchState() => [],
                   LoadedCustomersSearchState() => state.searchResults?.toList() ?? searchCustomersViewModel.customers,
                 };
+
+                //Ignore present ones
+                data.removeWhere((e) => customerIdsToIgnore.contains(e));
+
                 return Expanded(
                   child: NotificationListener<ScrollNotification>(
                     onNotification: (scrollInfo) {

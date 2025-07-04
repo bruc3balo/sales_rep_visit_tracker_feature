@@ -32,7 +32,7 @@ final class FailNetworkResponse extends NetworkResponse {
   FailNetworkResponse({
     this.statusCode,
     this.description = " Something went wrong",
-    this.failureType = FailureType.network,
+    this.failureType = FailureType.unknown,
     this.trace,
     this.data,
   });

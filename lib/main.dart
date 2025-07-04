@@ -10,6 +10,7 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remot
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/local_unsynced_visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/local_visit_statistics_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/connectivity_plus_connection_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/connectivity_service.dart';
@@ -24,10 +25,12 @@ import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/activity/
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/customer/hive_local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/customer/supabase_remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/visit/hive_local_unsynced_visit_repository.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/visit/hive_local_visit_statistics_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/visit/supabase_remote_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/service_impl/dio_network_service.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/service_impl/hive_local_database_service.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_visit_statistics_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/get_local_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/dark_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/light_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
@@ -49,6 +52,7 @@ Future<void> main() async {
   Hive.registerAdapter(UnSyncedLocalVisitAdapter());
   Hive.registerAdapter(LocalCustomerAdapter());
   Hive.registerAdapter(LocalActivityAdapter());
+  Hive.registerAdapter(LocalVisitStatisticsAdapter());
 
   LocalDatabaseService db = HiveLocalDatabaseService();
   GetIt.I.registerSingleton(db);
@@ -110,15 +114,11 @@ Future<void> main() async {
   );
   GetIt.I.registerSingleton(unsyncedVR);
 
-  /// Global view models
-
-  // ViewVisitStatisticsViewModel
-  ViewVisitStatisticsViewModel statsVm = ViewVisitStatisticsViewModel(
-    countVisitStatisticsUseCase: CountVisitStatisticsUseCase(
-      visitRepository: visitRepository,
-    ),
+  // Visit statistics
+  LocalVisitStatisticsRepository localVisitStatisticsRepository = HiveLocalVisitStatisticsRepository(
+    statisticsCrud: db,
   );
-  GetIt.I.registerSingleton(statsVm);
+  GetIt.I.registerSingleton(localVisitStatisticsRepository);
 
   /// Global use cases
   SyncUnsyncedLocalVisitsUseCase syncCase = SyncUnsyncedLocalVisitsUseCase(
@@ -139,7 +139,6 @@ class SalesRepVisitTrackerApplication extends StatefulWidget {
 }
 
 class _SalesRepVisitTrackerApplicationState extends State<SalesRepVisitTrackerApplication> {
-
   late final StreamSubscription<ToastMessage> toastStream;
 
   @override
@@ -171,5 +170,4 @@ class _SalesRepVisitTrackerApplicationState extends State<SalesRepVisitTrackerAp
       ),
     );
   }
-
 }

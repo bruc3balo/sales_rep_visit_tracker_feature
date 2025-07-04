@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 
 extension DateFormatter on DateTime {
@@ -56,5 +57,13 @@ extension ShowFlutterToast on ToastMessage {
       fontSize: 16.0,
     );
   }
+}
+
+extension VisitStatusColor on VisitStatus {
+  Color get color => switch(this) {
+    VisitStatus.completed => Colors.green,
+    VisitStatus.pending => Colors.blue,
+    VisitStatus.cancelled => Colors.grey,
+  };
 }
 

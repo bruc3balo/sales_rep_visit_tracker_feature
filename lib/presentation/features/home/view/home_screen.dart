@@ -49,6 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
           appBar: AppBar(
             title: Text(widget.homeViewModel.currentPage.label),
             actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(
+                    AppRoutes.viewVisitStatistics.path,
+                  );
+                },
+                icon: Icon(Icons.pie_chart),
+              ),
               switch (syncState) {
                 LoadingCountVisitState() => InfiniteLoader(),
                 LoadedCountVisitState() => Visibility(

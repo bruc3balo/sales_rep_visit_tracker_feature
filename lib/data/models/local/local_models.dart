@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:hive/hive.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_value_objects.dart';
 
 part 'local_models.g.dart';
 
 @HiveType(typeId: 0)
 class UnSyncedLocalVisit extends HiveObject {
-
   @HiveField(1)
   String hash;
 
@@ -32,7 +32,6 @@ class UnSyncedLocalVisit extends HiveObject {
 
   @HiveField(8)
   final DateTime createdAt;
-
 
   UnSyncedLocalVisit({
     required this.hash,
@@ -95,6 +94,7 @@ class LocalActivity extends HiveObject {
 
 @HiveType(typeId: 2)
 class LocalCustomer extends HiveObject {
+
   @HiveField(0)
   final int id;
 
@@ -112,5 +112,20 @@ class LocalCustomer extends HiveObject {
     required this.name,
     required this.createdAt,
     required this.updatedAt,
+  });
+}
+
+@HiveType(typeId: 3)
+class LocalVisitStatistics extends HiveObject {
+
+  @HiveField(0)
+  final Map<String, int> statistics;
+
+  @HiveField(1)
+  final DateTime createdAt;
+
+  LocalVisitStatistics({
+    required this.statistics,
+    required this.createdAt,
   });
 }

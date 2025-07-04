@@ -1,10 +1,9 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
-import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view/search_customers_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/visit_filter/model/visit_filter_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
@@ -108,6 +107,7 @@ class VisitFilterComponent extends StatelessWidget {
             ],
           ),
         ),
+
         ListTile(
           title: Text("Activities"),
           subtitle: Wrap(
@@ -133,6 +133,7 @@ class VisitFilterComponent extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return ActivitySearchDialog(
+                        activitiesToIgnore: HashSet.from(filter.activities.map((e) => e.id)),
                         searchActivitiesViewModel: searchActivitiesViewModel,
                         onSelect: (c) {
                           onChange(
@@ -147,6 +148,7 @@ class VisitFilterComponent extends StatelessWidget {
             ],
           ),
         ),
+
         ListTile(
           title: Text("Customer"),
           subtitle: Wrap(
@@ -158,6 +160,7 @@ class VisitFilterComponent extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return CustomerSearchDialog(
+                        customerIdsToIgnore: HashSet.from([filter.customer?.id].where((e) => e != null)),
                         searchCustomersViewModel: searchCustomersViewModel,
                         onSelect: (c) {
                           onChange(
@@ -178,6 +181,7 @@ class VisitFilterComponent extends StatelessWidget {
             ],
           ),
         ),
+
         ListTile(
           title: Text("Order"),
           subtitle: Wrap(
@@ -200,6 +204,7 @@ class VisitFilterComponent extends StatelessWidget {
             }).toList(),
           ),
         ),
+
         ListTile(
           title: Text("Sort"),
           subtitle: Wrap(
@@ -245,8 +250,8 @@ Future<VisitFilterState?> showVisitFilterBottomSheet({
         padding: MediaQuery.of(context).viewInsets,
         child: BottomSheet(
           onClosing: () {},
-          builder: (_) => Column(
-            mainAxisSize: MainAxisSize.min,
+          builder: (_) => ListView(
+            shrinkWrap: true,
             children: [
 
               Padding(

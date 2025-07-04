@@ -5,23 +5,51 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_visit_statistics_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/get_local_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/model/view_visit_statistics_models.dart';
 
 class ViewVisitStatisticsViewModel extends ChangeNotifier {
+  final GetLocalVisitStatisticsUseCase _getLocalVisitStatisticsUseCase;
   final CountVisitStatisticsUseCase _countVisitStatisticsUseCase;
   VisitStatisticsState _state = LoadedVisitStatistics();
   VisitStatisticsModel? _stats;
 
   ViewVisitStatisticsViewModel({
+    required GetLocalVisitStatisticsUseCase getLocalVisitStatisticsUseCase,
     required CountVisitStatisticsUseCase countVisitStatisticsUseCase,
-  }) : _countVisitStatisticsUseCase = countVisitStatisticsUseCase;
+  })  : _countVisitStatisticsUseCase = countVisitStatisticsUseCase,
+        _getLocalVisitStatisticsUseCase = getLocalVisitStatisticsUseCase {
+    getLocalStatistics();
+  }
 
   VisitStatisticsState get state => _state;
 
   VisitStatisticsModel? get stats => _stats;
 
-  Future<void> calculateStatistics() async {
+  Future<void> getLocalStatistics() async {
+    if (_state is! LoadedVisitStatistics) return;
+
+    try {
+      _state = LoadingVisitStatistics();
+      notifyListeners();
+
+      var statsResults = await _getLocalVisitStatisticsUseCase.execute();
+      switch (statsResults) {
+        case ErrorResult<VisitStatisticsModel?>():
+          GlobalToastMessage().add(ErrorMessage(message: statsResults.error));
+          break;
+        case SuccessResult<VisitStatisticsModel?>():
+         _stats = statsResults.data ?? _stats;
+          break;
+      }
+    } finally {
+      _state = LoadedVisitStatistics();
+      notifyListeners();
+    }
+  }
+
+  Future<void> calculateRemoteStatistics() async {
     if (_state is! LoadedVisitStatistics) return;
 
     try {
