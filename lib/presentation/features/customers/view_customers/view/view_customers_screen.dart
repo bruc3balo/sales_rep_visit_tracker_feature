@@ -31,6 +31,8 @@ class ViewCustomersScreen extends StatelessWidget {
         bool isLoading = viewCustomersViewModel.itemsState is LoadingViewCustomerState;
         var customers = viewCustomersViewModel.customers;
 
+        var itemCount = viewCustomersViewModel.customers.length + (isLoading ? 1 : 0);
+
         return NotificationListener<ScrollNotification>(
           onNotification: (scrollInfo) {
             bool isAtEndOfList = scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent;
@@ -43,79 +45,99 @@ class ViewCustomersScreen extends StatelessWidget {
           child: RefreshIndicator(
             onRefresh: () => viewCustomersViewModel.refresh(),
             child: ListView.builder(
-              itemCount: viewCustomersViewModel.customers.length + (isLoading ? 1 : 0),
+              itemCount: itemCount,
               itemBuilder: (context, index) {
                 if (index >= customers.length) {
                   return InfiniteLoader();
                 }
                 var customer = customers[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.grey.shade300,
-                    child: Icon(Icons.person, color: Colors.black,),
-                  ),
-                  title: Text(customer.name),
-                  trailing: Builder(
-                    builder: (context) {
-                      if(
-                      deleteState is LoadingDeleteCustomerState
-                          &&
-                          deleteState.customer.id == customer.id) {
-                        return Icon(Icons.auto_delete_outlined, color: Colors.red,);
-                      }
 
-                      return MenuAnchor(
-                        builder: (_, controller, __) {
-                          return IconButton(
-                            onPressed: () {
-                              if (controller.isOpen) {
-                                controller.close();
-                                return;
-                              }
-                              controller.open();
-                            },
-                            icon: const Icon(Icons.more_vert),
-                            tooltip: 'Activity options',
-                          );
-                        },
-                        menuChildren: CustomerTileMenuItem.values
-                            .map((menu) => MenuItemButton(
-                          onPressed: () async {
-                            switch(menu) {
+                if (deleteState is LoadingDeleteCustomerState && deleteState.customer.id == customer.id) {
+                  return Icon(
+                    Icons.auto_delete_outlined,
+                    color: Colors.red,
+                  );
+                }
 
-                              case CustomerTileMenuItem.delete:
-                                viewCustomersViewModel.deleteCustomer(
-                                    customer: customer
+                bool isLastItem = index + 1 >= itemCount;
+                var padding = (isLastItem) ? 120.0 : 0.0;
+
+                return Dismissible(
+                  key: ValueKey(customer.id),
+                  onDismissed: (d) {
+                    switch (d) {
+                      case DismissDirection.endToStart:
+                        viewCustomersViewModel.deleteCustomer(customer: customer);
+                        break;
+
+                      default:
+                        break;
+                    }
+                  },
+                  confirmDismiss: (d) async {
+                    switch (d) {
+                      case DismissDirection.endToStart:
+                        return await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text('Delete Customer'),
+                                  content: Text('Confirm to delete ${customer.name},',style: TextStyle(color: Colors.black),),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(false),
+                                      child: const Text('No'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                      child: const Text('Yes'),
+                                    ),
+                                  ],
                                 );
-                                break;
-                              case CustomerTileMenuItem.edit:
-                                var updatedCustomer = await showDialog<Customer?>(
-                                  context: context,
-                                  builder: (context) {
-                                    return EditCustomerScreen(
-                                      editCustomerViewModel: EditCustomerViewModel(
-                                        customer: customer,
-                                        updateCustomerUseCase: UpdateCustomerUseCase(
-                                            remoteCustomerRepository: remoteCustomerRepository,
-                                            localCustomerRepository: localCustomerRepository,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                                if(updatedCustomer == null) return;
-                                viewCustomersViewModel.updateItem(updatedCustomer);
-                                break;
-                            }
+                              },
+                            ) ??
+                            false;
+                      case DismissDirection.startToEnd:
+                        var updatedCustomer = await showDialog<Customer?>(
+                          context: context,
+                          builder: (context) {
+                            return EditCustomerScreen(
+                              editCustomerViewModel: EditCustomerViewModel(
+                                customer: customer,
+                                updateCustomerUseCase: UpdateCustomerUseCase(
+                                  remoteCustomerRepository: remoteCustomerRepository,
+                                  localCustomerRepository: localCustomerRepository,
+                                ),
+                              ),
+                            );
                           },
-                          child: Text(
-                            menu.name.capitalize,
-                            style: TextStyle(color:  Colors.black),
-                          ),
-                        ),
-                        ).toList(),
-                      );
-                    },
+                        );
+                        if (updatedCustomer != null) viewCustomersViewModel.updateItem(updatedCustomer);
+                        return false;
+
+                      default:
+                        return false;
+                    }
+                  },
+                  background: Container(
+                    color: Theme.of(context).colorScheme.primary,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Icon(Icons.edit, color: Colors.white),
+                  ),
+                  secondaryBackground: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: const Icon(Icons.delete, color: Colors.white),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: padding),
+                    child: CustomerListTile(
+                      customer: customer,
+                    ),
                   ),
                 );
               },
@@ -123,6 +145,29 @@ class ViewCustomersScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class CustomerListTile extends StatelessWidget {
+  const CustomerListTile({
+    required this.customer,
+    super.key,
+  });
+
+  final Customer customer;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Icon(
+          Icons.person_2_outlined,
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
+      ),
+      title: Text(customer.name),
     );
   }
 }

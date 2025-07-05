@@ -13,8 +13,3 @@ class LoadingDeleteCustomerState extends DeleteCustomerState {
 
   LoadingDeleteCustomerState({required this.customer});
 }
-
-enum CustomerTileMenuItem {
-  edit,
-  delete;
-}

@@ -57,8 +57,9 @@ class ViewVisitsScreen extends StatelessWidget {
                     if (index >= visits.length) {
                       return InfiniteLoader();
                     }
+                    bool isLastItem = index + 1 == itemCount;
                     var visit = visits[index];
-                    var padding = (index + 1 == itemCount) ? 60.0 : 0.0;
+                    var padding = (isLastItem) ? 120.0 : 0.0;
                     return Padding(
                       padding: EdgeInsets.only(bottom: padding),
                       child: VisitTile(visit: visit),
@@ -70,19 +71,22 @@ class ViewVisitsScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.small(
-        onPressed: () async {
-          var filters = await showVisitFilterBottomSheet(
-            context: context,
-            searchCustomersViewModel: searchCustomersViewModel,
-            searchActivitiesViewModel: searchActivitiesViewModel,
-            initialFilter: viewVisitsViewModel.filterState,
-          );
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 60.0, right: 3),
+        child: FloatingActionButton.small(
+          onPressed: () async {
+            var filters = await showVisitFilterBottomSheet(
+              context: context,
+              searchCustomersViewModel: searchCustomersViewModel,
+              searchActivitiesViewModel: searchActivitiesViewModel,
+              initialFilter: viewVisitsViewModel.filterState,
+            );
 
-          if(filters == null) return;
-          viewVisitsViewModel.updateFilter(filters);
-        },
-        child: Icon(Icons.filter_list),
+            if(filters == null) return;
+            viewVisitsViewModel.updateFilter(filters);
+          },
+          child: Icon(Icons.filter_list),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
     );
@@ -124,7 +128,8 @@ class VisitTile extends StatelessWidget {
           badgeStyle: badges.BadgeStyle(
             badgeColor: Colors.white,
             borderSide: BorderSide(
-              color: Colors.cyan,
+              width: 2.0,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           child: Icon(Icons.business_outlined),

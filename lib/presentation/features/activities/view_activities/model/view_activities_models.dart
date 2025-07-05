@@ -15,8 +15,3 @@ class LoadingDeleteActivityState extends DeleteActivityState {
 
   LoadingDeleteActivityState({required this.activity});
 }
-
-enum ActivityTileMenuItem {
-  edit,
-  delete;
-}

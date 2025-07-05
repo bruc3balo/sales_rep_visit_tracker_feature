@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/delete_activity_use_case.dart';
@@ -41,149 +43,176 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: widget.homeViewModel,
-      builder: (_, __) {
-        var syncState = widget.homeViewModel.visitCountState;
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(widget.homeViewModel.currentPage.label),
-            actions: [
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.viewVisitStatistics.path,
-                  );
-                },
-                icon: Icon(Icons.pie_chart),
-              ),
-              switch (syncState) {
-                LoadingCountVisitState() => InfiniteLoader(),
-                LoadedCountVisitState() => Visibility(
-                    visible: (syncState.unSyncedVisitCount ?? 0) > 0,
-                    child: badges.Badge(
-                      badgeContent: Text(syncState.unSyncedVisitCount?.toString() ?? '-'),
-                      badgeAnimation: badges.BadgeAnimation.rotation(),
-                      position: badges.BadgePosition.center(),
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(
-                            AppRoutes.visitUnsyncedVisits.path,
-                          );
-                        },
-                        icon: Icon(
-                          Icons.sync,
-                          size: 40,
+    return PopScope(
+      onPopInvokedWithResult: (_, __) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Exit'),
+              content: const Text('Did you mean to exit?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('No'),
+                ),
+                TextButton(
+                  onPressed: () => exit(0),
+                  child: const Text('Yes'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+      canPop: false,
+      child: ListenableBuilder(
+        listenable: widget.homeViewModel,
+        builder: (_, __) {
+          var syncState = widget.homeViewModel.visitCountState;
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(widget.homeViewModel.currentPage.label),
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.viewVisitStatistics.path,
+                    );
+                  },
+                  icon: Icon(Icons.pie_chart),
+                ),
+                switch (syncState) {
+                  LoadingCountVisitState() => InfiniteLoader(),
+                  LoadedCountVisitState() => Visibility(
+                      visible: (syncState.unSyncedVisitCount ?? 0) > 0,
+                      child: badges.Badge(
+                        badgeContent: Text(syncState.unSyncedVisitCount?.toString() ?? '-'),
+                        badgeAnimation: badges.BadgeAnimation.rotation(),
+                        position: badges.BadgePosition.center(),
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              AppRoutes.visitUnsyncedVisits.path,
+                            );
+                          },
+                          icon: Icon(
+                            Icons.sync,
+                            size: 40,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-              },
-              IconButton(
-                onPressed: () {
-                  switch (widget.homeViewModel.currentPage) {
-                    case HomePages.visits:
-                      Navigator.of(context).pushNamed(
-                        AppRoutes.addVisit.path,
-                      );
-                      break;
-                    case HomePages.activities:
-                      Navigator.of(context).pushNamed(
-                        AppRoutes.addActivity.path,
-                      );
-                      break;
-                    case HomePages.customers:
-                      Navigator.of(context).pushNamed(
-                        AppRoutes.addCustomer.path,
-                      );
-                      break;
-                  }
                 },
-                icon: Icon(Icons.add),
-              ),
-            ],
-          ),
-          body: switch (widget.homeViewModel.currentPage) {
-            HomePages.visits => ViewVisitsScreen(
-                searchActivitiesViewModel: SearchActivitiesViewModel(
-                  searchRemoteActivitiesUseCase: SearchRemoteActivitiesUseCase(
+              ],
+            ),
+            body: switch (widget.homeViewModel.currentPage) {
+              HomePages.visits => ViewVisitsScreen(
+                  searchActivitiesViewModel: SearchActivitiesViewModel(
+                    searchRemoteActivitiesUseCase: SearchRemoteActivitiesUseCase(
+                      remoteActivityRepository: GetIt.I(),
+                      localActivityRepository: GetIt.I(),
+                    ),
+                    searchLocalActivitiesUseCase: SearchLocalActivitiesUseCase(
+                      localActivityRepository: GetIt.I(),
+                    ),
+                    connectivityService: GetIt.I(),
+                  ),
+                  searchCustomersViewModel: SearchCustomersViewModel(
+                    searchRemoteCustomerUseCase: SearchRemoteCustomerUseCase(
+                      remoteCustomerRepository: GetIt.I(),
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    searchLocalCustomersUseCase: SearchLocalCustomersUseCase(
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    connectivityService: GetIt.I(),
+                  ),
+                  viewVisitsViewModel: ViewVisitsViewModel(
+                    pastVisitsUseCase: VisitListOfPastVisitsUseCase(
+                      visitRepository: GetIt.I(),
+                      activityRepository: GetIt.I(),
+                      customerRepository: GetIt.I(),
+                    ),
+                  ),
+                ),
+              HomePages.activities => ViewActivitiesScreen(
+                  updateActivityUseCase: UpdateActivityUseCase(
                     remoteActivityRepository: GetIt.I(),
                     localActivityRepository: GetIt.I(),
                   ),
-                  searchLocalActivitiesUseCase: SearchLocalActivitiesUseCase(
-                    localActivityRepository: GetIt.I(),
-                  ),
-                  connectivityService: GetIt.I(),
-                ),
-                searchCustomersViewModel: SearchCustomersViewModel(
-                  searchRemoteCustomerUseCase: SearchRemoteCustomerUseCase(
-                    remoteCustomerRepository: GetIt.I(),
-                    localCustomerRepository: GetIt.I(),
-                  ),
-                  searchLocalCustomersUseCase: SearchLocalCustomersUseCase(
-                    localCustomerRepository: GetIt.I(),
-                  ),
-                  connectivityService: GetIt.I(),
-                ),
-                viewVisitsViewModel: ViewVisitsViewModel(
-                  pastVisitsUseCase: VisitListOfPastVisitsUseCase(
-                    visitRepository: GetIt.I(),
-                    activityRepository: GetIt.I(),
-                    customerRepository: GetIt.I(),
+                  viewActivitiesViewModel: ViewActivitiesViewModel(
+                    connectivityService: GetIt.I(),
+                    remoteActivitiesUseCase: ViewRemoteActivitiesUseCase(
+                      remoteActivityRepository: GetIt.I(),
+                      localActivityRepository: GetIt.I(),
+                    ),
+                    localActivitiesUseCase: ViewLocalActivitiesUseCase(
+                      localActivityRepository: GetIt.I(),
+                    ),
+                    deleteActivityUseCase: DeleteActivityUseCase(
+                      remoteActivityRepository: GetIt.I(),
+                      localActivityRepository: GetIt.I(),
+                    ),
                   ),
                 ),
-              ),
-            HomePages.activities => ViewActivitiesScreen(
-                updateActivityUseCase: UpdateActivityUseCase(
-                  remoteActivityRepository: GetIt.I(),
-                  localActivityRepository: GetIt.I(),
-                ),
-                viewActivitiesViewModel: ViewActivitiesViewModel(
-                  connectivityService: GetIt.I(),
-                  remoteActivitiesUseCase: ViewRemoteActivitiesUseCase(
-                    remoteActivityRepository: GetIt.I(),
-                    localActivityRepository: GetIt.I(),
-                  ),
-                  localActivitiesUseCase: ViewLocalActivitiesUseCase(
-                    localActivityRepository: GetIt.I(),
-                  ),
-                  deleteActivityUseCase: DeleteActivityUseCase(
-                    remoteActivityRepository: GetIt.I(),
-                    localActivityRepository: GetIt.I(),
+              HomePages.customers => ViewCustomersScreen(
+                  localCustomerRepository: GetIt.I(),
+                  remoteCustomerRepository: GetIt.I(),
+                  viewCustomersViewModel: ViewCustomersViewModel(
+                    viewRemoteCustomersUseCase: ViewRemoteCustomersUseCase(
+                      remoteCustomerRepository: GetIt.I(),
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    viewLocalCustomersUseCase: ViewLocalCustomersUseCase(
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    deleteCustomerUseCase: DeleteCustomerUseCase(
+                      remoteCustomerRepository: GetIt.I(),
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    connectivityService: GetIt.I(),
                   ),
                 ),
-              ),
-            HomePages.customers => ViewCustomersScreen(
-                localCustomerRepository: GetIt.I(),
-                remoteCustomerRepository: GetIt.I(),
-                viewCustomersViewModel: ViewCustomersViewModel(
-                  viewRemoteCustomersUseCase: ViewRemoteCustomersUseCase(
-                    remoteCustomerRepository: GetIt.I(),
-                    localCustomerRepository: GetIt.I(),
-                  ),
-                  viewLocalCustomersUseCase: ViewLocalCustomersUseCase(
-                    localCustomerRepository: GetIt.I(),
-                  ),
-                  deleteCustomerUseCase: DeleteCustomerUseCase(
-                    remoteCustomerRepository: GetIt.I(),
-                    localCustomerRepository: GetIt.I(),
-                  ),
-                  connectivityService: GetIt.I(),
-                ),
-              ),
-          },
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: widget.homeViewModel.currentPage.index,
-            onTap: widget.homeViewModel.changePage,
-            items: widget.homeViewModel.homePages.map(
-                  (p) => BottomNavigationBarItem(
-                    icon: Icon(p.iconData),
-                    label: p.label,
-                  ),
-                ).toList(),
-          ),
-        );
-      },
+            },
+            floatingActionButton: FloatingActionButton.small(
+              onPressed: () {
+                switch (widget.homeViewModel.currentPage) {
+                  case HomePages.visits:
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.addVisit.path,
+                    );
+                    break;
+
+                  case HomePages.activities:
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.addActivity.path,
+                    );
+                    break;
+                  case HomePages.customers:
+                    Navigator.of(context).pushNamed(
+                      AppRoutes.addCustomer.path,
+                    );
+                    break;
+                }
+              },
+              child: Icon(Icons.add),
+            ),
+            bottomNavigationBar: BottomNavigationBar(
+              currentIndex: widget.homeViewModel.currentPage.index,
+              onTap: widget.homeViewModel.changePage,
+              items: widget.homeViewModel.homePages
+                  .map(
+                    (p) => BottomNavigationBarItem(
+                      icon: Icon(p.iconData),
+                      label: p.label,
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
+        },
+      ),
     );
   }
 }

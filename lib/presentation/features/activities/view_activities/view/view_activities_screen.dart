@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
-import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
-import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/activity/update_activity_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/edit_activity/view/edit_activity_screen.dart';
@@ -28,6 +25,7 @@ class ViewActivitiesScreen extends StatelessWidget {
         var deleteState = viewActivitiesViewModel.deleteState;
         bool isLoading = viewActivitiesViewModel.itemsState is LoadingViewActivitiesState;
         var activities = viewActivitiesViewModel.activities;
+        int itemCount = viewActivitiesViewModel.activities.length + (isLoading ? 1 : 0);
 
         return NotificationListener<ScrollNotification>(
           onNotification: (scrollInfo) {
@@ -41,78 +39,103 @@ class ViewActivitiesScreen extends StatelessWidget {
           child: RefreshIndicator(
             onRefresh: () => viewActivitiesViewModel.refresh(),
             child: ListView.builder(
-              itemCount: viewActivitiesViewModel.activities.length + (isLoading ? 1 : 0),
+              itemCount: itemCount,
               itemBuilder: (context, index) {
                 if (index >= activities.length) {
                   return InfiniteLoader();
                 }
 
                 var activity = activities[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.grey.shade300,
-                    child: Icon(Icons.run_circle_outlined, color: Colors.black,),
-                  ),
-                  title: Text(activity.description),
-                  trailing: Builder(
-                    builder: (context) {
-                      if(
-                      deleteState is LoadingDeleteActivityState
-                          &&
-                      deleteState.activity.id == activity.id) {
-                        return Icon(Icons.auto_delete_outlined, color: Colors.red,);
-                      }
+                bool activityIsBeingDeleted = deleteState is LoadingDeleteActivityState && activity.id == deleteState.activity.id;
+                if (activityIsBeingDeleted) {
+                  return Icon(
+                    Icons.auto_delete_outlined,
+                    color: Colors.red,
+                  );
+                }
 
-                      return MenuAnchor(
-                        builder: (_, controller, __) {
-                          return IconButton(
-                            onPressed: () {
-                              if (controller.isOpen) {
-                                controller.close();
-                                return;
-                              }
-                              controller.open();
-                            },
-                            icon: const Icon(Icons.more_vert),
-                            tooltip: 'Activity options',
-                          );
-                        },
-                        menuChildren: ActivityTileMenuItem.values
-                            .map((menu) => MenuItemButton(
-                          onPressed: () async {
-                            switch(menu) {
+                bool isLastItem = index + 1 >= viewActivitiesViewModel.activities.length;
+                var padding = (isLastItem) ? 120.0 : 0.0;
 
-                              case ActivityTileMenuItem.delete:
-                                viewActivitiesViewModel.deleteActivity(
-                                    activity: activity
+                return Dismissible(
+                  key: ValueKey(activity.id),
+                  onDismissed: (d) {
+                    switch (d) {
+                      case DismissDirection.endToStart:
+                        viewActivitiesViewModel.deleteActivity(activity: activity);
+                        break;
+
+                      default:
+                        break;
+                    }
+                  },
+                  confirmDismiss: (d) async {
+                    switch (d) {
+                      case DismissDirection.endToStart:
+                        return await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text('Delete Activity'),
+                                  content: Text(
+                                    'Confirm to delete ${activity.description}',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(false),
+                                      child: const Text('No'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true);
+                                      },
+                                      child: const Text('Yes'),
+                                    ),
+                                  ],
                                 );
-                                break;
-                              case ActivityTileMenuItem.edit:
-                                var updatedActivity = await showDialog<Activity?>(
-                                  context: context,
-                                  builder: (context) {
-                                    return EditActivityScreen(
-                                      editActivityViewModel: EditActivityViewModel(
-                                        updateActivityUseCase: updateActivityUseCase,
-                                        activity: activity,
-                                      ),
-                                    );
-                                  },
-                                );
+                              },
+                            ) ??
+                            false;
 
-                                if(updatedActivity == null) return;
-                                viewActivitiesViewModel.updateItem(updatedActivity);
-                                break;
-                            }
+                      case DismissDirection.startToEnd:
+                        var updatedActivity = await showDialog<Activity?>(
+                          context: context,
+                          builder: (context) {
+                            return EditActivityScreen(
+                              editActivityViewModel: EditActivityViewModel(
+                                updateActivityUseCase: updateActivityUseCase,
+                                activity: activity,
+                              ),
+                            );
                           },
-                          child: Text(
-                            menu.name.capitalize,
-                            style: TextStyle(color:  Colors.black),
-                          ),
-                        ),
-                        ).toList(),
-                      );
-                    },
+                        );
+
+                        if (updatedActivity != null) viewActivitiesViewModel.updateItem(updatedActivity);
+
+                        return false;
+
+                      default:
+                        return false;
+                    }
+                  },
+                  background: Container(
+                    color: Theme.of(context).colorScheme.primary,
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Icon(Icons.edit, color: Colors.white),
+                  ),
+                  secondaryBackground: Container(
+                    color: Colors.red,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: const Icon(Icons.delete, color: Colors.white),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: padding),
+                    child: ActivityListTile(
+                      activity: activity,
+                    ),
                   ),
                 );
               },
@@ -124,4 +147,25 @@ class ViewActivitiesScreen extends StatelessWidget {
   }
 }
 
+class ActivityListTile extends StatelessWidget {
+  const ActivityListTile({
+    required this.activity,
+    super.key,
+  });
 
+  final Activity activity;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Icon(
+          Icons.run_circle_outlined,
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
+      ),
+      title: Text(activity.description),
+    );
+  }
+}
