@@ -84,6 +84,7 @@ class SupabaseActivityRepository implements RemoteActivityRepository {
     String? order,
   }) async {
     var getActivityResponse = await _activityApi.sendGetActivityRequest(
+      ids: ids,
       likeDescription: likeDescription,
       equalDescription: equalDescription,
       page: page,

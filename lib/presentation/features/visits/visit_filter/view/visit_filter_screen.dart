@@ -51,7 +51,6 @@ class VisitFilterComponent extends StatelessWidget {
             }).toList(),
           ),
         ),
-
         ListTile(
           title: Text("Date Range"),
           subtitle: Wrap(
@@ -73,14 +72,15 @@ class VisitFilterComponent extends StatelessWidget {
                   onChange(updatedFilter);
                 },
                 deleteIcon: Icon(Icons.cancel_outlined),
-                onDeleted: filter.fromDateInclusive == null ? null : () {
-                  onChange(
-                    filter..fromDateInclusive = null,
-                  );
-                },
+                onDeleted: filter.fromDateInclusive == null
+                    ? null
+                    : () {
+                        onChange(
+                          filter..fromDateInclusive = null,
+                        );
+                      },
                 label: Text(filter.fromDateInclusive?.readableDate ?? 'Start Date'),
               ),
-
               FilterChip(
                 onSelected: (_) async {
                   var date = await showDatePicker(
@@ -94,32 +94,35 @@ class VisitFilterComponent extends StatelessWidget {
 
                   var updatedFilter = filter..toDateInclusive = date;
                   onChange(updatedFilter);
-
                 },
                 deleteIcon: Icon(Icons.cancel_outlined),
-                onDeleted: filter.toDateInclusive == null ? null : () {
-                  onChange(
-                    filter..toDateInclusive = null,
-                  );
-                },
+                onDeleted: filter.toDateInclusive == null
+                    ? null
+                    : () {
+                        onChange(
+                          filter..toDateInclusive = null,
+                        );
+                      },
                 label: Text(filter.toDateInclusive?.readableDate ?? 'End Date'),
               ),
             ],
           ),
         ),
-
         ListTile(
           title: Text("Activities"),
           subtitle: Wrap(
             spacing: 8,
             children: [
               ...filter.activities.map(
-                    (a) {
+                (a) {
                   return FilterChip(
                     label: Text(a.description),
                     deleteIcon: Icon(Icons.cancel_outlined),
                     onDeleted: () {
-                      var updatedFilter = filter..activities.removeWhere((ar) => ar.id == a.id,);
+                      var updatedFilter = filter
+                        ..activities.removeWhere(
+                          (ar) => ar.id == a.id,
+                        );
                       onChange(updatedFilter);
                     },
                     onSelected: (selected) {},
@@ -148,7 +151,6 @@ class VisitFilterComponent extends StatelessWidget {
             ],
           ),
         ),
-
         ListTile(
           title: Text("Customer"),
           subtitle: Wrap(
@@ -172,16 +174,17 @@ class VisitFilterComponent extends StatelessWidget {
                   );
                 },
                 deleteIcon: Icon(Icons.cancel_outlined),
-                onDeleted: filter.customer == null ? null : () {
-                  var updatedFilter = filter..customer = null;
-                  onChange(updatedFilter);
-                },
+                onDeleted: filter.customer == null
+                    ? null
+                    : () {
+                        var updatedFilter = filter..customer = null;
+                        onChange(updatedFilter);
+                      },
                 label: Text(filter.customer?.name ?? '-'),
               ),
             ],
           ),
         ),
-
         ListTile(
           title: Text("Order"),
           subtitle: Wrap(
@@ -204,7 +207,6 @@ class VisitFilterComponent extends StatelessWidget {
             }).toList(),
           ),
         ),
-
         ListTile(
           title: Text("Sort"),
           subtitle: Wrap(
@@ -253,12 +255,14 @@ Future<VisitFilterState?> showVisitFilterBottomSheet({
           builder: (_) => ListView(
             shrinkWrap: true,
             children: [
-
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12.0),
-                child: Text("Filter Visits", style: Theme.of(context).textTheme.headlineLarge),
+                child: Text(
+                  "Filter Visits",
+                  style: Theme.of(context).textTheme.headlineLarge,
+                  textAlign: TextAlign.center,
+                ),
               ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ValueListenableBuilder(
@@ -275,7 +279,6 @@ Future<VisitFilterState?> showVisitFilterBottomSheet({
                   },
                 ),
               ),
-
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Flex(
@@ -300,7 +303,6 @@ Future<VisitFilterState?> showVisitFilterBottomSheet({
                   ],
                 ),
               ),
-
             ],
           ),
         ),

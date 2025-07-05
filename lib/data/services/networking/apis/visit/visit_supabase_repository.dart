@@ -51,20 +51,21 @@ class SupabaseVisitApi {
     required int pageSize,
     String? order,
   }) async {
+    final parts = <String>[];
+
+    if (visitId != null) parts.add("id=eq.$visitId");
+    if (customerId != null) parts.add("customer_id=eq.$customerId");
+    if (activityIdsDone != null) parts.add("activities_done=cs.{${activityIdsDone.join(",")}}");
+    if (status != null) parts.add("status=eq.$status");
+    if (fromDateInclusive != null) parts.add("visit_date=gte.${Uri.encodeComponent(fromDateInclusive.toIso8601String())}");
+    if (toDateInclusive != null) parts.add("visit_date=lte.${Uri.encodeComponent(toDateInclusive.toIso8601String())}");
+    parts.add("limit=$pageSize");
+    parts.add("offset=${page * pageSize}");
+    if (order != null) parts.add("order=${Uri.encodeComponent(order)}");
+    String uri = parts.join("&");
+
     NetworkRequest request = NetworkRequest(
-      uri: Uri.parse(_baseUrl).replace(
-        queryParameters: {
-          if (visitId != null) "id": "eq.$visitId",
-          if (customerId != null) "customer_id": "eq.$customerId",
-          if (activityIdsDone != null)  "activities_done": "cs.{${activityIdsDone.join(",")}}",
-          if (status != null) "status": "eq.$status",
-          if (fromDateInclusive != null) "visit_date": "gte.${fromDateInclusive.toIso8601String()}",
-          if (toDateInclusive != null) "visit_date": "lte.${toDateInclusive.toIso8601String()}",
-          "limit": pageSize.toString(),
-          "offset": (page * pageSize).toString(),
-          if (order != null) "order": order,
-        },
-      ),
+      uri: Uri.parse("$_baseUrl?$uri"),
       headers: {"apiKey": _apiKey},
       method: HttpMethod.get,
     );

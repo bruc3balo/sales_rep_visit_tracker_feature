@@ -12,6 +12,9 @@ import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_uns
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/delete_unsynced_visit_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/get_local_visit_statistics_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/get_remote_daily_visit_statistics_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/get_remote_weekly_visit_statistics_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/get_top_n_completed_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/update_unsynced_visit_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/view_unsynced_local_visits_use_case.dart';
@@ -158,6 +161,17 @@ extension RoutePage on AppRoutes {
         ),
       AppRoutes.viewVisitStatistics => ViewVisitStatisticsScreen(
           statisticsViewModel: ViewVisitStatisticsViewModel(
+            getRemoteDailyVisitStatisticsUseCase: GetRemoteDailyVisitStatisticsUseCase(
+              visitRepository: GetIt.I(),
+            ),
+            getTopCustomersVisitStatisticsUseCase: GetTopCustomersVisitStatisticsUseCase(
+              remoteActivityRepository: GetIt.I(),
+              visitRepository: GetIt.I(),
+              remoteCustomerRepository: GetIt.I(),
+            ),
+            getRemoteWeeklyVisitStatisticsUseCase: GetRemoteWeeklyVisitStatisticsUseCase(
+              visitRepository: GetIt.I(),
+            ),
             getLocalVisitStatisticsUseCase: GetLocalVisitStatisticsUseCase(
               localVisitStatisticsRepository: GetIt.I(),
             ),

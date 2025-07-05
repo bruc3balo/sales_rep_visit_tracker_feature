@@ -1,4 +1,4 @@
-[![wakatime](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca.svg)](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca)
+ [![wakatime](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca.svg)](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca)
 
 # sales_rep_visit_tracker_feature
 
@@ -38,6 +38,19 @@ For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
 
 1. Dart (3.6.0)
 2. Flutter - Stable (3.27.1)
+3. json_annotation: ^4.8.1
+4. dio: ^5.8.0+1
+5. get_it: ^8.0.3
+6. hive: ^2.2.3
+7. hive_flutter: ^1.1.0
+8. crypto: ^3.0.6
+9. intl: ^0.18.1
+10. badges: ^3.1.2
+11. connectivity_plus: ^6.0.3
+12. internet_connection_checker: ^1.0.0+1
+13. fluttertoast: ^8.2.10
+14. fl_chart: ^0.71.0
+15. dots_indicator: ^4.0.1
 
 # Design pattern
 

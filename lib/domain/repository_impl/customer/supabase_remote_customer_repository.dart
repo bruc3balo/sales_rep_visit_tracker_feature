@@ -79,6 +79,7 @@ class SupabaseCustomerRepository implements RemoteCustomerRepository {
     String? order,
   }) async {
     var searchCustomerResponse = await _customerApi.sendGetCustomersRequest(
+      ids: ids,
       equalName: equalName,
       likeName: likeName,
       page: page,

@@ -45,15 +45,12 @@ class ActivityRef {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is ActivityRef &&
-        other.id == id &&
-        other.description == description;
+    return other is ActivityRef && other.id == id && other.description == description;
   }
 
   @override
   int get hashCode => id.hashCode ^ description.hashCode;
 }
-
 
 class CustomerRef {
   final int id;
@@ -72,6 +69,50 @@ class VisitStatisticsModel {
   });
 
   int get total => data.values.fold(0, (prev, curr) => prev + curr);
+
+  double getPercentage(VisitStatus status) {
+    int statusCount = getCount(status);
+    return (statusCount * 100) / total;
+  }
+
+  int getCount(VisitStatus status) {
+    return data[status] ?? 0;
+  }
 }
 
 enum SyncStatus { success, fail }
+
+class CompletedVisitStatistics {
+  final TopCustomerStatistics customer;
+  final TopActivityStatistics activity;
+
+  CompletedVisitStatistics({
+    required this.customer,
+    required this.activity,
+  });
+}
+
+class TopCustomerStatistics {
+  final Map<Customer, int> statistics;
+
+  TopCustomerStatistics({required this.statistics});
+}
+
+class TopActivityStatistics {
+  final Map<Activity, List<Visit>> statistics;
+
+  TopActivityStatistics({required this.statistics});
+}
+
+
+class Last7DaysStatistics {
+  final List<Visit> visits;
+
+  Last7DaysStatistics({required this.visits});
+}
+
+class TodayStatistics {
+  final List<Visit> visits;
+
+  TodayStatistics({required this.visits});
+}
