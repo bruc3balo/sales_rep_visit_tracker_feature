@@ -14,15 +14,14 @@ import 'package:badges/badges.dart' as badges;
 class ViewVisitsScreen extends StatelessWidget {
   const ViewVisitsScreen({
     required this.viewVisitsViewModel,
-    required this.searchCustomersViewModel ,
-    required this.searchActivitiesViewModel ,
+    required this.searchCustomersViewModel,
+    required this.searchActivitiesViewModel,
     super.key,
   });
 
   final ViewVisitsViewModel viewVisitsViewModel;
   final SearchCustomersViewModel searchCustomersViewModel;
   final SearchActivitiesViewModel searchActivitiesViewModel;
-
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +81,7 @@ class ViewVisitsScreen extends StatelessWidget {
               initialFilter: viewVisitsViewModel.filterState,
             );
 
-            if(filters == null) return;
+            if (filters == null) return;
             viewVisitsViewModel.updateFilter(filters);
           },
           child: Icon(Icons.filter_list),
@@ -113,7 +112,7 @@ class VisitTile extends StatelessWidget {
       leading: Container(
         padding: EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          color: Colors.grey.shade300,
+          color: Theme.of(context).primaryColor,
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         child: badges.Badge(
@@ -124,18 +123,28 @@ class VisitTile extends StatelessWidget {
             loopAnimation: false,
           ),
           stackFit: StackFit.passthrough,
-          badgeContent: Text(visit.activityMap.length.toString()),
-          badgeStyle: badges.BadgeStyle(
-            badgeColor: Colors.white,
-            borderSide: BorderSide(
-              width: 2.0,
-              color: Theme.of(context).colorScheme.primary,
+          badgeContent: Text(
+            visit.activityMap.length.toString(),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
-          child: Icon(Icons.business_outlined),
+          badgeStyle: badges.BadgeStyle(
+            badgeColor: Colors.black,
+            borderSide: BorderSide(
+              width: 2.0,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+          ),
+          child: Icon(
+            Icons.business_outlined,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
         ),
       ),
-      title: Text(visit.customer?.name ?? 'Unknown Customer'),
+      title: Text(
+        visit.customer?.name ?? 'Unknown Customer',
+      ),
       subtitle: Text(visit.visit.status),
       trailing: Text(visit.visit.visitDate.readableDateTime2Line),
     );

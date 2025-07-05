@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:sales_rep_visit_tracker_feature/config/config.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/local_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
@@ -29,18 +28,20 @@ import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/visit/hiv
 import 'package:sales_rep_visit_tracker_feature/domain/repository_impl/visit/supabase_remote_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/service_impl/dio_network_service.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/service_impl/hive_local_database_service.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_visit_statistics_use_case.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/get_local_visit_statistics_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/dark_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/light_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view_model/view_visit_statistics_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
 import 'domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
 
 Future<void> main() async {
+
+  ///Environment variables
+  final supabaseApiKey = String.fromEnvironment('SUPABASE_API_KEY');
+  final supabaseBaseUrl = String.fromEnvironment('SUPABASE_BASE_URL');
+
   /// Services
 
   // Network
@@ -64,7 +65,7 @@ Future<void> main() async {
   /// Repositories
 
   // Activity
-  //Remote
+  // Remote
   RemoteActivityRepository activityRepository = SupabaseActivityRepository(
     activityApi: ActivitySupabaseApi(
       networkService: ns,
@@ -74,14 +75,14 @@ Future<void> main() async {
   );
   GetIt.I.registerSingleton(activityRepository);
 
-  //Local
+  // Local
   LocalActivityRepository localActivityRepository = HiveLocalActivityRepository(
     localActivityCrud: db,
   );
   GetIt.I.registerSingleton(localActivityRepository);
 
   // Customer
-  //Remote
+  // Remote
   RemoteCustomerRepository customerRepository = SupabaseCustomerRepository(
     customerApi: CustomerSupabaseApi(
       networkService: ns,
@@ -91,7 +92,7 @@ Future<void> main() async {
   );
   GetIt.I.registerSingleton(customerRepository);
 
-  //Local
+  // Local
   LocalCustomerRepository localCustomerRepository = HiveLocalCustomerRepository(
     localCustomerCrud: db,
   );

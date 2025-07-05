@@ -3,7 +3,9 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view/search_activities_screen.dart';
@@ -236,6 +238,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                       title: Text("Location"),
                       subtitle: TextFormField(
                         controller: locationController,
+                        textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           hintText: "Where is the visit located",
                         ),
@@ -250,6 +253,7 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                       title: Text("Notes"),
                       subtitle: TextFormField(
                         controller: notesController,
+                        textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                           hintText: "Add any relevant notes",
                         ),
@@ -259,34 +263,49 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                     ),
                   ),
 
-                  ElevatedButton(
-                    onPressed: () {
-                      Customer? customer = customerNotifier.value;
-                      if (customer == null) return;
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Customer? customer = customerNotifier.value;
+                        if (customer == null) {
+                          GlobalToastMessage().add(InfoMessage(message: "Customer required"));
+                          return;
+                        }
 
-                      DateTime visitDate = visitDateNotifier.value;
+                        DateTime visitDate = visitDateNotifier.value;
 
-                      VisitStatus? status = visitStatusNotifier.value;
-                      if (status == null) return;
+                        VisitStatus? status = visitStatusNotifier.value;
+                        if (status == null) {
+                          GlobalToastMessage().add(InfoMessage(message: "Select status"));
+                          return;
+                        }
 
-                      String location = locationController.text;
-                      if (location.isEmpty) return;
+                        String location = locationController.text;
+                        if (location.isEmpty) {
+                          GlobalToastMessage().add(InfoMessage(message: "Please enter visit location"));
+                          return;
+                        }
 
-                      String notes = notesController.text;
-                      if (notes.isEmpty) return;
+                        String notes = notesController.text;
+                        if (notes.isEmpty) {
+                          GlobalToastMessage().add(InfoMessage(message: "Provide a brief summary your visit"));
+                          return;
+                        }
 
-                      List<Activity> activities = activitiesNotifier.value;
+                        List<Activity> activities = activitiesNotifier.value;
 
-                      widget.addVisitViewModel.addNewVisit(
-                        customer: customer,
-                        visitDate: visitDate,
-                        status: status,
-                        location: location,
-                        notes: notes,
-                        activities: activities,
-                      );
-                    },
-                    child: Text("Submit"),
+                        widget.addVisitViewModel.addNewVisit(
+                          customer: customer,
+                          visitDate: visitDate,
+                          status: status,
+                          location: location,
+                          notes: notes,
+                          activities: activities,
+                        );
+                      },
+                      child: Text("Submit"),
+                    ),
                   ),
                 ],
               ),
