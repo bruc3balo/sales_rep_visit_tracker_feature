@@ -23,6 +23,7 @@ dependencies:
   fluttertoast: ^8.2.10
   fl_chart: ^0.71.0
   dots_indicator: ^4.0.1
+  flutter_secure_storage: ^9.2.4
 
 dev_dependencies:
   flutter_test:

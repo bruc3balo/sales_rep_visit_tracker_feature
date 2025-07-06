@@ -1,4 +1,4 @@
- [![wakatime](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca.svg)](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca)
+[![wakatime](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca.svg)](https://wakatime.com/badge/user/e508bec6-f1ed-42e9-a365-8c4e69c8dd19/project/cd2034a0-28f1-4885-858e-a6c53b6d69ca)
 
 # sales_rep_visit_tracker_feature
 
@@ -7,11 +7,16 @@ Automation app. Design and structure your solution as though this feature is par
 larger, scalable application.
 The app should allow a sales rep to:
 
-* Add a new visit by filling out a form ([add_a_new_visit_use_case.dart](lib/domain/use_cases/visit/add_a_new_visit_use_case.dart))
-* View a list of their customer visits [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart)
-* Track activities completed during the visit [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart)
-* View basic statistics related to their visits (e.g., how many completed) [count_visit_statistics_use_case.dart](lib/domain/use_cases/visit/count_visit_statistics_use_case.dart)
-* Search or filter visits [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart)
+* Add a new visit by filling out a
+  form ([add_a_new_visit_use_case.dart](lib/domain/use_cases/visit/add_a_new_visit_use_case.dart))
+* View a list of their customer
+  visits [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart)
+* Track activities completed during the
+  visit [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart)
+* View basic statistics related to their visits (e.g., how many
+  completed) [count_visit_statistics_use_case.dart](lib/domain/use_cases/visit/count_visit_statistics_use_case.dart)
+* Search or filter
+  visits [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart)
 
 # License
 
@@ -52,13 +57,35 @@ For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
 14. fl_chart: ^0.71.0
 15. dots_indicator: ^4.0.1
 
+# N/B
+* Dart code indenture used is **150** **_Each line communicates something_**
+
 # Design pattern
 
 The chosen design pattern is MVVM due to it's robustness and ease of separation of UI and Data layer
 The project is divided into 3 layers for clear separation of concerns and code reusability
 
-
 # Building
+
+## Code generation
 ```bash
     flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+## Environment variables
+Store values in a file and pass the path to --dart-define-from-file= or pass them from --dart-define
+```properties
+SUPABASE_BASE_URL=${SUPABASE_BASE_URL}
+SUPABASE_API_KEY=${SUPABASE_API_KEY}
+HIVE_ENCRYPTION_KEY_NAME=${HIVE_ENCRYPTION_KEY_NAME}
+```
+
+## Running
+```bash
+    flutter run --dart-define-from-file=.env
+```
+
+## Build apk
+```bash
+    flutter build apk --dart-define-from-file=.env
 ```

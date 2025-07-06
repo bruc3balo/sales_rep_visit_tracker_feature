@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -34,16 +35,18 @@ import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
+import 'data/utils/hive_cypher_generator.dart';
 import 'domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
 
 Future<void> main() async {
 
   ///Environment variables
-  final supabaseApiKey = String.fromEnvironment('SUPABASE_API_KEY');
-  final supabaseBaseUrl = String.fromEnvironment('SUPABASE_BASE_URL');
+  const supabaseBaseUrl = String.fromEnvironment('SUPABASE_BASE_URL');
+  const supabaseApiKey = String.fromEnvironment('SUPABASE_API_KEY');
+  const hiveEncryptionKeyName = String.fromEnvironment('HIVE_ENCRYPTION_KEY_NAME');
+  if(supabaseApiKey.isEmpty || supabaseBaseUrl.isEmpty || hiveEncryptionKeyName.isEmpty) exit(1);
 
   /// Services
-
   // Network
   NetworkService ns = DioNetworkService();
   GetIt.I.registerSingleton(ns);
@@ -55,7 +58,9 @@ Future<void> main() async {
   Hive.registerAdapter(LocalActivityAdapter());
   Hive.registerAdapter(LocalVisitStatisticsAdapter());
 
-  LocalDatabaseService db = HiveLocalDatabaseService();
+  LocalDatabaseService db = HiveLocalDatabaseService(
+    cipher: await HiveKeyGenerator(keyName: hiveEncryptionKeyName).obtainHiveAesCipher(),
+  );
   GetIt.I.registerSingleton(db);
 
   // Connectivity

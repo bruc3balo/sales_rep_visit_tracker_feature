@@ -8,13 +8,19 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart'
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalDatabaseService implements LocalDatabaseService {
-  Future<Box<UnSyncedLocalVisit>> get openUnsyncedBox async => await Hive.openBox('unsynced_visits');
+  final HiveAesCipher _cipher;
 
-  Future<Box<LocalCustomer>> get openCustomerBox async => await Hive.openBox('customers');
+  Future<Box<UnSyncedLocalVisit>> get openUnsyncedBox async => await Hive.openBox('unsynced_visits', encryptionCipher: _cipher);
 
-  Future<Box<LocalActivity>> get openActivityBox async => await Hive.openBox('activities');
+  Future<Box<LocalCustomer>> get openCustomerBox async => await Hive.openBox('customers', encryptionCipher: _cipher);
 
-  Future<Box<LocalVisitStatistics>> get openVisitStatisticsBox async => await Hive.openBox('visit_statistics');
+  Future<Box<LocalActivity>> get openActivityBox async => await Hive.openBox('activities', encryptionCipher: _cipher);
+
+  Future<Box<LocalVisitStatistics>> get openVisitStatisticsBox async => await Hive.openBox('visit_statistics', encryptionCipher: _cipher);
+
+  HiveLocalDatabaseService({
+    required HiveAesCipher cipher,
+  }) : _cipher = cipher;
 
   @override
   Future<TaskResult<List<UnSyncedLocalVisit>>> getUnsyncedLocalVisits({required int page, required int pageSize}) async {
