@@ -21,10 +21,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Run code generation
+      - name: Code generation
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
-      - name: Run tests
+      - name: Testing
         run: flutter test
 
       - name: Build release APK

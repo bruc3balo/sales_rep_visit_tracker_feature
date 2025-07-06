@@ -89,3 +89,12 @@ HIVE_ENCRYPTION_KEY_NAME=${HIVE_ENCRYPTION_KEY_NAME}
 ```bash
     flutter build apk --dart-define-from-file=.env
 ```
+
+# CI/CD
+```bash
+    git tag v.1.0
+```
+
+```bash
+    git push origin v.1.0
+```

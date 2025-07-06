@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -52,10 +53,13 @@ Future<void> main() async {
   final File logFile = File('${appDir.path}/com-sales-logs.log');
   if (!logFile.existsSync()) logFile.createSync(recursive: true, exclusive: true);
 
+  const Level logLevel = kDebugMode ? Level.debug : Level.info;
+  Logger.level = logLevel;
+
   AppLog(
     output: FileLogOutput(logFile.absolute.path),
     printer: TagPrinter(),
-    level: Level.all,
+    level: logLevel,
   );
 
   AppLog.I.i("MAIN", "Logger initiated");
