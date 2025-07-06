@@ -8,8 +8,11 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/sync_status.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 
 class UpdateUnsyncedVisitUseCase {
+  static const _tag = "UpdateUnsyncedVisitUseCase";
+
   final LocalUnsyncedVisitRepository _localUnsyncedVisitRepository;
   final LocalActivityRepository _localActivityRepository;
   final LocalCustomerRepository _localCustomerRepository;
@@ -31,15 +34,19 @@ class UpdateUnsyncedVisitUseCase {
     List<int>? activityIdsDone,
     int? customerIdVisited,
   }) async {
-    var visitStatus = VisitSyncStatus();
-    if (visitStatus.isSyncing) return ErrorResult(error: "Cannot update while syncing");
+    AppLog.I.i(_tag, "Starting update for visit with hash=${hash.value}");
 
-    var unsyncedVisitFound = await _localUnsyncedVisitRepository.findByHash(
-      hash: hash,
-    );
+    var visitStatus = VisitSyncStatus();
+    if (visitStatus.isSyncing) {
+      AppLog.I.w(_tag, "Update rejected: Sync is in progress");
+      return ErrorResult(error: "Cannot update while syncing");
+    }
+
+    var unsyncedVisitFound = await _localUnsyncedVisitRepository.findByHash(hash: hash);
 
     switch (unsyncedVisitFound) {
       case ErrorResult<UnSyncedLocalVisit?>():
+        AppLog.I.e(_tag, "Failed to find visit by hash", trace: unsyncedVisitFound.trace);
         return ErrorResult(
           error: unsyncedVisitFound.error,
           trace: unsyncedVisitFound.trace,
@@ -47,12 +54,12 @@ class UpdateUnsyncedVisitUseCase {
       case SuccessResult<UnSyncedLocalVisit?>():
         var updatedUnsyncedVisit = unsyncedVisitFound.data;
         if (updatedUnsyncedVisit == null) {
-          return ErrorResult(
-            error: "Visit has already been synced",
-          );
+          AppLog.I.w(_tag, "Visit already synced for hash=${hash.value}");
+          return ErrorResult(error: "Visit has already been synced");
         }
 
-        //Update visit
+        AppLog.I.d(_tag, "Updating fields for visit hash=${hash.value}");
+
         updatedUnsyncedVisit.visitDate = visitDate ?? updatedUnsyncedVisit.visitDate;
         updatedUnsyncedVisit.status = status?.name.capitalize ?? updatedUnsyncedVisit.status;
         updatedUnsyncedVisit.location = location ?? updatedUnsyncedVisit.location;
@@ -60,17 +67,18 @@ class UpdateUnsyncedVisitUseCase {
         updatedUnsyncedVisit.activityIdsDone = activityIdsDone ?? updatedUnsyncedVisit.activityIdsDone;
         updatedUnsyncedVisit.customerIdVisited = customerIdVisited ?? updatedUnsyncedVisit.customerIdVisited;
 
-        var localSaveResult = await _localUnsyncedVisitRepository.setUnsyncedVisit(
-          visit: updatedUnsyncedVisit,
-        );
+        var localSaveResult = await _localUnsyncedVisitRepository.setUnsyncedVisit(visit: updatedUnsyncedVisit);
         switch (localSaveResult) {
           case ErrorResult<void>():
+            AppLog.I.e(_tag, "Failed to persist updated visit hash=${hash.value}", trace: localSaveResult.trace);
             return ErrorResult(
               error: localSaveResult.error,
               trace: localSaveResult.trace,
             );
 
           case SuccessResult<void>():
+            AppLog.I.i(_tag, "Persisted updated visit hash=${hash.value}");
+
             CustomerRef? customerRef;
             var localCustomerResult = await _localCustomerRepository.getLocalCustomersByIds(
               customerIds: [updatedUnsyncedVisit.customerIdVisited],
@@ -78,6 +86,7 @@ class UpdateUnsyncedVisitUseCase {
 
             switch (localCustomerResult) {
               case ErrorResult<Map<int, Customer>>():
+                AppLog.I.w(_tag, "Could not resolve customer for visit hash=${hash.value}");
                 break;
               case SuccessResult<Map<int, Customer>>():
                 var c = localCustomerResult.data.values.first;
@@ -92,12 +101,17 @@ class UpdateUnsyncedVisitUseCase {
 
             switch (localActivityRefs) {
               case ErrorResult<Map<int, Activity>>():
+                AppLog.I.w(_tag, "Could not resolve activities for visit hash=${hash.value}");
                 break;
               case SuccessResult<Map<int, Activity>>():
                 var aMap = localActivityRefs.data;
-                activityRef = {for (var a in aMap.values) a.id: ActivityRef(a.id, a.description)};
+                activityRef = {
+                  for (var a in aMap.values) a.id: ActivityRef(a.id, a.description),
+                };
                 break;
             }
+
+            AppLog.I.i(_tag, "Visit updated successfully for hash=${hash.value}");
 
             return SuccessResult(
               data: UnsyncedVisitAggregate(

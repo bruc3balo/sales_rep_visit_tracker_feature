@@ -1,3 +1,5 @@
+import 'package:logger/logger.dart';
+
 class VisitSyncStatus {
   
   VisitSyncStatus._();
@@ -11,3 +13,4 @@ class VisitSyncStatus {
   set syncing(bool newSyncStatus) => _offlineSyncing = newSyncStatus;
   
 }
+

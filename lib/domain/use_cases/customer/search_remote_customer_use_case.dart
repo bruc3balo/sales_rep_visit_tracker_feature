@@ -5,6 +5,7 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remot
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 
 class SearchRemoteCustomerUseCase {
 
@@ -21,7 +22,11 @@ class SearchRemoteCustomerUseCase {
     String? likeName,
     required int page,
     required int pageSize,
-}) async {
+  }) async {
+    AppLog.I.i(
+      "SearchRemoteCustomerUseCase",
+      "Searching remote customers: likeName=$likeName, page=$page, pageSize=$pageSize",
+    );
 
     var searchResult = await _remoteCustomerRepository.getCustomers(
       page: page,
@@ -29,8 +34,12 @@ class SearchRemoteCustomerUseCase {
       likeName: likeName,
     );
 
-    //cache activities async
-    if(searchResult is SuccessResult<List<Customer>>) {
+    if (searchResult is SuccessResult<List<Customer>>) {
+      AppLog.I.i(
+        "SearchRemoteCustomerUseCase",
+        "Caching ${searchResult.data.length} customers locally",
+      );
+
       _localCustomerRepository.setLocalCustomers(
         customer: searchResult.data,
       );

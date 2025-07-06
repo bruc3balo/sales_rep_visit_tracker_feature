@@ -3,6 +3,7 @@ import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/conne
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 
 class ConnectivityPlusConnectionService implements ConnectivityService {
 
@@ -10,7 +11,7 @@ class ConnectivityPlusConnectionService implements ConnectivityService {
   final InternetConnectionChecker _internetChecker = InternetConnectionChecker();
   final StreamController<bool> _connectionStatusStreamController = StreamController.broadcast();
 
-  bool lastResultNotifier = false;
+  bool _lastResult = false;
 
   static final ConnectivityPlusConnectionService _instance = ConnectivityPlusConnectionService._();
   factory ConnectivityPlusConnectionService() => _instance;
@@ -24,9 +25,11 @@ class ConnectivityPlusConnectionService implements ConnectivityService {
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   Future<void> initialize() async {
+    AppLog.I.i("Connectivity", "Subscribe to connectivity");
     _connectivitySubscription = _connectivity.onConnectivityChanged.listen((result) async {
-      bool isConnected = await _internetChecker.hasConnection;
-      _connectionStatusStreamController.add(isConnected);
+      _lastResult = await _internetChecker.hasConnection;
+      AppLog.I.i("Connectivity", _lastResult ? "Connected" : "No internet connection");
+      _connectionStatusStreamController.add(_lastResult);
     });
   }
 
@@ -36,7 +39,7 @@ class ConnectivityPlusConnectionService implements ConnectivityService {
     if (ConnectivityResult.none == results.lastOrNull) return false;
 
     bool hasConnection = await _internetChecker.hasConnection;
-    lastResultNotifier = hasConnection;
+    _lastResult = hasConnection;
     return hasConnection;
   }
 
@@ -46,5 +49,5 @@ class ConnectivityPlusConnectionService implements ConnectivityService {
   }
 
   @override
-  bool get lastResult => lastResultNotifier;
+  bool get lastResult => _lastResult;
 }

@@ -5,6 +5,7 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remot
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 
 class ViewRemoteCustomersUseCase {
   final RemoteCustomerRepository _remoteCustomerRepository;
@@ -13,7 +14,7 @@ class ViewRemoteCustomersUseCase {
   ViewRemoteCustomersUseCase({
     required RemoteCustomerRepository remoteCustomerRepository,
     required LocalCustomerRepository localCustomerRepository,
-  }): _remoteCustomerRepository = remoteCustomerRepository,
+  })  : _remoteCustomerRepository = remoteCustomerRepository,
         _localCustomerRepository = localCustomerRepository;
 
   Future<TaskResult<List<Customer>>> execute({
@@ -24,6 +25,11 @@ class ViewRemoteCustomersUseCase {
     required int pageSize,
     String? order,
   }) async {
+    AppLog.I.i(
+      "ViewRemoteCustomersUseCase",
+      "Fetching remote customers with filters: ids=$ids, likeName=$likeName, equalName=$equalName, page=$page, pageSize=$pageSize, order=$order",
+    );
+
     var getActivitiesResult = await _remoteCustomerRepository.getCustomers(
       ids: ids,
       page: page,
@@ -33,11 +39,21 @@ class ViewRemoteCustomersUseCase {
       order: order,
     );
 
-    //Cache activities async
-    if (getActivitiesResult is SuccessResult<List<Customer>>) {
-      _localCustomerRepository.setLocalCustomers(
-        customer: getActivitiesResult.data,
-      );
+    switch (getActivitiesResult) {
+      case SuccessResult<List<Customer>>():
+        AppLog.I.i(
+          "ViewRemoteCustomersUseCase",
+          "Fetched ${getActivitiesResult.data.length} remote customers. Caching locally.",
+        );
+        _localCustomerRepository.setLocalCustomers(
+          customer: getActivitiesResult.data,
+        );
+      case ErrorResult<List<Customer>>():
+        AppLog.I.e(
+          "ViewRemoteCustomersUseCase",
+          "Failed to fetch remote customers: ${getActivitiesResult.error}",
+          trace: getActivitiesResult.trace,
+        );
     }
 
     return getActivitiesResult;

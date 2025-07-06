@@ -3,6 +3,7 @@ import 'package:sales_rep_visit_tracker_feature/data/models/domain_local_mapper.
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/local_database/local_customer_crud.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalCustomerRepository extends LocalCustomerRepository {
@@ -12,8 +13,11 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
     required LocalCustomerCrud localCustomerCrud,
   }) : _localCustomerCrud = localCustomerCrud;
 
+  static const _tag = "HiveLocalCustomerRepository";
+
   @override
   Future<TaskResult<void>> clearLocalCustomers() {
+    AppLog.I.i(_tag, "clearLocalCustomers()");
     return _localCustomerCrud.clearAllLocalCustomers();
   }
 
@@ -22,6 +26,7 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
     required int page,
     required int pageSize,
   }) async {
+    AppLog.I.i(_tag, "getLocalCustomers(page: $page, pageSize: $pageSize)");
     var results = await _localCustomerCrud.getLocalCustomers(
       page: page,
       pageSize: pageSize,
@@ -44,6 +49,7 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
   Future<TaskResult<Map<int, Customer>>> getLocalCustomersByIds({
     required List<int> customerIds,
   }) async {
+    AppLog.I.i(_tag, "getLocalCustomersByIds(customerIds: $customerIds)");
     var results = await _localCustomerCrud.getLocalCustomerByIds(
       ids: customerIds,
     );
@@ -65,11 +71,13 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
   Future<TaskResult<void>> setLocalCustomer({
     required Customer customer,
   }) async {
+    AppLog.I.i(_tag, "setLocalCustomer(id: ${customer.id}, name: ${customer.name})");
     return await _localCustomerCrud.setLocalCustomer(customer: customer.toLocal);
   }
 
   @override
   Future<TaskResult<void>> deleteLocalCustomer({required int customerId}) async {
+    AppLog.I.i(_tag, "deleteLocalCustomer(customerId: $customerId)");
     return await _localCustomerCrud.deleteLocalCustomer(customerId: customerId);
   }
 
@@ -79,6 +87,7 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
     required int pageSize,
     required String likeName,
   }) async {
+    AppLog.I.i(_tag, "searchLocalCustomers(page: $page, pageSize: $pageSize, likeName: $likeName)");
     var results = await _localCustomerCrud.searchLocalCustomers(
       page: page,
       pageSize: pageSize,
@@ -102,6 +111,7 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
   Future<TaskResult<void>> setLocalCustomers({
     required List<Customer> customer,
   }) async {
+    AppLog.I.i(_tag, "setLocalCustomers(count: ${customer.length})");
     return await _localCustomerCrud.setLocalCustomers(
       customers: customer.map((c) => c.toLocal).toList(),
     );

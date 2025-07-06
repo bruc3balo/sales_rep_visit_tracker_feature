@@ -81,7 +81,7 @@ class VisitStatisticsPieChartState extends State<VisitStatisticsPieChart> {
                           touchedNotifier.value = null;
                           return;
                         }
-                        touchedNotifier.value = VisitStatus.values[pieTouchResponse.touchedSection!.touchedSectionIndex];
+                       // touchedNotifier.value = VisitStatus.values[pieTouchResponse.touchedSection!.touchedSectionIndex];
                       },
                     ),
                     startDegreeOffset: 0,

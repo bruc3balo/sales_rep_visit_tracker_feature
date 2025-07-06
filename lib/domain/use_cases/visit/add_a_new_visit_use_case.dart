@@ -8,6 +8,7 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_v
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 
 class AddANewVisitUseCase {
   final RemoteVisitRepository _visitRepository;
@@ -33,6 +34,11 @@ class AddANewVisitUseCase {
     required String notes,
     required List<Activity> activitiesDone,
   }) async {
+    AppLog.I.i(
+      "AddANewVisitUseCase",
+      "Creating visit for customer ${customer.id} with ${activitiesDone.length} activities",
+    );
+
     var result = await _visitRepository.createVisit(
       customerIdVisited: customer.id,
       visitDate: visitDate,
@@ -44,9 +50,14 @@ class AddANewVisitUseCase {
 
     switch (result) {
       case ErrorResult<void>():
-        //Store offline if error is no internet
+        AppLog.I.e(
+          "AddANewVisitUseCase",
+          "Remote visit creation failed. FailureType: ${result.failure}, Error: ${result.error}",
+          trace: result.trace,
+        );
+
+        // Store offline if error is no internet
         if (FailureType.network == result.failure) {
-          //Offline storage
           var key = generateHash(
             customerIdVisited: customer.id,
             visitDate: visitDate,
@@ -55,6 +66,12 @@ class AddANewVisitUseCase {
             notes: notes,
             activityIdsDone: activitiesDone.map((a) => a.id).toList(),
           );
+
+          AppLog.I.i(
+            "AddANewVisitUseCase",
+            "Storing visit offline with hash ${key.value}",
+          );
+
           var localSaveResult = await _localUnsyncedVisitRepository.setUnsyncedVisit(
             visit: UnSyncedLocalVisit(
               hash: key.value,
@@ -70,16 +87,22 @@ class AddANewVisitUseCase {
 
           switch (localSaveResult) {
             case ErrorResult<void>():
+              AppLog.I.e(
+                "AddANewVisitUseCase",
+                "Failed to save unsynced visit locally: ${localSaveResult.error}",
+                trace: localSaveResult.trace,
+              );
               return ErrorResult(
                 error: localSaveResult.error,
                 trace: localSaveResult.trace,
               );
             case SuccessResult<void>():
-              //Cache activity and customer for offline resolution async
+              AppLog.I.i(
+                "AddANewVisitUseCase",
+                "Visit saved offline successfully. Caching activities and customer.",
+              );
               _localActivityRepository.setLocalActivities(activities: activitiesDone);
-
               _localCustomerRepository.setLocalCustomer(customer: customer);
-
               return SuccessResult(data: null, message: "Visit created offline, will be synced later");
           }
         }
@@ -89,7 +112,12 @@ class AddANewVisitUseCase {
           trace: result.trace,
           failure: result.failure,
         );
+
       case SuccessResult<void>():
+        AppLog.I.i(
+          "AddANewVisitUseCase",
+          "Visit successfully created remotely",
+        );
         return result;
     }
   }

@@ -5,6 +5,7 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/local
 import 'package:sales_rep_visit_tracker_feature/data/repositories/activity/remote_activity_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/local_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 
 class SearchLocalCustomersUseCase {
   final LocalCustomerRepository _localCustomerRepository;
@@ -18,13 +19,20 @@ class SearchLocalCustomersUseCase {
     required int page,
     required int pageSize,
   }) async {
+    AppLog.I.i(
+      "SearchLocalCustomersUseCase",
+      "Executing search: likeName=$likeName, page=$page, pageSize=$pageSize",
+    );
+
     if (likeName == null) {
+      AppLog.I.i("SearchLocalCustomersUseCase", "Fetching all local customers.");
       return await _localCustomerRepository.getLocalCustomers(
         page: page,
         pageSize: pageSize,
       );
     }
 
+    AppLog.I.i("SearchLocalCustomersUseCase", "Searching local customers with name like '$likeName'");
     return await _localCustomerRepository.searchLocalCustomers(
       page: page,
       pageSize: pageSize,

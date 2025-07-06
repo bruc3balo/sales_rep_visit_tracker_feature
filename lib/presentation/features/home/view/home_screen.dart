@@ -14,6 +14,7 @@ import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/search
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/view_local_customers_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/view_remote_customers_use_case.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_theme_notifier.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/view_activities/view/view_activities_screen.dart';
@@ -72,6 +73,23 @@ class _HomeScreenState extends State<HomeScreen> {
           var syncState = widget.homeViewModel.visitCountState;
           return Scaffold(
             appBar: AppBar(
+              leading: ValueListenableBuilder(
+                valueListenable: GlobalThemeNotifier(),
+                builder: (context, themeMode, snapshot) {
+                  final isLight = ThemeMode.light == themeMode;
+                  return Visibility(
+                    visible: isLight,
+                    replacement: IconButton(
+                      onPressed: () => GlobalThemeNotifier().setTheme(ThemeMode.light),
+                      icon: Icon(Icons.nightlight),
+                    ),
+                    child: IconButton(
+                      onPressed: () => GlobalThemeNotifier().setTheme(ThemeMode.dark),
+                      icon: Icon(Icons.sunny),
+                    ),
+                  );
+                },
+              ),
               title: Text(widget.homeViewModel.currentPage.label),
               actions: [
                 IconButton(
