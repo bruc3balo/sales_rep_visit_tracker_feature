@@ -99,6 +99,7 @@ class UpdateUnsyncedVisitUseCase {
           status: updatedStatus,
           location: updatedLocation,
           notes: updatedNotes,
+          visitDate: visitDate,
           activityIdsDone: updatedActivityIdsDone,
           customerIdVisited: updatedCustomerIdVisited,
           hash: updatedHash.value,

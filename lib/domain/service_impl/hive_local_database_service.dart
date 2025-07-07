@@ -60,8 +60,7 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     AppLog.I.i("HiveLocalDatabaseService", "removeLocalVisit called");
     try {
       var box = await openUnsyncedBox;
-      var hash = visit.hash;
-      await box.delete(hash);
+      await box.delete(visit.key);
       return SuccessResult(data: null);
     } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
@@ -73,7 +72,6 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     AppLog.I.i("HiveLocalDatabaseService", "findByHash called $hash");
     try {
       var box = await openUnsyncedBox;
-
       var data = box.values.where((e) => e.hash == hash.value).firstOrNull;
       return SuccessResult(data: data);
     } catch (e, trace) {

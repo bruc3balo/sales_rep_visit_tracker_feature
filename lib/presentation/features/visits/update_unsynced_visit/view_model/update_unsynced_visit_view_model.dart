@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
@@ -9,35 +11,34 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/upd
 
 class UpdateUnsyncedVisitViewModel extends ChangeNotifier {
   final UpdateUnsyncedVisitUseCase _updateUnsyncedVisitUseCase;
-  late UpdateUnsyncedVisitState _state;
+  UpdateUnsyncedVisitState _state = InitialUpdateUnsyncedVisitState();
+  final UnsyncedVisitAggregate _originalVisit;
 
   UpdateUnsyncedVisitViewModel({
     required UpdateUnsyncedVisitUseCase updateUnsyncedVisitUseCase,
     required UnsyncedVisitAggregate visit,
   })  : _updateUnsyncedVisitUseCase = updateUnsyncedVisitUseCase,
-        _state = LoadedUpdateUnsyncedVisitState(visit: visit);
+        _originalVisit = visit;
 
   UpdateUnsyncedVisitState get state => _state;
+  UnsyncedVisitAggregate get originalVisit => _originalVisit;
 
   Future<void> update({
-    DateTime? visitDate,
-    VisitStatus? status,
-    String? location,
-    String? notes,
-    List<int>? activityIdsDone,
-    int? customerId,
+    required DateTime visitDate,
+    required VisitStatus status,
+    required String location,
+    required String notes,
+    required List<int> activityIdsDone,
+    required int customerId,
   }) async {
-    if (_state is! LoadedUpdateUnsyncedVisitState) return;
-
-    var state = _state as LoadedUpdateUnsyncedVisitState;
-    var previousVisit = state.visit;
+    if (_state is! InitialUpdateUnsyncedVisitState) return;
 
     try {
       _state = LoadingUpdateUnsyncedVisitState();
       notifyListeners();
 
       var results = await _updateUnsyncedVisitUseCase.execute(
-        key: previousVisit.key,
+        key: _originalVisit.key,
         visitDate: visitDate,
         status: status,
         location: location,
@@ -49,11 +50,10 @@ class UpdateUnsyncedVisitViewModel extends ChangeNotifier {
       switch (results) {
         case ErrorResult<UnsyncedVisitAggregate>():
           GlobalToastMessage().add(ErrorMessage(message: results.error));
-          _state = LoadedUpdateUnsyncedVisitState(visit: previousVisit);
+          _state = InitialUpdateUnsyncedVisitState();
           break;
         case SuccessResult<UnsyncedVisitAggregate>():
-          GlobalToastMessage().add(SuccessMessage(message: results.data.customer?.name ?? 'No customer'));
-          _state = LoadedUpdateUnsyncedVisitState(visit: results.data);
+          _state = CompletedUpdateUnsyncedVisitState();
           break;
       }
     } finally {

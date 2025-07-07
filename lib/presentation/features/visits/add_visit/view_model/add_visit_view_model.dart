@@ -117,6 +117,7 @@ class AddVisitViewModel extends ChangeNotifier {
           GlobalToastMessage().add(ErrorMessage(message: addResult.error));
           break;
         case SuccessResult<void>():
+          clearDraft();
           _state = SuccessAddingVisitState();
           GlobalToastMessage().add(SuccessMessage(message: addResult.message));
           break;

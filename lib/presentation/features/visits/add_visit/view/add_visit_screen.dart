@@ -34,6 +34,7 @@ class AddVisitScreen extends StatefulWidget {
 }
 
 class _AddVisitScreenState extends State<AddVisitScreen> {
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
@@ -168,40 +169,62 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                         onSelected: (t) => widget.addVisitViewModel.updateVisitForm(form: form.copyWith(status: t)),
                         itemLabelBuilder: (e) => e.name.capitalize,
                       ),
+
                       ActivitySelectionTile(
                         label: "Activities",
-                        onDelete: (a) => widget.addVisitViewModel
-                            .updateVisitForm(form: form.copyWith(activities: form.activities.where((e) => e.id != a.id).toList())),
-                        onAdd: (a) => widget.addVisitViewModel.updateVisitForm(form: form.copyWith(activities: [...form.activities, a])),
+                        onDelete: (a) => widget.addVisitViewModel.updateVisitForm(
+                          form: form.copyWith(
+                            activities: form.activities.where((e) => e.id != a.id).toList(),
+                          ),
+                        ),
+                        onAdd: (a) => widget.addVisitViewModel.updateVisitForm(
+                          form: form.copyWith(
+                            activities: [...form.activities, a],
+                          ),
+                        ),
                         selectedActivities: form.activities,
                         viewModel: widget.searchActivitiesViewModel,
                       ),
+
                       TextFieldTile(
                         initialValue: form.location,
                         label: "Location",
                         hintText: "Where is the visit located",
-                        debounceDuration: Duration(seconds: 2),
-                        onDebouncedChanged: (v) => widget.addVisitViewModel.updateVisitForm(form: form.copyWith(location: v)),
+                        debounceDuration: Duration(seconds: 1),
+                        onDebouncedChanged: (v) => widget.addVisitViewModel.updateVisitForm(
+                          form: form.copyWith(
+                            location: v,
+                          ),
+                        ),
                       ),
+
                       TextFieldTile(
                         initialValue: form.notes,
                         label: "Notes",
                         hintText: "Add any relevant notes",
-                        debounceDuration: Duration(seconds: 2),
-                        onDebouncedChanged: (v) => widget.addVisitViewModel.updateVisitForm(form: form.copyWith(notes: v)),
+                        debounceDuration: Duration(seconds: 1),
+                        onDebouncedChanged: (v) => widget.addVisitViewModel.updateVisitForm(
+                          form: form.copyWith(
+                            notes: v,
+                          ),
+                        ),
                         minLines: 4,
                       ),
+
                       const SizedBox(height: 12),
+
                       ElevatedButton(
                         style: ButtonStyle(
-                          backgroundColor: widget.addVisitViewModel.isValid ? null: WidgetStatePropertyAll(Colors.grey),
+                          backgroundColor: widget.addVisitViewModel.isValid ? null : WidgetStatePropertyAll(Colors.grey),
                         ),
                         onPressed: () {
                           widget.addVisitViewModel.addNewVisit();
                         },
                         child: const Text("Submit"),
                       ),
+
                       const SizedBox(height: 16),
+
                     ],
                   ),
                 LoadingAddVisitState() => const InfiniteLoader(),

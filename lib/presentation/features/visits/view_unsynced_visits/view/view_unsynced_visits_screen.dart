@@ -166,7 +166,7 @@ class UnsyncedVisitTile extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: ListTile(
           onTap: () {
-            Navigator.of(context).pushReplacementNamed(
+            Navigator.of(context).pushNamed(
               AppRoutes.updateUnsyncedVisits.path,
               arguments: visit,
             );
