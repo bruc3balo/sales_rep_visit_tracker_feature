@@ -1,46 +1,30 @@
 import 'package:flutter/material.dart';
 
-InputDecorationTheme get defaultInputDecoration {
+const Color kSeedColor = Colors.deepPurple;
+
+InputDecorationTheme getDefaultInputDecoration(Brightness brightness) {
+  final isDark = brightness == Brightness.dark;
   return InputDecorationTheme(
-    labelStyle: TextStyle(
-      color: Colors.black,
-    ),
-    border: OutlineInputBorder(
-        borderSide: BorderSide.none,
-        borderRadius: BorderRadius.all(Radius.circular(10))
-    ),
+    labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.black),
+    fillColor: isDark ? Colors.grey[800] : Colors.grey[300],
+    border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(10))),
     focusedBorder: OutlineInputBorder(
         borderSide: BorderSide(
           color: Colors.black,
         ),
-        borderRadius: BorderRadius.all(Radius.circular(10))
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderSide: BorderSide.none,
-      borderRadius: BorderRadius.all(Radius.circular(10))
-    ),
-    disabledBorder: OutlineInputBorder(
-      borderSide: BorderSide(color: Colors.grey),
-      borderRadius: BorderRadius.all(Radius.circular(10))
-    ),
+        borderRadius: BorderRadius.all(Radius.circular(10))),
+    enabledBorder: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: BorderRadius.all(Radius.circular(10))),
+    disabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey), borderRadius: BorderRadius.all(Radius.circular(10))),
     errorBorder: OutlineInputBorder(
-      borderSide: BorderSide(
-          color: Colors.red,
-          width: 1.0
-      ),
+      borderSide: BorderSide(color: Colors.red, width: 1.0),
     ),
     focusedErrorBorder: OutlineInputBorder(
-      borderSide: BorderSide(
-          color: Colors.cyan,
-          width: 1.0
-      ),
+      borderSide: BorderSide(color: Colors.cyan, width: 1.0),
     ),
     alignLabelWithHint: true,
-    fillColor: Colors.grey.shade300,
     filled: true,
   );
 }
-
 
 ElevatedButtonThemeData get defaultButtonTheme {
   return ElevatedButtonThemeData(
@@ -48,23 +32,18 @@ ElevatedButtonThemeData get defaultButtonTheme {
       fixedSize: WidgetStatePropertyAll(Size(150, 40)),
       padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 5, horizontal: 30)),
       shape: WidgetStatePropertyAll(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8.0)),
-          ),
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+        ),
       ),
     ),
   );
 }
 
-Container borderedContainer({
-  required Widget child,
-}) {
-  return Container(
-      padding: EdgeInsets.all(14.0),
-      decoration: BoxDecoration(
-          color: Colors.grey.shade300,
-          borderRadius: BorderRadius.all(Radius.circular(10))
-      ),
-      child: child
-  );
-}
+
+const PageTransitionsTheme pageTransitionsTheme = PageTransitionsTheme(
+  builders: {
+    TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+  },
+);

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view/search_activities_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
@@ -64,9 +63,7 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                     );
                   },
                   title: Text("Customer"),
-                  subtitle: borderedContainer(
-                    child: Text(viewModel.visit.customer?.name ?? "Tap to select a customer"),
-                  ),
+                  subtitle: Text(viewModel.visit.customer?.name ?? "Tap to select a customer"),
                 ),
               ),
 
@@ -107,9 +104,7 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                     );
                   },
                   title: Text("Visit date"),
-                  subtitle: borderedContainer(
-                    child: Text(viewModel.visit.visitDate.humanReadable),
-                  ),
+                  subtitle: Text(viewModel.visit.visitDate.humanReadable),
                 ),
               ),
 
@@ -181,36 +176,40 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                 ),
                 subtitle: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: borderedContainer(
-                    child: Visibility(
-                      visible: viewModel.visit.activityMap.isNotEmpty,
-                      replacement: Text("No activities recorded"),
-                      child: Container(
-                        constraints: BoxConstraints(
-                          maxHeight: 300,
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: viewModel.visit.activityMap.values
-                              .map(
-                                (a) => ListTile(
-                                  title: Text(a.description),
-                                  trailing: IconButton(
-                                    onPressed: () {
-                                      viewModel.visit.activityMap.remove(a.id);
-                                      viewModel.update(
-                                        activityIdsDone: viewModel.visit.activityMap.values.map((a) => a.id).toList(),
-                                      );
-                                    },
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                    ),
+                  child: Visibility(
+                    visible: viewModel.visit.activityMap.isNotEmpty,
+                    replacement: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "No activities recorded",
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    child: Container(
+                      constraints: BoxConstraints(
+                        maxHeight: 300,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: viewModel.visit.activityMap.values
+                            .map(
+                              (a) => ListTile(
+                                title: Text(a.description),
+                                trailing: IconButton(
+                                  onPressed: () {
+                                    viewModel.visit.activityMap.remove(a.id);
+                                    viewModel.update(
+                                      activityIdsDone: viewModel.visit.activityMap.values.map((a) => a.id).toList(),
+                                    );
+                                  },
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
                                   ),
                                 ),
-                              )
-                              .toList(),
-                        ),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ),
                   ),

@@ -63,7 +63,7 @@ extension VisitStatusColor on VisitStatus {
   Color get color => switch(this) {
     VisitStatus.completed => Colors.green,
     VisitStatus.pending => Colors.blue,
-    VisitStatus.cancelled => Colors.grey,
+    VisitStatus.cancelled => Colors.redAccent,
   };
 }
 

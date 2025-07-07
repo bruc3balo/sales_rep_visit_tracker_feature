@@ -39,9 +39,6 @@ class ViewVisitDetailsScreen extends StatelessWidget {
                     textAlign: TextAlign.left,
                   ),
                 ),
-                Divider(
-                  height: 2,
-                ),
                 ListTile(
                   leading: Text("Customer"),
                   title: Text(visit.customer?.name ?? 'Unknown customer'),
@@ -69,16 +66,19 @@ class ViewVisitDetailsScreen extends StatelessWidget {
                   title: Text(visit.visit.status),
                 ),
 
-                Text(
-                  "Activities",
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .headlineMedium
-                      ?.copyWith(
-                    fontWeight: FontWeight.w500,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  child: Text(
+                    "Activities",
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium
+                        ?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.left,
                   ),
-                  textAlign: TextAlign.left,
                 ),
 
                 ...visit
@@ -86,21 +86,24 @@ class ViewVisitDetailsScreen extends StatelessWidget {
                     .values
                     .map((a) =>
                     ListTile(
-                      leading: Icon(Icons.circle),
+                      leading: Icon(Icons.run_circle_outlined),
                       title: Text(a.description),
                     ),
                 ),
 
-                Text(
-                  "Notes",
-                  style: Theme
-                      .of(context)
-                      .textTheme
-                      .headlineMedium
-                      ?.copyWith(
-                    fontWeight: FontWeight.w500,
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 15.0),
+                  child: Text(
+                    "Notes",
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium
+                        ?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.left,
                   ),
-                  textAlign: TextAlign.left,
                 ),
 
                 Text(

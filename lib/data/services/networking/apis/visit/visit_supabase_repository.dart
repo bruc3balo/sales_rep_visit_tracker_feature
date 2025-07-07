@@ -37,7 +37,7 @@ class SupabaseVisitApi {
         "created_at": createdAt.toIso8601String(),
       },
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendGetVisitsRequest({
@@ -69,7 +69,7 @@ class SupabaseVisitApi {
       headers: {"apiKey": _apiKey},
       method: HttpMethod.get,
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendDeleteVisitRequest({
@@ -80,7 +80,7 @@ class SupabaseVisitApi {
       headers: {"apiKey": _apiKey},
       method: HttpMethod.delete,
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendUpdateVisitRequest({
@@ -105,6 +105,6 @@ class SupabaseVisitApi {
         if (activityIdsDone != null) "activities_done": activityIdsDone,
       },
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 }

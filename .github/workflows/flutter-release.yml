@@ -24,6 +24,12 @@ jobs:
       - name: Code generation
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
+      - name: Generate splash screen
+        run: flutter pub run flutter_native_splash:create
+
+      - name: Generate icons
+        run: flutter pub run flutter_launcher_icons
+
       - name: Testing
         run: flutter test
 

@@ -8,7 +8,7 @@ larger, scalable application.
 The app should allow a sales rep to:
 
 * Add a new visit by filling out a
-  form ([add_a_new_visit_use_case.dart](lib/domain/use_cases/visit/add_a_new_visit_use_case.dart))
+ Nairobi form ([add_a_new_visit_use_case.dart](lib/domain/use_cases/visit/add_a_new_visit_use_case.dart))
 * View a list of their customer
   visits [visit_list_of_past_visits_use_case.dart](lib/domain/use_cases/visit/visit_list_of_past_visits_use_case.dart)
 * Track activities completed during the
@@ -97,4 +97,14 @@ HIVE_ENCRYPTION_KEY_NAME=${HIVE_ENCRYPTION_KEY_NAME}
 
 ```bash
     git push origin v.1.0
+```
+
+Splash screen
+```bash
+  flutter pub run flutter_native_splash:create
+```
+
+Icons
+```bash
+  flutter pub run flutter_launcher_icons
 ```

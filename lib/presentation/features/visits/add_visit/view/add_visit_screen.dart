@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
@@ -41,259 +40,117 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("New Visit"),
       ),
-      body: ListenableBuilder(
-        listenable: widget.addVisitViewModel,
-        builder: (_, __) {
-          var state = widget.addVisitViewModel.state;
-          return switch (state) {
-            InitialAddVisitState() => ListView(
-                children: [
-                  // Customer search
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: ListenableBuilder(
+          listenable: widget.addVisitViewModel,
+          builder: (_, __) {
+            var state = widget.addVisitViewModel.state;
+            return switch (state) {
+              InitialAddVisitState() => ListView(
+                  children: [
+                    const SizedBox(height: 8),
+                    _LabeledCard(
+                      label: "Customer",
+                      icon: Icons.person_outline,
                       onTap: () {
-                        //Select customer
                         showDialog(
                           context: context,
-                          builder: (context) {
-                            return CustomerSearchDialog(
-                              customerIdsToIgnore: HashSet.from([customerNotifier.value?.id].where((e) => e != null)),
-                              searchCustomersViewModel: widget.searchCustomersViewModel,
-                              onSelect: (c) {
-                                customerNotifier.value = c;
-                              },
-                            );
-                          },
+                          builder: (_) => CustomerSearchDialog(
+                            customerIdsToIgnore: HashSet.from([customerNotifier.value?.id].whereType<String>()),
+                            searchCustomersViewModel: widget.searchCustomersViewModel,
+                            onSelect: (c) => customerNotifier.value = c,
+                          ),
                         );
                       },
-                      title: Text("Customer"),
-                      subtitle: borderedContainer(
-                        child: ValueListenableBuilder(
-                          valueListenable: customerNotifier,
-                          builder: (_, customer, __) {
-                            if (customer == null) {
-                              return Text("Tap to select a customer");
-                            }
-                            return Text(customer.name);
-                          },
+                      child: ValueListenableBuilder<Customer?>(
+                        valueListenable: customerNotifier,
+                        builder: (_, customer, __) => Text(
+                          customer?.name ?? "Tap to select a customer",
+                          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                         ),
                       ),
                     ),
-                  ),
-
-                  //Visit date
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
+                    _LabeledCard(
+                      label: "Visit Date",
+                      icon: Icons.calendar_today_outlined,
                       onTap: () async {
                         var date = await showDatePicker(
                           context: context,
                           firstDate: DateTime(DateTime.now().year - 1),
                           lastDate: DateTime.now(),
                         );
-
-                        if (date == null) return;
-                        if (!context.mounted) return;
-
+                        if (date == null || !context.mounted) return;
                         var time = await showTimePicker(
                           context: context,
                           initialTime: TimeOfDay.now(),
                         );
-
-                        if (time == null) return;
-                        if (!context.mounted) return;
-
-                        var newVisitDate = date.copyWith(
-                          hour: time.hour,
-                          minute: time.minute,
-                        );
-
-                        if (newVisitDate.isAfter(DateTime.now())) {
-                          //TODO: Notify user of error
-                          return;
-                        }
-
+                        if (time == null || !context.mounted) return;
+                        var newVisitDate = date.copyWith(hour: time.hour, minute: time.minute);
+                        if (newVisitDate.isAfter(DateTime.now())) return;
                         visitDateNotifier.value = newVisitDate;
                       },
-                      title: Text("Visit date"),
-                      subtitle: borderedContainer(
-                        child: ValueListenableBuilder(
-                          valueListenable: visitDateNotifier,
-                          builder: (_, visitDate, __) {
-                            return Text(visitDate.humanReadable);
-                          },
+                      child: ValueListenableBuilder<DateTime>(
+                        valueListenable: visitDateNotifier,
+                        builder: (_, date, __) => Text(
+                          date.humanReadable,
+                          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                         ),
                       ),
                     ),
-                  ),
-
-                  // Visit status
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      title: Text("Visit status"),
-                      subtitle: ValueListenableBuilder(
-                        valueListenable: visitStatusNotifier,
-                        builder: (_, visitStatus, __) {
-                          return DropdownMenu<VisitStatus>(
-                            trailingIcon: SizedBox.shrink(),
-                            width: double.infinity,
-                            initialSelection: visitStatus,
-                            hintText: "What is the status of your visit",
-                            dropdownMenuEntries: VisitStatus.values
-                                .map(
-                                  (o) => DropdownMenuEntry<VisitStatus>(
-                                    value: o,
-                                    label: o.name.capitalize,
-                                    style: ButtonStyle(
-                                      foregroundColor: WidgetStatePropertyAll(
-                                        Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                )
-                                .toList(),
-                            onSelected: (o) {
-                              visitStatusNotifier.value = o;
-                            },
-                          );
-                        },
-                      ),
+                    _LabeledDropdown(
+                      label: "Visit Status",
+                      notifier: visitStatusNotifier,
+                      items: VisitStatus.values,
+                      itemLabelBuilder: (e) => e.name.capitalize,
                     ),
-                  ),
-
-                  // Activity search
-                  ValueListenableBuilder(
-                    valueListenable: activitiesNotifier,
-                    builder: (_, activities, __) {
-                      return ListTile(
-                        title: ListTile(
-                          title: Text("Activities"),
-                          trailing: CircleAvatar(
-                            child: IconButton(
-                                onPressed: () {
-                                  //Select activity
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return ActivitySearchDialog(
-                                        activitiesToIgnore: HashSet.from(activitiesNotifier.value.map((e) => e.id)),
-                                        searchActivitiesViewModel: widget.searchActivitiesViewModel,
-                                        onSelect: (a) {
-                                          if (activitiesNotifier.value.any((e) => e.id == a.id)) return;
-                                          activitiesNotifier.value.add(a);
-                                          activitiesNotifier.value = List.from(activitiesNotifier.value);
-                                        },
-                                      );
-                                    },
-                                  );
-                                },
-                                icon: Icon(Icons.add)),
-                          ),
-                        ),
-                        subtitle: borderedContainer(
-                          child: Visibility(
-                            visible: activities.isNotEmpty,
-                            replacement: Text("No activities recorded"),
-                            child: Container(
-                              constraints: BoxConstraints(
-                                maxHeight: 300,
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: activities
-                                    .map(
-                                      (a) => ListTile(
-                                        title: Text(a.description),
-                                        trailing: IconButton(
-                                          onPressed: () {
-                                            activitiesNotifier.value.remove(a);
-                                            activitiesNotifier.value = List.from(activitiesNotifier.value);
-                                          },
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-
-                  // Location
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      title: Text("Location"),
-                      subtitle: TextFormField(
-                        controller: locationController,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                          hintText: "Where is the visit located",
-                        ),
-                      ),
+                    _LabeledActivities(
+                      label: "Activities",
+                      notifier: activitiesNotifier,
+                      viewModel: widget.searchActivitiesViewModel,
                     ),
-                  ),
-
-                  // Notes
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      title: Text("Notes"),
-                      subtitle: TextFormField(
-                        controller: notesController,
-                        textInputAction: TextInputAction.done,
-                        decoration: InputDecoration(
-                          hintText: "Add any relevant notes",
-                        ),
-                        maxLines: null,
-                        minLines: 4,
-                      ),
+                    _LabeledTextField(
+                      label: "Location",
+                      controller: locationController,
+                      hintText: "Where is the visit located",
                     ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: ElevatedButton(
+                    _LabeledTextField(
+                      label: "Notes",
+                      controller: notesController,
+                      hintText: "Add any relevant notes",
+                      minLines: 4,
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
                       onPressed: () {
-                        Customer? customer = customerNotifier.value;
+                        final customer = customerNotifier.value;
+                        final visitDate = visitDateNotifier.value;
+                        final status = visitStatusNotifier.value;
+                        final location = locationController.text.trim();
+                        final notes = notesController.text.trim();
+                        final activities = activitiesNotifier.value;
+
                         if (customer == null) {
                           GlobalToastMessage().add(InfoMessage(message: "Customer required"));
                           return;
                         }
-
-                        DateTime visitDate = visitDateNotifier.value;
-
-                        VisitStatus? status = visitStatusNotifier.value;
                         if (status == null) {
                           GlobalToastMessage().add(InfoMessage(message: "Select status"));
                           return;
                         }
-
-                        String location = locationController.text;
                         if (location.isEmpty) {
                           GlobalToastMessage().add(InfoMessage(message: "Please enter visit location"));
                           return;
                         }
-
-                        String notes = notesController.text;
                         if (notes.isEmpty) {
                           GlobalToastMessage().add(InfoMessage(message: "Provide a brief summary your visit"));
                           return;
                         }
-
-                        List<Activity> activities = activitiesNotifier.value;
 
                         widget.addVisitViewModel.addNewVisit(
                           customer: customer,
@@ -304,30 +161,233 @@ class _AddVisitScreenState extends State<AddVisitScreen> {
                           activities: activities,
                         );
                       },
-                      child: Text("Submit"),
+                      child: const Text("Submit"),
                     ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              LoadingAddVisitState() => const InfiniteLoader(),
+              SuccessAddingVisitState() => Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Visit saved", textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: Navigator.of(context).pop,
+                      child: const Text("Back"),
+                    )
+                  ],
+                ),
+            };
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _LabeledCard extends StatelessWidget {
+  const _LabeledCard({
+    required this.label,
+    required this.icon,
+    required this.child,
+    this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final Widget child;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        onTap: onTap,
+        title: Text(label, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4.0),
+          child: child,
+        ),
+        trailing: Icon(icon),
+      ),
+    );
+  }
+}
+
+class _LabeledDropdown<T> extends StatelessWidget {
+  const _LabeledDropdown({
+    required this.label,
+    required this.notifier,
+    required this.items,
+    required this.itemLabelBuilder,
+  });
+
+  final String label;
+  final ValueNotifier<T?> notifier;
+  final List<T> items;
+  final String Function(T) itemLabelBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        title: Text(label, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
+        subtitle: ValueListenableBuilder<T?>(
+          valueListenable: notifier,
+          builder: (_, selected, __) {
+            return DropdownMenu<T>(
+              trailingIcon: const Icon(Icons.arrow_drop_down),
+              width: MediaQuery.of(context).size.width - 24,
+              initialSelection: selected,
+              hintText: "Select $label",
+              textStyle: theme.textTheme.bodyMedium,
+              dropdownMenuEntries: items.map((e) {
+                return DropdownMenuEntry<T>(
+                  value: e,
+                  label: itemLabelBuilder(e),
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStatePropertyAll(theme.colorScheme.onSurface),
                   ),
-                ],
-              ),
-            LoadingAddVisitState() => InfiniteLoader(),
-            SuccessAddingVisitState() => Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                );
+              }).toList(),
+              onSelected: (val) => notifier.value = val,
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _LabeledTextField extends StatelessWidget {
+  const _LabeledTextField({
+    required this.label,
+    required this.controller,
+    this.hintText,
+    this.minLines,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final String? hintText;
+  final int? minLines;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          TextFormField(
+            controller: controller,
+            textInputAction: TextInputAction.next,
+            decoration: InputDecoration(hintText: hintText),
+            minLines: minLines,
+            maxLines: minLines != null ? null : 1,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LabeledActivities extends StatelessWidget {
+  const _LabeledActivities({
+    required this.label,
+    required this.notifier,
+    required this.viewModel,
+  });
+
+  final String label;
+  final ValueNotifier<List<Activity>> notifier;
+  final SearchActivitiesViewModel viewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ValueListenableBuilder<List<Activity>>(
+        valueListenable: notifier,
+        builder: (_, activities, __) {
+          return ListTile(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => ActivitySearchDialog(
+                        activitiesToIgnore: HashSet.from(activities.map((e) => e.id)),
+                        searchActivitiesViewModel: viewModel,
+                        onSelect: (a) {
+                          if (!notifier.value.any((e) => e.id == a.id)) {
+                            notifier.value = [...notifier.value, a];
+                          }
+                        },
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.add_circle_outline),
+                ),
+              ],
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Visit saved",
-                    textAlign: TextAlign.center,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
-                    child: ElevatedButton(
-                      onPressed: Navigator.of(context).pop,
-                      child: Text("Back"),
+                  const SizedBox(height: 8),
+                  Visibility(
+                    visible: activities.isNotEmpty,
+                    replacement: Text(
+                      "No activities recorded",
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    child: Container(
+                      constraints: const BoxConstraints(maxHeight: 300),
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: activities.length,
+                        itemBuilder: (_, i) => ListTile(
+                          title: Text(activities[i].description),
+                          trailing: IconButton(
+                            onPressed: () {
+                              notifier.value.removeAt(i);
+                              notifier.value = [...notifier.value];
+                            },
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-          };
+            ),
+          );
         },
       ),
     );

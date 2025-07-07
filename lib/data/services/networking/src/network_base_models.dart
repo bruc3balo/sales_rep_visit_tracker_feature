@@ -18,9 +18,7 @@ class NetworkRequest {
   });
 }
 
-sealed class NetworkResponse {
-
-}
+sealed class NetworkResponse {}
 
 final class FailNetworkResponse extends NetworkResponse {
   final int? statusCode;

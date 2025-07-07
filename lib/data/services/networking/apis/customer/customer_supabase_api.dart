@@ -28,7 +28,7 @@ class CustomerSupabaseApi {
         "apiKey" : _apiKey
       },
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendGetCustomersRequest({
@@ -55,7 +55,7 @@ class CustomerSupabaseApi {
       },
       method: HttpMethod.get,
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendDeleteCustomerRequest({
@@ -70,7 +70,7 @@ class CustomerSupabaseApi {
       },
       method: HttpMethod.delete,
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendUpdateCustomerRequest({
@@ -89,6 +89,6 @@ class CustomerSupabaseApi {
         if (name != null) "name": name,
       },
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 }

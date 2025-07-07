@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/themes/shared_theme.dart';
 
 ThemeData get darkTheme {
-  const seedColor = Colors.deepPurple;
-
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
+
     colorScheme: ColorScheme.fromSeed(
-      seedColor: seedColor,
+      seedColor: kSeedColor,
       brightness: Brightness.dark,
     ),
     scaffoldBackgroundColor: Colors.grey[900],
@@ -23,10 +22,10 @@ ThemeData get darkTheme {
         color: Colors.white,
       ),
     ),
-    inputDecorationTheme: defaultInputDecoration,
+    inputDecorationTheme: getDefaultInputDecoration(Brightness.dark),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: defaultButtonTheme.style?.copyWith(
-        backgroundColor: const WidgetStatePropertyAll(seedColor),
+        backgroundColor: const WidgetStatePropertyAll(kSeedColor),
         foregroundColor: const WidgetStatePropertyAll(Colors.white),
         textStyle: const WidgetStatePropertyAll(
           TextStyle(fontWeight: FontWeight.bold),
@@ -35,19 +34,19 @@ ThemeData get darkTheme {
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: seedColor.shade200,
+        foregroundColor: kSeedColor,
         textStyle: const TextStyle(fontWeight: FontWeight.w600),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
-        foregroundColor: seedColor.shade200,
-        side: BorderSide(color: seedColor.shade200),
+        foregroundColor: kSeedColor,
+        side: BorderSide(color: kSeedColor),
         textStyle: const TextStyle(fontWeight: FontWeight.w500),
       ),
     ),
     dropdownMenuTheme: DropdownMenuThemeData(
-      inputDecorationTheme: defaultInputDecoration,
+      //inputDecorationTheme: getDefaultInputDecoration(Brightness.dark),
       textStyle: const TextStyle(fontSize: 14, color: Colors.white),
       menuStyle: MenuStyle(
         backgroundColor: const WidgetStatePropertyAll(Colors.black),
@@ -69,26 +68,26 @@ ThemeData get darkTheme {
       backgroundColor: Colors.grey[850],
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       titleTextStyle: TextStyle(
-        color: seedColor.shade200,
+        color: kSeedColor,
         fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
-      contentTextStyle: const TextStyle(fontSize: 14, color: Colors.white),
+      contentTextStyle: const TextStyle(fontSize: 14, color: Colors.black),
     ),
     snackBarTheme: SnackBarThemeData(
-      backgroundColor: seedColor,
+      backgroundColor: kSeedColor,
       contentTextStyle: const TextStyle(color: Colors.white),
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
     switchTheme: SwitchThemeData(
-      thumbColor: WidgetStatePropertyAll(seedColor),
-      trackColor: WidgetStatePropertyAll(seedColor.withOpacity(0.4)),
+      thumbColor: WidgetStatePropertyAll(kSeedColor),
+      trackColor: WidgetStatePropertyAll(kSeedColor.withOpacity(0.4)),
     ),
     sliderTheme: SliderThemeData(
-      activeTrackColor: seedColor.shade300,
-      thumbColor: seedColor,
-      overlayColor: seedColor.withOpacity(0.3),
+      activeTrackColor: kSeedColor,
+      thumbColor: kSeedColor,
+      overlayColor: kSeedColor.withOpacity(0.3),
       inactiveTrackColor: Colors.grey[700],
     ),
     textTheme: const TextTheme(
@@ -97,5 +96,6 @@ ThemeData get darkTheme {
       bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),
       labelLarge: TextStyle(fontSize: 12, color: Colors.white70),
     ),
+    pageTransitionsTheme: pageTransitionsTheme,
   );
 }

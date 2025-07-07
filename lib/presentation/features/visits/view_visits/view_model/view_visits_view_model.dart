@@ -14,8 +14,9 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/vie
 class ViewVisitsViewModel extends ChangeNotifier {
   final VisitListOfPastVisitsUseCase _pastVisitsUseCase;
   int _page = 0;
-  final SplayTreeSet<VisitAggregate> _visits = SplayTreeSet(
-    (a, b) => -a.visit.visitDate.compareTo(b.visit.visitDate),
+  final LinkedHashSet<VisitAggregate> _visits = LinkedHashSet(
+    equals: (a, b) => a.visit.id == b.visit.id,
+    hashCode: (v) => v.visit.id.hashCode,
   );
   ViewVisitsState _itemsState = LoadedViewVisitsState();
   VisitFilterState _filterState = VisitFilterState();
@@ -85,4 +86,5 @@ class ViewVisitsViewModel extends ChangeNotifier {
     _visits.clear();
     loadMoreItems();
   }
+
 }

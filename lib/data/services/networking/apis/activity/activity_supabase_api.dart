@@ -28,7 +28,7 @@ class ActivitySupabaseApi {
         "created_at": DateTime.now().toIso8601String(),
       },
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendGetActivityRequest({
@@ -55,7 +55,7 @@ class ActivitySupabaseApi {
       },
       method: HttpMethod.get,
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendDeleteActivityRequest({
@@ -70,7 +70,7 @@ class ActivitySupabaseApi {
       },
       method: HttpMethod.delete,
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 
   Future<NetworkResponse> sendUpdateActivityRequest({
@@ -89,6 +89,6 @@ class ActivitySupabaseApi {
        if(description != null) "description": description
       },
     );
-    return _networkService.sendJsonRequest(request: request);
+    return await _networkService.sendJsonRequest(request: request);
   }
 }

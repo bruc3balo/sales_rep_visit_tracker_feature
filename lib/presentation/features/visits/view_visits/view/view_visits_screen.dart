@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/visit_filter/view/visit_filter_screen.dart';
@@ -54,15 +55,16 @@ class ViewVisitsScreen extends StatelessWidget {
                   itemCount: itemCount,
                   itemBuilder: (context, index) {
                     if (index >= visits.length) {
-                      return InfiniteLoader();
+
+                      // Show InfiniteLoader if still loading
+                      if (isLoading && index == visits.length) return InfiniteLoader();
+
+                      // Otherwise, show bottom spacer
+                      return const SizedBox(height: 120);
                     }
-                    bool isLastItem = index + 1 == itemCount;
+
                     var visit = visits[index];
-                    var padding = (isLastItem) ? 120.0 : 0.0;
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: padding),
-                      child: VisitTile(visit: visit),
-                    );
+                    return VisitTile(visit: visit);
                   },
                 ),
               ),
@@ -102,51 +104,88 @@ class VisitTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: () {
-        Navigator.of(context).pushNamed(
-          AppRoutes.visitDetails.path,
-          arguments: visit,
-        );
-      },
-      leading: Container(
-        padding: EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        child: badges.Badge(
-          position: badges.BadgePosition.topEnd(),
-          badgeAnimation: badges.BadgeAnimation.scale(
-            toAnimate: true,
-            curve: Curves.slowMiddle,
-            loopAnimation: false,
-          ),
-          stackFit: StackFit.passthrough,
-          badgeContent: Text(
-            visit.activityMap.length.toString(),
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    final isDark = theme.brightness == Brightness.dark;
+    final badgeBackground = isDark ? colorScheme.surface : colorScheme.primaryContainer;
+    final badgeTextColor = isDark ? Colors.white : Colors.black;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: VisitStatus.findByCapitalizedString(visit.visit.status)?.color,
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 4.0),
+        elevation: 1,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: ListTile(
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              AppRoutes.visitDetails.path,
+              arguments: visit,
+            );
+          },
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          leading: Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: colorScheme.primary,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: badges.Badge(
+              position: badges.BadgePosition.topEnd(),
+              badgeAnimation: badges.BadgeAnimation.scale(
+                toAnimate: true,
+                curve: Curves.easeInOut,
+                loopAnimation: false,
+              ),
+              stackFit: StackFit.passthrough,
+              badgeContent: Text(
+                visit.activityMap.length.toString(),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: badgeTextColor,
+                ),
+              ),
+              badgeStyle: badges.BadgeStyle(
+                badgeColor: badgeBackground,
+                borderSide: BorderSide(
+                  color: colorScheme.onPrimary,
+                  width: 2,
+                ),
+                padding: const EdgeInsets.all(4),
+              ),
+              child: Icon(
+                Icons.business_outlined,
+                color: colorScheme.onPrimary,
+                size: 24,
+              ),
             ),
           ),
-          badgeStyle: badges.BadgeStyle(
-            badgeColor: Colors.black,
-            borderSide: BorderSide(
-              width: 2.0,
-              color: Theme.of(context).colorScheme.onPrimary,
+          title: Text(
+            visit.customer?.name ?? 'Unknown Customer',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: colorScheme.onSurface,
             ),
           ),
-          child: Icon(
-            Icons.business_outlined,
-            color: Theme.of(context).colorScheme.onPrimary,
+          subtitle: Text(
+            visit.visit.status,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
+          ),
+          trailing: Text(
+            visit.visit.visitDate.readableDateTime2Line,
+            textAlign: TextAlign.right,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
       ),
-      title: Text(
-        visit.customer?.name ?? 'Unknown Customer',
-      ),
-      subtitle: Text(visit.visit.status),
-      trailing: Text(visit.visit.visitDate.readableDateTime2Line),
     );
   }
 }

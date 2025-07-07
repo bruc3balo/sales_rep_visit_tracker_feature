@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/network_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/networking/src/network_base_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
@@ -25,7 +26,7 @@ class DioNetworkService implements NetworkService {
     dio.interceptors.add(
       LogInterceptor(
         request: true,
-        requestHeader: false,
+        requestHeader: kDebugMode,
         requestBody: true,
         responseHeader: true,
         responseBody: true,

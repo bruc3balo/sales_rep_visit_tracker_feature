@@ -25,6 +25,7 @@ dependencies:
   dots_indicator: ^4.0.1
   flutter_secure_storage: ^9.2.4
   logger: ^2.6.0
+  flutter_native_splash:
 
 dev_dependencies:
   flutter_test:
@@ -34,7 +35,26 @@ dev_dependencies:
   json_serializable: ^6.7.1
   hive_generator: ^2.0.1
   mocktail: ^1.0.0
-
+  flutter_launcher_icons:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/ic_icon.png
+  android: true
+  android_12:
+    image: assets/ic_icon.png
+  ios: true
+  android_gravity: center
+  ios_content_mode: center
+  fullscreen: true
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/ic_icon.png"
+  min_sdk_android: 21

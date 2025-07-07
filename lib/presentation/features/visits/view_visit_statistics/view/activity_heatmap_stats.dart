@@ -16,6 +16,8 @@ class ActivityHeatmap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = Theme.of(context);
+    bool isDarkMode = theme.brightness == Brightness.dark;
     final dayLabels = DayOfWeek.values.map((d) => d.shortLabel);
 
     // Step 1: Build heatmap matrix per activity
@@ -31,7 +33,14 @@ class ActivityHeatmap extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       child: DataTable(
         columns: [
-          const DataColumn(label: Text('Activity')),
+          const DataColumn(
+            label: Text(
+              'Activity',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           ...dayLabels.map((d) => DataColumn(label: Text(d))),
         ],
         rows: matrix.entries.toList().asMap().entries.map((entry) {
@@ -40,15 +49,28 @@ class ActivityHeatmap extends StatelessWidget {
           final dayCounts = entry.value.value;
 
           final isEven = index.isEven;
-          final rowColor = isEven ? WidgetStateProperty.all(Colors.grey.shade300) : null;
+          final rowColor = isEven
+              ? WidgetStateProperty.all(Colors.grey)
+              : isDarkMode
+                  ? null
+                  : WidgetStateProperty.all(Colors.black);
+          final textColor = isEven ? (isDarkMode ? Colors.black : Colors.black) : (isDarkMode ? Colors.white : Colors.white);
 
           return DataRow(
             color: rowColor,
             cells: [
-              DataCell(Text(activity.description)),
+              DataCell(
+                Text(
+                  activity.description,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               ...List.generate(
                 7,
-                    (i) {
+                (i) {
                   final day = i + 1;
                   final count = dayCounts[day] ?? 0;
                   final color = _heatColor(count);
@@ -56,9 +78,7 @@ class ActivityHeatmap extends StatelessWidget {
                     CircleAvatar(
                       radius: 15,
                       backgroundColor: color,
-                      child: count > 0
-                          ? Text('$count', style: const TextStyle(color: Colors.white, fontSize: 12))
-                          : const SizedBox.shrink(),
+                      child: count > 0 ? Text('$count', style: const TextStyle(color: Colors.white, fontSize: 12)) : const SizedBox.shrink(),
                     ),
                   );
                 },

@@ -45,22 +45,24 @@ class ViewCustomersScreen extends StatelessWidget {
           child: RefreshIndicator(
             onRefresh: () => viewCustomersViewModel.refresh(),
             child: ListView.builder(
-              itemCount: itemCount,
+              itemCount: itemCount + 1, // One extra for the SizedBox
               itemBuilder: (context, index) {
                 if (index >= customers.length) {
-                  return InfiniteLoader();
+                  // Show InfiniteLoader if still loading
+                  if (isLoading && index == customers.length) return InfiniteLoader();
+
+                  // Otherwise, show bottom spacer
+                  return const SizedBox(height: 120);
                 }
+
                 var customer = customers[index];
 
                 if (deleteState is LoadingDeleteCustomerState && deleteState.customer.id == customer.id) {
-                  return Icon(
+                  return const Icon(
                     Icons.auto_delete_outlined,
                     color: Colors.red,
                   );
                 }
-
-                bool isLastItem = index + 1 >= itemCount;
-                var padding = (isLastItem) ? 120.0 : 0.0;
 
                 return Dismissible(
                   key: ValueKey(customer.id),
@@ -69,7 +71,6 @@ class ViewCustomersScreen extends StatelessWidget {
                       case DismissDirection.endToStart:
                         viewCustomersViewModel.deleteCustomer(customer: customer);
                         break;
-
                       default:
                         break;
                     }
@@ -81,8 +82,18 @@ class ViewCustomersScreen extends StatelessWidget {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: const Text('Delete Customer'),
-                                  content: Text('Confirm to delete ${customer.name},',style: TextStyle(color: Colors.black),),
+                                  title: const Text(
+                                    'Delete Customer',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  content: Text(
+                                    "Confirm deletion of '${customer.name}'",
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.secondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.of(context).pop(false),
@@ -99,6 +110,7 @@ class ViewCustomersScreen extends StatelessWidget {
                               },
                             ) ??
                             false;
+
                       case DismissDirection.startToEnd:
                         var updatedCustomer = await showDialog<Customer?>(
                           context: context,
@@ -114,7 +126,9 @@ class ViewCustomersScreen extends StatelessWidget {
                             );
                           },
                         );
-                        if (updatedCustomer != null) viewCustomersViewModel.updateItem(updatedCustomer);
+                        if (updatedCustomer != null) {
+                          viewCustomersViewModel.updateItem(updatedCustomer);
+                        }
                         return false;
 
                       default:
@@ -125,7 +139,7 @@ class ViewCustomersScreen extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Icon(Icons.edit, color: Colors.white),
+                    child: const Icon(Icons.edit, color: Colors.white),
                   ),
                   secondaryBackground: Container(
                     color: Colors.red,
@@ -133,11 +147,8 @@ class ViewCustomersScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: const Icon(Icons.delete, color: Colors.white),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: padding),
-                    child: CustomerListTile(
-                      customer: customer,
-                    ),
+                  child: CustomerListTile(
+                    customer: customer,
                   ),
                 );
               },
@@ -159,15 +170,30 @@ class CustomerListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: Icon(
-          Icons.person_2_outlined,
-          color: Theme.of(context).colorScheme.onPrimary,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        leading: CircleAvatar(
+          backgroundColor: colorScheme.primary,
+          child: Icon(
+            Icons.person_2_outlined,
+            color: colorScheme.onPrimary,
+          ),
+        ),
+        title: Text(
+          customer.name,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface,
+          ),
         ),
       ),
-      title: Text(customer.name),
     );
   }
 }

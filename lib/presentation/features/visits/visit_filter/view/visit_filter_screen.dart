@@ -81,6 +81,7 @@ class VisitFilterComponent extends StatelessWidget {
                       },
                 label: Text(filter.fromDateInclusive?.readableDate ?? 'Start Date'),
               ),
+
               FilterChip(
                 onSelected: (_) async {
                   var date = await showDatePicker(

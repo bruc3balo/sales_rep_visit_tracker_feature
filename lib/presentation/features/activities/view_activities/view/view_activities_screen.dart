@@ -39,23 +39,21 @@ class ViewActivitiesScreen extends StatelessWidget {
           child: RefreshIndicator(
             onRefresh: () => viewActivitiesViewModel.refresh(),
             child: ListView.builder(
-              itemCount: itemCount,
+              itemCount: itemCount + 1, // Add one extra slot for the SizedBox
               itemBuilder: (context, index) {
                 if (index >= activities.length) {
-                  return InfiniteLoader();
+                  if (isLoading && index == activities.length) return InfiniteLoader();
+                  return const SizedBox(height: 120); // Spacer for last item for FAB
                 }
 
                 var activity = activities[index];
                 bool activityIsBeingDeleted = deleteState is LoadingDeleteActivityState && activity.id == deleteState.activity.id;
                 if (activityIsBeingDeleted) {
-                  return Icon(
+                  return const Icon(
                     Icons.auto_delete_outlined,
                     color: Colors.red,
                   );
                 }
-
-                bool isLastItem = index + 1 >= viewActivitiesViewModel.activities.length;
-                var padding = (isLastItem) ? 120.0 : 0.0;
 
                 return Dismissible(
                   key: ValueKey(activity.id),
@@ -64,7 +62,6 @@ class ViewActivitiesScreen extends StatelessWidget {
                       case DismissDirection.endToStart:
                         viewActivitiesViewModel.deleteActivity(activity: activity);
                         break;
-
                       default:
                         break;
                     }
@@ -76,10 +73,17 @@ class ViewActivitiesScreen extends StatelessWidget {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: const Text('Delete Activity'),
+                                  title: const Text(
+                                    'Delete activity',
+                                    textAlign: TextAlign.center,
+                                  ),
                                   content: Text(
-                                    'Confirm to delete ${activity.description}',
-                                    style: TextStyle(color: Colors.black),
+                                    "Confirm deletion of '${activity.description}'",
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.secondary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                   actions: [
                                     TextButton(
@@ -111,7 +115,9 @@ class ViewActivitiesScreen extends StatelessWidget {
                           },
                         );
 
-                        if (updatedActivity != null) viewActivitiesViewModel.updateItem(updatedActivity);
+                        if (updatedActivity != null) {
+                          viewActivitiesViewModel.updateItem(updatedActivity);
+                        }
 
                         return false;
 
@@ -123,7 +129,7 @@ class ViewActivitiesScreen extends StatelessWidget {
                     color: Theme.of(context).colorScheme.primary,
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Icon(Icons.edit, color: Colors.white),
+                    child: const Icon(Icons.edit, color: Colors.white),
                   ),
                   secondaryBackground: Container(
                     color: Colors.red,
@@ -131,11 +137,8 @@ class ViewActivitiesScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: const Icon(Icons.delete, color: Colors.white),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: padding),
-                    child: ActivityListTile(
-                      activity: activity,
-                    ),
+                  child: ActivityListTile(
+                    activity: activity,
                   ),
                 );
               },
@@ -157,15 +160,30 @@ class ActivityListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: Icon(
-          Icons.run_circle_outlined,
-          color: Theme.of(context).colorScheme.onPrimary,
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      elevation: 1,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+        leading: CircleAvatar(
+          backgroundColor: colorScheme.primary,
+          child: Icon(
+            Icons.run_circle_outlined,
+            color: colorScheme.onPrimary,
+          ),
+        ),
+        title: Text(
+          activity.description,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface,
+          ),
         ),
       ),
-      title: Text(activity.description),
     );
   }
 }
