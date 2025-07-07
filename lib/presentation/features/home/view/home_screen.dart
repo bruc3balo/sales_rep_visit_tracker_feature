@@ -50,10 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: const Text('Exit',
+              title: const Text(
+                'Exit',
                 textAlign: TextAlign.center,
               ),
-              content:  Text(
+              content: Text(
                 'Did you mean to exit?',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.secondary,
@@ -111,100 +112,99 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 switch (syncState) {
                   LoadingCountVisitState() => InfiniteLoader(),
-                  LoadedCountVisitState() =>
-                      Visibility(
-                        visible: (syncState.unSyncedVisitCount ?? 0) > 0,
+                  LoadedCountVisitState() => Visibility(
+                      visible: (syncState.unSyncedVisitCount ?? 0) > 0,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.visitUnsyncedVisits.path,
+                          );
+                        },
                         child: badges.Badge(
-                          badgeContent: Text(syncState.unSyncedVisitCount?.toString() ?? '-'),
+                          badgeContent: Text(
+                            syncState.unSyncedVisitCount?.toString() ?? '-',
+                          ),
                           badgeAnimation: badges.BadgeAnimation.rotation(),
                           position: badges.BadgePosition.center(),
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.of(context).pushNamed(
-                                AppRoutes.visitUnsyncedVisits.path,
-                              );
-                            },
-                            icon: Icon(
-                              Icons.sync,
-                              size: 40,
-                            ),
+                          child: Icon(
+                            Icons.sync,
+                            size: 40,
                           ),
                         ),
                       ),
+                    ),
                 },
               ],
             ),
             body: switch (widget.homeViewModel.currentPage) {
-              HomePages.visits =>
-                  ViewVisitsScreen(
-                    searchActivitiesViewModel: SearchActivitiesViewModel(
-                      searchRemoteActivitiesUseCase: SearchRemoteActivitiesUseCase(
-                        remoteActivityRepository: GetIt.I(),
-                        localActivityRepository: GetIt.I(),
-                      ),
-                      searchLocalActivitiesUseCase: SearchLocalActivitiesUseCase(
-                        localActivityRepository: GetIt.I(),
-                      ),
-                      connectivityService: GetIt.I(),
-                    ),
-                    searchCustomersViewModel: SearchCustomersViewModel(
-                      searchRemoteCustomerUseCase: SearchRemoteCustomerUseCase(
-                        remoteCustomerRepository: GetIt.I(),
-                        localCustomerRepository: GetIt.I(),
-                      ),
-                      searchLocalCustomersUseCase: SearchLocalCustomersUseCase(
-                        localCustomerRepository: GetIt.I(),
-                      ),
-                      connectivityService: GetIt.I(),
-                    ),
-                    viewVisitsViewModel: ViewVisitsViewModel(
-                      pastVisitsUseCase: VisitListOfPastVisitsUseCase(
-                        visitRepository: GetIt.I(),
-                        activityRepository: GetIt.I(),
-                        customerRepository: GetIt.I(),
-                      ),
-                    ),
-                  ),
-              HomePages.activities =>
-                  ViewActivitiesScreen(
-                    updateActivityUseCase: UpdateActivityUseCase(
+              HomePages.visits => ViewVisitsScreen(
+                  searchActivitiesViewModel: SearchActivitiesViewModel(
+                    searchRemoteActivitiesUseCase: SearchRemoteActivitiesUseCase(
                       remoteActivityRepository: GetIt.I(),
                       localActivityRepository: GetIt.I(),
                     ),
-                    viewActivitiesViewModel: ViewActivitiesViewModel(
-                      connectivityService: GetIt.I(),
-                      remoteActivitiesUseCase: ViewRemoteActivitiesUseCase(
-                        remoteActivityRepository: GetIt.I(),
-                        localActivityRepository: GetIt.I(),
-                      ),
-                      localActivitiesUseCase: ViewLocalActivitiesUseCase(
-                        localActivityRepository: GetIt.I(),
-                      ),
-                      deleteActivityUseCase: DeleteActivityUseCase(
-                        remoteActivityRepository: GetIt.I(),
-                        localActivityRepository: GetIt.I(),
-                      ),
+                    searchLocalActivitiesUseCase: SearchLocalActivitiesUseCase(
+                      localActivityRepository: GetIt.I(),
+                    ),
+                    connectivityService: GetIt.I(),
+                  ),
+                  searchCustomersViewModel: SearchCustomersViewModel(
+                    searchRemoteCustomerUseCase: SearchRemoteCustomerUseCase(
+                      remoteCustomerRepository: GetIt.I(),
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    searchLocalCustomersUseCase: SearchLocalCustomersUseCase(
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    connectivityService: GetIt.I(),
+                  ),
+                  viewVisitsViewModel: ViewVisitsViewModel(
+                    connectivityService: GetIt.I(),
+                    pastVisitsUseCase: VisitListOfPastVisitsUseCase(
+                      visitRepository: GetIt.I(),
+                      activityRepository: GetIt.I(),
+                      customerRepository: GetIt.I(),
                     ),
                   ),
-              HomePages.customers =>
-                  ViewCustomersScreen(
-                    localCustomerRepository: GetIt.I(),
-                    remoteCustomerRepository: GetIt.I(),
-                    viewCustomersViewModel: ViewCustomersViewModel(
-                      viewRemoteCustomersUseCase: ViewRemoteCustomersUseCase(
-                        remoteCustomerRepository: GetIt.I(),
-                        localCustomerRepository: GetIt.I(),
-                      ),
-                      viewLocalCustomersUseCase: ViewLocalCustomersUseCase(
-                        localCustomerRepository: GetIt.I(),
-                      ),
-                      deleteCustomerUseCase: DeleteCustomerUseCase(
-                        remoteCustomerRepository: GetIt.I(),
-                        localCustomerRepository: GetIt.I(),
-                      ),
-                      connectivityService: GetIt.I(),
+                ),
+              HomePages.activities => ViewActivitiesScreen(
+                  updateActivityUseCase: UpdateActivityUseCase(
+                    remoteActivityRepository: GetIt.I(),
+                    localActivityRepository: GetIt.I(),
+                  ),
+                  viewActivitiesViewModel: ViewActivitiesViewModel(
+                    connectivityService: GetIt.I(),
+                    remoteActivitiesUseCase: ViewRemoteActivitiesUseCase(
+                      remoteActivityRepository: GetIt.I(),
+                      localActivityRepository: GetIt.I(),
+                    ),
+                    localActivitiesUseCase: ViewLocalActivitiesUseCase(
+                      localActivityRepository: GetIt.I(),
+                    ),
+                    deleteActivityUseCase: DeleteActivityUseCase(
+                      remoteActivityRepository: GetIt.I(),
+                      localActivityRepository: GetIt.I(),
                     ),
                   ),
+                ),
+              HomePages.customers => ViewCustomersScreen(
+                  localCustomerRepository: GetIt.I(),
+                  remoteCustomerRepository: GetIt.I(),
+                  viewCustomersViewModel: ViewCustomersViewModel(
+                    viewRemoteCustomersUseCase: ViewRemoteCustomersUseCase(
+                      remoteCustomerRepository: GetIt.I(),
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    viewLocalCustomersUseCase: ViewLocalCustomersUseCase(
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    deleteCustomerUseCase: DeleteCustomerUseCase(
+                      remoteCustomerRepository: GetIt.I(),
+                      localCustomerRepository: GetIt.I(),
+                    ),
+                    connectivityService: GetIt.I(),
+                  ),
+                ),
             },
             floatingActionButton: FloatingActionButton.small(
               onPressed: () {
@@ -234,12 +234,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: widget.homeViewModel.changePage,
               items: widget.homeViewModel.homePages
                   .map(
-                    (p) =>
-                    BottomNavigationBarItem(
+                    (p) => BottomNavigationBarItem(
                       icon: Icon(p.iconData),
                       label: p.label,
                     ),
-              )
+                  )
                   .toList(),
             ),
           );

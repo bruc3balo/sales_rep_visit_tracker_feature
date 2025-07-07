@@ -20,6 +20,7 @@ class SearchActivitiesViewModel extends ChangeNotifier {
   );
   int _remotePage = 0;
   int _localPage = 0;
+  static final int _pageSize = 20;
   String? _lastQuery;
 
   SearchActivityState _state = LoadedActivitySearchState();
@@ -30,9 +31,7 @@ class SearchActivitiesViewModel extends ChangeNotifier {
     required ConnectivityService connectivityService,
   })  : _searchRemoteActivityUseCase = searchRemoteActivitiesUseCase,
         _searchLocalActivitiesUseCase = searchLocalActivitiesUseCase,
-        _connectivityService = connectivityService {
-    searchActivities();
-  }
+        _connectivityService = connectivityService;
 
   SearchActivityState get state => _state;
 
@@ -40,7 +39,6 @@ class SearchActivitiesViewModel extends ChangeNotifier {
 
   Future<void> searchActivities({
     String? activityDescription,
-    int pageSize = 20,
   }) async {
     if (_lastQuery != null && _lastQuery != activityDescription) {
       _localPage = 0;
@@ -56,19 +54,16 @@ class SearchActivitiesViewModel extends ChangeNotifier {
     if (hasConnectivity) {
       await _searchRemoteActivities(
         activityDescription: activityDescription,
-        pageSize: pageSize,
       );
     } else {
       await _searchLocalActivities(
         activityDescription: activityDescription,
-        pageSize: pageSize,
       );
     }
   }
 
   Future<void> _searchRemoteActivities({
     String? activityDescription,
-    int pageSize = 20,
   }) async {
     if (_state is! LoadedActivitySearchState) return;
 
@@ -79,7 +74,7 @@ class SearchActivitiesViewModel extends ChangeNotifier {
       var getActivityResult = await _searchRemoteActivityUseCase.execute(
         likeDescription: activityDescription,
         page: _remotePage,
-        pageSize: pageSize,
+        pageSize: _pageSize,
       );
 
       switch (getActivityResult) {
@@ -88,7 +83,7 @@ class SearchActivitiesViewModel extends ChangeNotifier {
           _state = LoadedActivitySearchState(searchResults: LinkedHashSet());
           break;
         case SuccessResult<List<Activity>>():
-          if(getActivityResult.data.length == pageSize) _remotePage++;
+          if(getActivityResult.data.length >= _pageSize) _remotePage++;
           _activities.addAll(getActivityResult.data);
           _state = LoadedActivitySearchState(searchResults: LinkedHashSet.from(getActivityResult.data));
           break;
@@ -100,7 +95,6 @@ class SearchActivitiesViewModel extends ChangeNotifier {
 
   Future<void> _searchLocalActivities({
     String? activityDescription,
-    int pageSize = 20,
   }) async {
     if (_state is! LoadedActivitySearchState) return;
 
@@ -111,17 +105,16 @@ class SearchActivitiesViewModel extends ChangeNotifier {
       var getActivityResult = await _searchLocalActivitiesUseCase.execute(
         likeDescription: activityDescription,
         page: _localPage,
-        pageSize: pageSize,
+        pageSize: _pageSize,
       );
 
       switch (getActivityResult) {
         case ErrorResult<List<Activity>>():
-          print(getActivityResult.trace.toString());
           GlobalToastMessage().add(ErrorMessage(message: getActivityResult.error));
           _state = LoadedActivitySearchState();
           break;
         case SuccessResult<List<Activity>>():
-          if(getActivityResult.data.length == pageSize) _localPage++;
+          if(getActivityResult.data.length >= _pageSize) _localPage++;
           _activities.addAll(getActivityResult.data);
           _state = LoadedActivitySearchState(searchResults: LinkedHashSet.from(getActivityResult.data));
           break;

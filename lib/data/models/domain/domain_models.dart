@@ -10,6 +10,22 @@ class Customer {
     required this.name,
     required this.createdAt,
   });
+
+  factory Customer.fromJson(Map<String, dynamic> json) {
+    return Customer(
+      id: json['id'],
+      name: json['name'],
+      createdAt: DateTime.parse(json['createdAt']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
 }
 
 class Activity {
@@ -22,6 +38,22 @@ class Activity {
     required this.description,
     required this.createdAt,
   });
+
+  factory Activity.fromJson(Map<String, dynamic> json) {
+    return Activity(
+      id: json['id'],
+      description: json['description'],
+      createdAt: DateTime.parse(json['createdAt']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'description': description,
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
 }
 
 class Visit {

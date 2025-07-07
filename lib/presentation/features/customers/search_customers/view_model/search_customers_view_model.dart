@@ -20,6 +20,7 @@ class SearchCustomersViewModel extends ChangeNotifier {
   );
   int _localPage = 0;
   int _remotePage = 0;
+  static final int _pageSize = 20;
   String? _lastQuery;
   SearchCustomerState _state = LoadedCustomersSearchState();
 
@@ -29,9 +30,7 @@ class SearchCustomersViewModel extends ChangeNotifier {
     required ConnectivityService connectivityService,
   })  : _searchRemoteCustomerUseCase = searchRemoteCustomerUseCase,
         _searchLocalCustomersUseCase = searchLocalCustomersUseCase,
-        _connectivityService = connectivityService {
-    searchCustomers();
-  }
+        _connectivityService = connectivityService;
 
   SearchCustomerState get state => _state;
 
@@ -39,7 +38,6 @@ class SearchCustomersViewModel extends ChangeNotifier {
 
   Future<void> searchCustomers({
     String? customerName,
-    int pageSize = 20,
   }) async {
     if (_lastQuery != null && _lastQuery != customerName) {
       _localPage = 0;
@@ -55,19 +53,16 @@ class SearchCustomersViewModel extends ChangeNotifier {
     if (hasConnectivity) {
       await _searchRemoteCustomers(
         customerName: customerName,
-        pageSize: pageSize,
       );
     } else {
       await _searchLocalCustomers(
         customerName: customerName,
-        pageSize: pageSize,
       );
     }
   }
 
   Future<void> _searchLocalCustomers({
     String? customerName,
-    int pageSize = 20,
   }) async {
     if (_state is! LoadedCustomersSearchState) return;
 
@@ -78,7 +73,7 @@ class SearchCustomersViewModel extends ChangeNotifier {
       var getCustomerResult = await _searchLocalCustomersUseCase.execute(
         likeName: customerName,
         page: _localPage,
-        pageSize: pageSize,
+        pageSize: _pageSize,
       );
 
       switch (getCustomerResult) {
@@ -87,7 +82,7 @@ class SearchCustomersViewModel extends ChangeNotifier {
           _state = LoadedCustomersSearchState();
           break;
         case SuccessResult<List<Customer>>():
-          if(getCustomerResult.data.length == pageSize) _localPage++;
+          if(getCustomerResult.data.length >= _pageSize) _localPage++;
           _customers.addAll(getCustomerResult.data);
           _state = LoadedCustomersSearchState(searchResults: LinkedHashSet.from(getCustomerResult.data));
           break;
@@ -99,7 +94,6 @@ class SearchCustomersViewModel extends ChangeNotifier {
 
   Future<void> _searchRemoteCustomers({
     String? customerName,
-    int pageSize = 20,
   }) async {
     if (_state is! LoadedCustomersSearchState) return;
 
@@ -110,7 +104,7 @@ class SearchCustomersViewModel extends ChangeNotifier {
       var getCustomerResult = await _searchRemoteCustomerUseCase.execute(
         likeName: customerName,
         page: _remotePage,
-        pageSize: pageSize,
+        pageSize: _pageSize,
       );
 
       switch (getCustomerResult) {
@@ -119,7 +113,7 @@ class SearchCustomersViewModel extends ChangeNotifier {
           _state = LoadedCustomersSearchState();
           break;
         case SuccessResult<List<Customer>>():
-          if(getCustomerResult.data.length == pageSize) _remotePage++;
+          if(getCustomerResult.data.length >= _pageSize) _remotePage++;
           _customers.addAll(getCustomerResult.data);
           _state = LoadedCustomersSearchState(searchResults: LinkedHashSet.from(getCustomerResult.data));
           break;

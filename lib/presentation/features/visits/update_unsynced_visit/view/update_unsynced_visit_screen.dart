@@ -3,15 +3,23 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/models/model_mapper.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/card_tile.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/drop_down_tile.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/global_toast_message.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/text_field_tile.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view/search_activities_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/activities/search_activities/view_model/search_activities_view_model.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view/search_customers_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view_model/search_customers_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/add_visit/view/add_visit_screen.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/update_unsynced_visit/model/update_unsynced_visit_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/update_unsynced_visit/view_model/update_unsynced_visit_view_model.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
-class UpdateUnsyncedVisitScreen extends StatefulWidget {
+class UpdateUnsyncedVisitScreen extends StatelessWidget {
   const UpdateUnsyncedVisitScreen({
     required this.updateUnsyncedVisitViewModel,
     required this.searchCustomersViewModel,
@@ -24,240 +32,168 @@ class UpdateUnsyncedVisitScreen extends StatefulWidget {
   final SearchActivitiesViewModel searchActivitiesViewModel;
 
   @override
-  State<UpdateUnsyncedVisitScreen> createState() => _UpdateUnsyncedVisitScreenState();
-}
-
-class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
-  UpdateUnsyncedVisitViewModel get viewModel => widget.updateUnsyncedVisitViewModel;
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Update Visit"),
-      ),
-      body: ListenableBuilder(
-        listenable: widget.updateUnsyncedVisitViewModel,
-        builder: (_, __) {
-          return ListView(
-            children: [
-              // Customer search
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  onTap: () {
-                    //Select customer
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return CustomerSearchDialog(
-                          customerIdsToIgnore: HashSet.from([viewModel.visit.customer?.id].where((e) => e != null)),
-                          searchCustomersViewModel: widget.searchCustomersViewModel,
-                          onSelect: (c) {
-                            viewModel.update(
-                              customerId: c.id,
-                            );
-                          },
-                        );
-                      },
-                    );
-                  },
-                  title: Text("Customer"),
-                  subtitle: Text(viewModel.visit.customer?.name ?? "Tap to select a customer"),
-                ),
-              ),
+    ThemeData theme = Theme.of(context);
+    return PopScope(
+      onPopInvokedWithResult: (_, __) {
+        Navigator.of(context).pushReplacementNamed(
+          AppRoutes.visitUnsyncedVisits.path,
+        );
+      },
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Update Visit"),
+        ),
+        body: ListenableBuilder(
+          listenable: updateUnsyncedVisitViewModel,
+          builder: (_, __) {
+            var state = updateUnsyncedVisitViewModel.state;
 
-              //Visit date
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  onTap: () async {
-                    var date = await showDatePicker(
-                      context: context,
-                      firstDate: DateTime(DateTime.now().year - 1),
-                      lastDate: DateTime.now(),
-                    );
-
-                    if (date == null) return;
-                    if (!context.mounted) return;
-
-                    var time = await showTimePicker(
-                      context: context,
-                      initialTime: TimeOfDay.now(),
-                    );
-
-                    if (time == null) return;
-                    if (!context.mounted) return;
-
-                    var newVisitDate = date.copyWith(
-                      hour: time.hour,
-                      minute: time.minute,
-                    );
-
-                    if (newVisitDate.isAfter(DateTime.now())) {
-                      //TODO: Notify user of error
-                      return;
-                    }
-
-                    viewModel.update(
-                      visitDate: newVisitDate,
-                    );
-                  },
-                  title: Text("Visit date"),
-                  subtitle: Text(viewModel.visit.visitDate.humanReadable),
-                ),
-              ),
-
-              // Visit status
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  title: Text("Visit status"),
-                  subtitle: DropdownMenu<VisitStatus>(
-                    trailingIcon: SizedBox.shrink(),
-                    width: double.infinity,
-                    initialSelection: viewModel.visit.status,
-                    hintText: "What is the status of your visit",
-                    dropdownMenuEntries: VisitStatus.values
-                        .map(
-                          (o) => DropdownMenuEntry<VisitStatus>(
-                            value: o,
-                            label: o.name.capitalize,
-                            style: ButtonStyle(
-                              foregroundColor: WidgetStatePropertyAll(
-                                Colors.black,
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onSelected: (o) {
-                      viewModel.update(
-                        status: o,
-                      );
-                    },
-                  ),
-                ),
-              ),
-
-              // Activity search
-              ListTile(
-                title: ListTile(
-                  title: Text("Activities"),
-                  trailing: CircleAvatar(
-                    child: IconButton(
-                        onPressed: () {
-                          //Select activity
+            switch (state) {
+              case LoadedUpdateUnsyncedVisitState():
+                var visit = state.visit;
+                debugPrint("Rebuilding UI with customer: ${visit.customer?.name}");
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: ListView(
+                    children: [
+                      // Customer search
+                      CardTile(
+                        label: "Customer",
+                        icon: Icons.person_outline,
+                        onTap: () {
                           showDialog(
                             context: context,
-                            builder: (context) {
-                              return ActivitySearchDialog(
-                                activitiesToIgnore: HashSet.from(viewModel.visit.activityMap.keys),
-                                searchActivitiesViewModel: widget.searchActivitiesViewModel,
-                                onSelect: (a) {
-                                  if (viewModel.visit.activityMap.containsKey(a.id)) return;
-
-                                  viewModel.visit.activityMap.update(
-                                    a.id,
-                                    (_) => ActivityRef(a.id, a.description),
-                                    ifAbsent: () => ActivityRef(a.id, a.description),
-                                  );
-
-                                  viewModel.update(
-                                    activityIdsDone: viewModel.visit.activityMap.values.map((a) => a.id).toList(),
-                                  );
-                                },
-                              );
-                            },
+                            builder: (_) => CustomerSearchDialog(
+                              customerIdsToIgnore: HashSet.from([visit.customer?.id].where((e) => e != null)),
+                              searchCustomersViewModel: searchCustomersViewModel,
+                              onSelect: (c) {
+                                updateUnsyncedVisitViewModel.update(
+                                  customerId: c.id,
+                                );
+                              },
+                            ),
                           );
                         },
-                        icon: Icon(Icons.add)),
-                  ),
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Visibility(
-                    visible: viewModel.visit.activityMap.isNotEmpty,
-                    replacement: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "No activities recorded",
-                        textAlign: TextAlign.center,
+                        child: Text(
+                          visit.customer?.name ?? "Tap to select a customer",
+                          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                        ),
                       ),
-                    ),
-                    child: Container(
-                      constraints: BoxConstraints(
-                        maxHeight: 300,
+
+                      //Visit date
+                      CardTile(
+                        label: "Visit Date",
+                        icon: Icons.calendar_today_outlined,
+                        onTap: () async {
+                          var date = await showDatePicker(
+                            context: context,
+                            initialDate: visit.visitDate,
+                            firstDate: DateTime(DateTime.now().year - 1),
+                            lastDate: DateTime.now(),
+                          );
+                          if (date == null || !context.mounted) return;
+                          var time = await showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.fromDateTime(visit.visitDate),
+                            initialEntryMode: TimePickerEntryMode.input,
+                          );
+                          if (time == null || !context.mounted) return;
+                          var newVisitDate = date.copyWith(hour: time.hour, minute: time.minute);
+                          if (newVisitDate.isAfter(DateTime.now())) {
+                            GlobalToastMessage().add(InfoMessage(message: "Visit date should not be in the future"));
+                            return;
+                          }
+
+                          updateUnsyncedVisitViewModel.update(
+                            visitDate: newVisitDate,
+                          );
+                        },
+                        child: Text(
+                          visit.visitDate.humanReadable,
+                          style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                        ),
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: viewModel.visit.activityMap.values
+
+                      // Visit status
+                      DropdownTile<VisitStatus>(
+                        label: "Visit Status",
+                        items: VisitStatus.values,
+                        selectedItem: visit.status,
+                        onSelected: (t) => updateUnsyncedVisitViewModel.update(
+                          status: t,
+                        ),
+                        itemLabelBuilder: (e) => e.name.capitalize,
+                      ),
+
+                      // Activity search
+                      ActivitySelectionTile(
+                        label: "Activities",
+                        onDelete: (a) {
+                          visit.activityMap.remove(a.id);
+                          updateUnsyncedVisitViewModel.update(
+                            activityIdsDone: visit.activityMap.values.map((a) => a.id).toList(),
+                          );
+                        },
+                        onAdd: (a) {
+                          if (visit.activityMap.containsKey(a.id)) return;
+
+                          visit.activityMap.update(
+                            a.id,
+                            (_) => a.toRef,
+                            ifAbsent: () => a.toRef,
+                          );
+
+                          updateUnsyncedVisitViewModel.update(
+                            activityIdsDone: visit.activityMap.values.map((a) => a.id).toList(),
+                          );
+                        },
+                        selectedActivities: visit.activityMap.values
                             .map(
-                              (a) => ListTile(
-                                title: Text(a.description),
-                                trailing: IconButton(
-                                  onPressed: () {
-                                    viewModel.visit.activityMap.remove(a.id);
-                                    viewModel.update(
-                                      activityIdsDone: viewModel.visit.activityMap.values.map((a) => a.id).toList(),
-                                    );
-                                  },
-                                  icon: Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                ),
+                              (e) => Activity(
+                                id: e.id,
+                                description: e.description,
+
+                                //Default date time here as not considered
+                                createdAt: DateTime.now(),
                               ),
                             )
                             .toList(),
+                        viewModel: searchActivitiesViewModel,
                       ),
-                    ),
-                  ),
-                ),
-              ),
 
-              // Location
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  title: Text("Location"),
-                  subtitle: TextFormField(
-                    initialValue: viewModel.visit.location,
-                    onChanged: (s) {
-                      viewModel.update(
-                        location: s,
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText: "Where is the visit located",
-                    ),
+                      // Location
+                      TextFieldTile(
+                        initialValue: visit.location,
+                        label: "Location",
+                        hintText: "Where is the visit located",
+                        onDebouncedChanged: (s) {
+                          updateUnsyncedVisitViewModel.update(
+                            location: s,
+                          );
+                        },
+                      ),
+                      TextFieldTile(
+                        initialValue: visit.notes,
+                        label: "Notes",
+                        hintText: "Add any relevant notes",
+                        minLines: 4,
+                        onDebouncedChanged: (s) {
+                          updateUnsyncedVisitViewModel.update(
+                            notes: s,
+                          );
+                        },
+                      ),
+                    ],
                   ),
-                ),
-              ),
+                );
 
-              // Notes
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ListTile(
-                  title: Text("Notes"),
-                  subtitle: TextFormField(
-                    initialValue: viewModel.visit.notes,
-                    onChanged: (s) {
-                      viewModel.update(
-                        notes: s,
-                      );
-                    },
-                    decoration: InputDecoration(
-                      hintText: "Add any relevant notes",
-                    ),
-                    maxLines: null,
-                    minLines: 4,
-                  ),
-                ),
-              ),
-            ],
-          );
-        },
+              case LoadingUpdateUnsyncedVisitState():
+                return InfiniteLoader();
+            }
+          },
+        ),
       ),
     );
   }

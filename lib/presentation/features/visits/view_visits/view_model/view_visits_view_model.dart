@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/connectivity_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
@@ -13,7 +14,9 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/vie
 
 class ViewVisitsViewModel extends ChangeNotifier {
   final VisitListOfPastVisitsUseCase _pastVisitsUseCase;
+  final ConnectivityService _connectivityService;
   int _page = 0;
+  static final int _pageSize = 20;
   final LinkedHashSet<VisitAggregate> _visits = LinkedHashSet(
     equals: (a, b) => a.visit.id == b.visit.id,
     hashCode: (v) => v.visit.id.hashCode,
@@ -23,7 +26,9 @@ class ViewVisitsViewModel extends ChangeNotifier {
 
   ViewVisitsViewModel({
     required VisitListOfPastVisitsUseCase pastVisitsUseCase,
-  }) : _pastVisitsUseCase = pastVisitsUseCase {
+    required ConnectivityService connectivityService,
+  })  : _pastVisitsUseCase = pastVisitsUseCase,
+        _connectivityService = connectivityService {
     loadMoreItems();
   }
 
@@ -40,15 +45,19 @@ class ViewVisitsViewModel extends ChangeNotifier {
 
   Future<void> loadMoreItems() async {
     if (_itemsState is LoadingViewVisitsState) return;
+    if (false == _connectivityService.lastResult) {
+      if (_visits.isEmpty) _itemsState = OfflineViewVisitsState();
+      GlobalToastMessage().add(InfoMessage(message: "Internet connection required to see visits"));
+      return;
+    }
 
     try {
       _itemsState = LoadingViewVisitsState();
       notifyListeners();
 
-
       var visitsResult = await _pastVisitsUseCase.execute(
         page: _page,
-        pageSize: 20,
+        pageSize: _pageSize,
         customerId: _filterState.customer?.id,
         order: "${_filterState.orderBy.order}.${_filterState.sortBy.sort}",
         fromDateInclusive: _filterState.fromDateInclusive,
@@ -70,7 +79,7 @@ class ViewVisitsViewModel extends ChangeNotifier {
           break;
         case SuccessResult<List<VisitAggregate>>():
           _visits.addAll(visitsResult.data);
-          if (visitsResult.data.isNotEmpty) _page++;
+          if (visitsResult.data.length >= _pageSize) _page++;
           _itemsState = LoadedViewVisitsState();
 
           break;
@@ -86,5 +95,4 @@ class ViewVisitsViewModel extends ChangeNotifier {
     _visits.clear();
     loadMoreItems();
   }
-
 }

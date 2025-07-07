@@ -41,6 +41,7 @@ class ViewVisitStatisticsViewModel extends ChangeNotifier {
         _getRemoteDailyVisitStatisticsUseCase = getRemoteDailyVisitStatisticsUseCase,
         _getRemoteWeeklyVisitStatisticsUseCase = getRemoteWeeklyVisitStatisticsUseCase {
     getLocalVisitStatusStatistics();
+    calculateRemoteVisitStatusStatistics();
     calculateWeeklyVisitStatusStatistics();
     calculateCompletedVisitsStatistics();
     calculateDailyVisitStatusStatistics();

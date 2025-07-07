@@ -11,7 +11,11 @@ abstract class LocalUnSyncedLocalVisitCrud {
     required LocalVisitHash hash,
   });
 
-  Future<TaskResult<LocalVisitHash>> setLocalVisit({
+  Future<TaskResult<UnSyncedLocalVisit?>> findByKey({
+    required dynamic key,
+  });
+
+  Future<TaskResult<void>> setLocalVisit({
     required UnSyncedLocalVisit visit,
   });
 

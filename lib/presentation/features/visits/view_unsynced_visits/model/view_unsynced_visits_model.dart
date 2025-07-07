@@ -12,9 +12,3 @@ class LoadingUnsyncedVisitState extends UnsyncedVisitsState {
 class DisplayingUnsyncedVisitState extends UnsyncedVisitsState {}
 
 class SyncingVisitState extends UnsyncedVisitsState {}
-
-class FinishedSyncingVisitState extends UnsyncedVisitsState {
-  final String results;
-
-  FinishedSyncingVisitState({required this.results});
-}

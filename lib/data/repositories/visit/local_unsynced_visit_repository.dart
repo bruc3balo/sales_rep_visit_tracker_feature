@@ -5,12 +5,16 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 abstract class LocalUnsyncedVisitRepository {
 
-  Stream<void> get unsyncedVisitUpdatedStream;
+  Stream<UnSyncedLocalVisit?> get unsyncedVisitUpdatedStream;
 
   Future<TaskResult<int>> countUnsyncedVisits();
 
   Future<TaskResult<UnSyncedLocalVisit?>> findByHash({
     required LocalVisitHash hash,
+  });
+
+  Future<TaskResult<UnSyncedLocalVisit?>> findByKey({
+    required dynamic key,
   });
 
   Future<TaskResult<List<UnSyncedLocalVisit>>> getUnsyncedVisits({

@@ -15,6 +15,7 @@ class VisitAggregate {
 }
 
 class UnsyncedVisitAggregate {
+  final dynamic key;
   final LocalVisitHash hash;
   final DateTime visitDate;
   final VisitStatus status;
@@ -25,6 +26,7 @@ class UnsyncedVisitAggregate {
   final CustomerRef? customer;
 
   UnsyncedVisitAggregate({
+    required this.key,
     required this.hash,
     required this.visitDate,
     required this.status,

@@ -7,6 +7,7 @@ import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/local_un
 import 'package:sales_rep_visit_tracker_feature/data/repositories/visit/remote_visit_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/random_gen.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 
@@ -72,8 +73,10 @@ class AddANewVisitUseCase {
             "Storing visit offline with hash ${key.value}",
           );
 
+
           var localSaveResult = await _localUnsyncedVisitRepository.setUnsyncedVisit(
             visit: UnSyncedLocalVisit(
+              key: generateRandomKey(15),
               hash: key.value,
               customerIdVisited: customer.id,
               visitDate: visitDate,

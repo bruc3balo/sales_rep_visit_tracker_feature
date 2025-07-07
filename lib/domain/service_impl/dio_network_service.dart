@@ -73,18 +73,24 @@ class DioNetworkService implements NetworkService {
       } on DioException catch (e, trace) {
         AppLog.I.w(_tag, "DioException occurred: ${e.message} (retry=${!isLastTry})");
 
-        if (isLastTry) {
+        if (isLastTry || !e.type.shouldRetry) {
           AppLog.I.e(_tag, "Final attempt failed. Returning FailNetworkResponse", error: e, trace: trace);
           return FailNetworkResponse(
             statusCode: e.response?.statusCode,
             description: e.message ?? e.error.toString(),
             trace: trace,
+            failureType: e.type.failureType,
             data: e.response?.data,
           );
         }
 
         requestCountTry++;
         AppLog.I.i(_tag, "Retrying...");
+      } catch(e, trace) {
+        return FailNetworkResponse(
+          description: e.toString(),
+          trace: trace,
+        );
       }
     }
 

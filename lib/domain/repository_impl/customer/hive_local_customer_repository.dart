@@ -41,8 +41,12 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
         );
       case SuccessResult<List<LocalCustomer>>():
         var data = results.data.map((e) => e.toDomain).toList();
-        return SuccessResult(data: data, message: results.message);
+        return SuccessResult(
+          data: data,
+          message: results.message,
+        );
     }
+
   }
 
   @override
@@ -61,6 +65,7 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
           failure: results.failure,
           trace: results.trace,
         );
+
       case SuccessResult<Map<int, LocalCustomer>>():
         var data = {for (var c in results.data.entries) c.key: c.value.toDomain};
         return SuccessResult(data: data, message: results.message);

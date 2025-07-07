@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:logger/logger.dart';
@@ -44,7 +45,8 @@ import 'data/utils/hive_cypher_generator.dart';
 import 'domain/use_cases/visit/sync_unsynced_local_visits_use_case.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   ///Logger
 
@@ -175,6 +177,7 @@ Future<void> main() async {
   AppLog.I.d("MAIN", "Initializing global visit sync use case");
 
   runApp(const SalesRepVisitTrackerApplication());
+  FlutterNativeSplash.remove();
 }
 
 class SalesRepVisitTrackerApplication extends StatefulWidget {
@@ -192,8 +195,6 @@ class _SalesRepVisitTrackerApplicationState extends State<SalesRepVisitTrackerAp
   @override
   void initState() {
     toastStream = GlobalToastMessage().toastStream.listen((toast) => toast.show());
-
-    //TODO: Fix remove unnecessary initial message
     connectivityStream = GetIt.I<ConnectivityService>().onConnectionChange.listen(
       (online) {
         GlobalToastMessage().add(
@@ -222,7 +223,6 @@ class _SalesRepVisitTrackerApplicationState extends State<SalesRepVisitTrackerAp
           child: MaterialApp(
             title: 'Visit Tracker',
             debugShowCheckedModeBanner: false,
-            //TODO: Make theme dynamic and listenable
             themeMode: themeMode,
             theme: lightTheme,
             darkTheme: darkTheme,

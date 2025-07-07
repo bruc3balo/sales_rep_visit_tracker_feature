@@ -17,6 +17,7 @@ class UnSyncedLocalVisitAdapter extends TypeAdapter<UnSyncedLocalVisit> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return UnSyncedLocalVisit(
+      key: fields[0] as String,
       hash: fields[1] as String,
       customerIdVisited: fields[2] as int,
       visitDate: fields[3] as DateTime,
@@ -31,7 +32,9 @@ class UnSyncedLocalVisitAdapter extends TypeAdapter<UnSyncedLocalVisit> {
   @override
   void write(BinaryWriter writer, UnSyncedLocalVisit obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
+      ..writeByte(0)
+      ..write(obj.key)
       ..writeByte(1)
       ..write(obj.hash)
       ..writeByte(2)

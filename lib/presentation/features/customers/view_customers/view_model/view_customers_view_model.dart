@@ -20,6 +20,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
   final ConnectivityService _connectivityService;
   int _localPage = 0;
   int _remotePage = 0;
+  static final int _pageSize = 20;
   final SplayTreeSet<Customer> _customers = SplayTreeSet(
     (a, b) => a.id.compareTo(b.id),
   );
@@ -62,7 +63,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
 
       var customerResult = await _remoteCustomersUseCase.execute(
         page: _remotePage,
-        pageSize: 20,
+        pageSize: _pageSize,
         order: "created_at.desc",
       );
 
@@ -72,7 +73,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
           break;
         case SuccessResult<List<Customer>>():
           _customers.addAll(customerResult.data);
-          if (customerResult.data.isNotEmpty) _remotePage++;
+          if (customerResult.data.length >= _pageSize) _remotePage++;
           break;
       }
     } finally {
@@ -90,7 +91,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
 
       var customerResult = await _localCustomersUseCase.execute(
         page: _localPage,
-        pageSize: 20,
+        pageSize: _pageSize,
       );
 
       switch (customerResult) {
@@ -99,7 +100,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
           break;
         case SuccessResult<List<Customer>>():
           _customers.addAll(customerResult.data);
-          if (customerResult.data.isNotEmpty) _localPage++;
+          if (customerResult.data.length >= _pageSize) _localPage++;
           break;
       }
     } finally {

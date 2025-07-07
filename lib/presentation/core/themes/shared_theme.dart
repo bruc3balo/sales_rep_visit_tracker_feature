@@ -40,7 +40,6 @@ ElevatedButtonThemeData get defaultButtonTheme {
   );
 }
 
-
 const PageTransitionsTheme pageTransitionsTheme = PageTransitionsTheme(
   builders: {
     TargetPlatform.android: CupertinoPageTransitionsBuilder(),

@@ -16,6 +16,8 @@ class SyncUnsyncedLocalVisitsUseCase {
   final ConnectivityService _connectivityService;
   late final StreamSubscription<bool> _connectivitySubscription;
 
+  final String _tag = "SyncUnsyncedLocalVisitsUseCase";
+
   SyncUnsyncedLocalVisitsUseCase({
     required RemoteVisitRepository remoteVisitRepository,
     required LocalUnsyncedVisitRepository localUnsyncedVisitRepository,
@@ -27,11 +29,11 @@ class SyncUnsyncedLocalVisitsUseCase {
   }
 
   Future<TaskResult<Map<UnSyncedLocalVisit, SyncStatus>>> execute() async {
-    AppLog.I.i("SyncUnsyncedLocalVisitsUseCase", "Starting sync of unsynced visits");
+    AppLog.I.i(_tag, "Starting sync of unsynced visits");
 
     var visitStatus = VisitSyncStatus();
     if (visitStatus.isSyncing) {
-      AppLog.I.w("SyncUnsyncedLocalVisitsUseCase", "Sync is already in progress");
+      AppLog.I.w(_tag, "Sync is already in progress");
       return ErrorResult(error: "Sync currently ongoing");
     }
 
@@ -44,7 +46,7 @@ class SyncUnsyncedLocalVisitsUseCase {
       visitStatus.syncing = true;
 
       do {
-        AppLog.I.d("SyncUnsyncedLocalVisitsUseCase", "Fetching unsynced visits: page $page");
+        AppLog.I.d(_tag, "Fetching unsynced visits: page $page");
 
         var visitResult = await _localUnsyncedVisitRepository.getUnsyncedVisits(
           page: page,
@@ -53,7 +55,7 @@ class SyncUnsyncedLocalVisitsUseCase {
 
         switch (visitResult) {
           case ErrorResult<List<UnSyncedLocalVisit>>():
-            AppLog.I.e("SyncUnsyncedLocalVisitsUseCase", "Failed to fetch unsynced visits", trace: visitResult.trace);
+            AppLog.I.e(_tag, "Failed to fetch unsynced visits", trace: visitResult.trace);
             return ErrorResult(
               error: visitResult.error,
               trace: visitResult.trace,
@@ -61,14 +63,13 @@ class SyncUnsyncedLocalVisitsUseCase {
             );
 
           case SuccessResult<List<UnSyncedLocalVisit>>():
-            AppLog.I.d("SyncUnsyncedLocalVisitsUseCase", "Fetched ${visitResult.data.length} unsynced visits");
+            AppLog.I.d(_tag, "Fetched ${visitResult.data.length} unsynced visits");
 
-            foundPageSizeResults = visitResult.data.length == pageSize;
+            foundPageSizeResults = visitResult.data.length >= pageSize;
             var syncResults = visitResult.data.map((v) async {
-              AppLog.I.d("SyncUnsyncedLocalVisitsUseCase", "Syncing visit hash=${v.hash}");
+              AppLog.I.d(_tag, "Syncing visit hash=${v.hash}");
 
-              return await _remoteVisitRepository
-                  .createVisit(
+              return await _remoteVisitRepository.createVisit(
                 customerIdVisited: v.customerIdVisited,
                 visitDate: v.visitDate,
                 status: VisitStatus.findByCapitalizedString(v.status)!,
@@ -76,16 +77,15 @@ class SyncUnsyncedLocalVisitsUseCase {
                 notes: v.notes,
                 activityIdsDone: v.activityIdsDone,
                 createdAt: v.createdAt,
-              )
-                  .then((createOnlineVisitResult) {
+              ).then((createOnlineVisitResult) {
                 switch (createOnlineVisitResult) {
                   case ErrorResult<void>():
-                    AppLog.I.e("SyncUnsyncedLocalVisitsUseCase", "Failed to sync visit hash=${v.hash}");
+                    AppLog.I.e(_tag, "Failed to sync visit hash=${v.hash}");
                     resultCount.putIfAbsent(v, () => SyncStatus.fail);
                     break;
                   case SuccessResult<void>():
                     _localUnsyncedVisitRepository.removeUnsyncedVisit(visit: v);
-                    AppLog.I.i("SyncUnsyncedLocalVisitsUseCase", "Successfully synced visit hash=${v.hash}");
+                    AppLog.I.i(_tag, "Successfully synced visit hash=${v.hash}");
                     resultCount.putIfAbsent(v, () => SyncStatus.success);
                     break;
                 }
@@ -98,14 +98,14 @@ class SyncUnsyncedLocalVisitsUseCase {
         page++;
       } while (foundPageSizeResults);
 
-      AppLog.I.i("SyncUnsyncedLocalVisitsUseCase", "Completed syncing visits");
+      AppLog.I.i(_tag, "Completed syncing visits");
 
       return SuccessResult(
         data: resultCount,
         message: resultCount.toString(),
       );
     } catch (e, trace) {
-      AppLog.I.e("SyncUnsyncedLocalVisitsUseCase", "Unexpected error during sync", trace: trace);
+      AppLog.I.e(_tag, "Unexpected error during sync", trace: trace);
       return ErrorResult(
         error: e.toString(),
         trace: trace,
@@ -118,17 +118,17 @@ class SyncUnsyncedLocalVisitsUseCase {
   void _syncOnConnection() {
     _connectivitySubscription = _connectivityService.onConnectionChange.listen((hasConnectivity) {
       if (!hasConnectivity) {
-        AppLog.I.w("SyncUnsyncedLocalVisitsUseCase", "No connectivity, cannot sync");
+        AppLog.I.w(_tag, "No connectivity, cannot sync");
         return;
       }
 
-      AppLog.I.i("SyncUnsyncedLocalVisitsUseCase", "Connectivity restored, attempting sync");
+      AppLog.I.i(_tag, "Connectivity restored, attempting sync");
       execute();
     });
   }
 
   Future<void> dispose() async {
-    AppLog.I.d("SyncUnsyncedLocalVisitsUseCase", "Disposing connectivity subscription");
+    AppLog.I.d(_tag, "Disposing connectivity subscription");
     await _connectivitySubscription.cancel();
   }
 }

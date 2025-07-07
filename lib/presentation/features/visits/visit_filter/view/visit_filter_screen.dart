@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
-import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models.dart';
+import 'package:sales_rep_visit_tracker_feature/domain/models/model_mapper.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/search_customers/view/search_customers_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/visit_filter/model/visit_filter_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
@@ -141,7 +141,7 @@ class VisitFilterComponent extends StatelessWidget {
                         searchActivitiesViewModel: searchActivitiesViewModel,
                         onSelect: (c) {
                           onChange(
-                            filter..activities.add(ActivityRef(c.id, c.description)),
+                            filter..activities.add(c.toRef),
                           );
                         },
                       );
@@ -167,7 +167,7 @@ class VisitFilterComponent extends StatelessWidget {
                         searchCustomersViewModel: searchCustomersViewModel,
                         onSelect: (c) {
                           onChange(
-                            filter..customer = CustomerRef(c.id, c.name),
+                            filter..customer = c.toRef,
                           );
                         },
                       );

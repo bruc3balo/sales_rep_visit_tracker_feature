@@ -5,6 +5,7 @@ import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.d
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_value_objects.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/local_database/local_unsynced_local_visit_crud.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/random_gen.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class MockLocalUnSyncedLocalVisitCrud extends Mock implements LocalUnSyncedLocalVisitCrud {}
@@ -14,8 +15,9 @@ class FakeLocalVisitHash extends Fake implements LocalVisitHash {}
 
 void main() {
   late LocalUnSyncedLocalVisitCrud crud;
-  final hash = LocalVisitHash(value: 't' * 64);
+  final hash = LocalVisitHash(value: generateRandomKey(64));
   final visit = UnSyncedLocalVisit(
+    key: generateRandomKey(15),
     visitDate: DateTime.now(),
     status: VisitStatus.pending.name.capitalize,
     location: 'Test Location',

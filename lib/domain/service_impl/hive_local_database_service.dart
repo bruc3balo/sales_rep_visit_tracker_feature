@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:math';
 
 import 'package:hive/hive.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
@@ -6,6 +7,7 @@ import 'package:sales_rep_visit_tracker_feature/data/models/local/local_value_ob
 import 'package:sales_rep_visit_tracker_feature/data/services/local_database/local_database_service.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalDatabaseService implements LocalDatabaseService {
@@ -30,9 +32,8 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     AppLog.I.i("HiveLocalDatabaseService", "getUnsyncedLocalVisits called");
     try {
       var box = await openUnsyncedBox;
-      if (box.isEmpty) return SuccessResult(data: []);
-
-      var data = box.values.skip(page * pageSize).take(pageSize).toList();
+      final pagedKeys = box.keys.toList().toPage(page: page, pageSize: pageSize);
+      final data = pagedKeys.map((e) => box.get(e)).whereType<UnSyncedLocalVisit>().toList();
       return SuccessResult(data: data);
     } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
@@ -40,13 +41,15 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
   }
 
   @override
-  Future<TaskResult<LocalVisitHash>> setLocalVisit({required UnSyncedLocalVisit visit}) async {
+  Future<TaskResult<void>> setLocalVisit({
+    required UnSyncedLocalVisit visit,
+  }) async {
     AppLog.I.i("HiveLocalDatabaseService", "setLocalVisit called");
     try {
       var box = await openUnsyncedBox;
-      var hash = visit.hash;
-      await box.put(hash, visit);
-      return SuccessResult(data: LocalVisitHash(value: hash));
+
+      await box.put(visit.key, visit);
+      return SuccessResult(data: null);
     } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
     }
@@ -67,10 +70,23 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
 
   @override
   Future<TaskResult<UnSyncedLocalVisit?>> findByHash({required LocalVisitHash hash}) async {
-    AppLog.I.i("HiveLocalDatabaseService", "findByHash called");
+    AppLog.I.i("HiveLocalDatabaseService", "findByHash called $hash");
     try {
       var box = await openUnsyncedBox;
-      var data = box.get(hash.value);
+
+      var data = box.values.where((e) => e.hash == hash.value).firstOrNull;
+      return SuccessResult(data: data);
+    } catch (e, trace) {
+      return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
+    }
+  }
+
+  @override
+  Future<TaskResult<UnSyncedLocalVisit?>> findByKey({required dynamic key}) async {
+    AppLog.I.i("HiveLocalDatabaseService", "findByKey called $key");
+    try {
+      var box = await openUnsyncedBox;
+      var data = box.get(key);
       return SuccessResult(data: data);
     } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
@@ -163,9 +179,9 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     AppLog.I.i("HiveLocalDatabaseService", "getLocalActivities called");
     try {
       var box = await openActivityBox;
-      if (box.isEmpty) return SuccessResult(data: []);
 
-      var data = box.values.skip(page * pageSize).take(pageSize).toList();
+      final pagedKeys = box.keys.toList().toPage(page: page, pageSize: pageSize);
+      final data = pagedKeys.map((e) => box.get(e)).whereType<LocalActivity>().toList();
       return SuccessResult(data: data);
     } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
@@ -205,9 +221,8 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     AppLog.I.i("HiveLocalDatabaseService", "getLocalCustomers called");
     try {
       var box = await openCustomerBox;
-      if (box.isEmpty) return SuccessResult(data: []);
-
-      var data = box.values.skip(page * pageSize).take(pageSize).toList();
+      final pagedKeys = box.keys.toList().toPage(page: page, pageSize: pageSize);
+      final data = pagedKeys.map((e) => box.get(e)).whereType<LocalCustomer>().toList();
       return SuccessResult(data: data);
     } catch (e, trace) {
       return ErrorResult(error: e.toString(), trace: trace, failure: FailureType.localDatabase);
@@ -255,9 +270,11 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     AppLog.I.i("HiveLocalDatabaseService", "searchLocalActivities called");
     try {
       var box = await openActivityBox;
-      if (box.isEmpty) return SuccessResult(data: []);
+      var data = box.values
+          .where((e) => e.description.toLowerCase().contains(likeDescription.toLowerCase()))
+          .toList()
+          .toPage<LocalActivity>(page: page, pageSize: pageSize);
 
-      var data = box.values.where((e) => e.description.toLowerCase().contains(likeDescription.toLowerCase())).skip(page * pageSize).take(pageSize).toList();
       return SuccessResult(data: data);
     } catch (e, trace) {
       return ErrorResult(
@@ -273,9 +290,11 @@ class HiveLocalDatabaseService implements LocalDatabaseService {
     AppLog.I.i("HiveLocalDatabaseService", "searchLocalCustomers called");
     try {
       var box = await openCustomerBox;
-      if (box.isEmpty) return SuccessResult(data: []);
+      var data = box.values
+          .where((e) => e.name.toLowerCase().contains(likeName.toLowerCase()))
+          .toList()
+          .toPage<LocalCustomer>(page: page, pageSize: pageSize);
 
-      var data = box.values.where((e) => e.name.toLowerCase().contains(likeName.toLowerCase())).skip(page * pageSize).take(pageSize).toList();
       AppLog.I.i("HiveLocalDatabaseService", "${data.length} customers for $likeName");
       return SuccessResult(data: data);
     } catch (e, trace) {

@@ -21,6 +21,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
 
   int _remotePage = 0;
   int _localPage = 0;
+  static final int _pageSize = 20;
   final SplayTreeSet<Activity> _activities = SplayTreeSet(
     (a, b) => a.id.compareTo(b.id),
   );
@@ -62,7 +63,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
       notifyListeners();
 
       var activityResult = await _remoteActivitiesUseCase.execute(
-          page: _remotePage, pageSize: 20, order: "created_at.desc"
+          page: _remotePage, pageSize: _pageSize, order: "created_at.desc"
       );
 
       switch (activityResult) {
@@ -76,7 +77,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
           break;
         case SuccessResult<List<Activity>>():
           _activities.addAll(activityResult.data);
-          if(activityResult.data.isNotEmpty) _remotePage++;
+          if(activityResult.data.length >= _pageSize) _remotePage++;
           break;
       }
     } finally {
@@ -93,7 +94,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
       notifyListeners();
 
       var activityResult = await _localActivitiesUseCase.execute(
-          page: _localPage, pageSize: 20,
+          page: _localPage, pageSize: _pageSize,
       );
 
       switch (activityResult) {
@@ -103,7 +104,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
           break;
         case SuccessResult<List<Activity>>():
           _activities.addAll(activityResult.data);
-          if(activityResult.data.isNotEmpty) _localPage++;
+          if(activityResult.data.length >= _pageSize) _localPage++;
           break;
       }
     } finally {

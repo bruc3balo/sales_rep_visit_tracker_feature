@@ -8,7 +8,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalUnsyncedVisitRepository extends LocalUnsyncedVisitRepository {
   final LocalUnSyncedLocalVisitCrud _localUnSyncedLocalVisitCrud;
-  final StreamController<void> _visitAddedStream = StreamController.broadcast();
+  final StreamController<UnSyncedLocalVisit?> _visitAddedStream = StreamController.broadcast();
   static const _tag = "HiveLocalUnsyncedVisitRepository";
 
   HiveLocalUnsyncedVisitRepository({
@@ -25,11 +25,15 @@ class HiveLocalUnsyncedVisitRepository extends LocalUnsyncedVisitRepository {
   }
 
   @override
-  Future<TaskResult<void>> setUnsyncedVisit({required UnSyncedLocalVisit visit}) async {
+  Future<TaskResult<void>> setUnsyncedVisit({
+    required UnSyncedLocalVisit visit,
+  }) async {
     AppLog.I.i(_tag, "setUnsyncedVisit(hash: ${visit.hash})");
-    var result = await _localUnSyncedLocalVisitCrud.setLocalVisit(visit: visit);
+    var result = await _localUnSyncedLocalVisitCrud.setLocalVisit(
+      visit: visit,
+    );
     if (result is SuccessResult<void>) {
-      _visitAddedStream.add(null);
+      _visitAddedStream.add(visit);
       AppLog.I.i(_tag, "Visit added and stream notified");
     }
     return result;
@@ -53,6 +57,12 @@ class HiveLocalUnsyncedVisitRepository extends LocalUnsyncedVisitRepository {
   }
 
   @override
+  Future<TaskResult<UnSyncedLocalVisit?>> findByKey({required dynamic key}) async {
+    AppLog.I.i(_tag, "findByKey(hash: $key)");
+    return await _localUnSyncedLocalVisitCrud.findByKey(key: key);
+  }
+
+  @override
   Future<TaskResult<int>> countUnsyncedVisits() async {
     AppLog.I.i(_tag, "countUnsyncedVisits()");
     return await _localUnSyncedLocalVisitCrud.countUnsyncedVisits();
@@ -70,7 +80,7 @@ class HiveLocalUnsyncedVisitRepository extends LocalUnsyncedVisitRepository {
   }
 
   @override
-  Stream<void> get unsyncedVisitUpdatedStream {
+  Stream<UnSyncedLocalVisit?> get unsyncedVisitUpdatedStream {
     AppLog.I.i(_tag, "Accessed unsyncedVisitUpdatedStream");
     return _visitAddedStream.stream;
   }

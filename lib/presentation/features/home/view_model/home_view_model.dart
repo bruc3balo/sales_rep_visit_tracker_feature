@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/sync_status.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/visit/count_unsynced_visit_use_case.dart';
@@ -12,6 +13,7 @@ class HomeViewModel extends ChangeNotifier {
   final CountUnsyncedVisitsUseCase _countUnsyncedVisitsUseCase;
   final List<HomePages> homePages = UnmodifiableListView(HomePages.values);
   late final StreamSubscription<void> _countUpdatedSubscription;
+  late final StreamSubscription<bool> _syncSubscription;
 
   HomePages _currentPage = HomePages.visits;
   CountHomeVisitsState _visitCountState = LoadedCountVisitState(
@@ -31,6 +33,10 @@ class HomeViewModel extends ChangeNotifier {
   void initializeViewModel() {
     _countUnsyncedVisits();
     _countUpdatedSubscription = _countUnsyncedVisitsUseCase.onUpdatedStream.listen((_) async => await _countUnsyncedVisits());
+    _syncSubscription = VisitSyncStatus().syncStream.listen((isSyncing) {
+      if(isSyncing) return;
+      _countUnsyncedVisits();
+    });
   }
 
   void changePage(int pageIndex) {
@@ -72,6 +78,7 @@ class HomeViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _countUpdatedSubscription.cancel();
+    _syncSubscription.cancel();
     super.dispose();
   }
 
