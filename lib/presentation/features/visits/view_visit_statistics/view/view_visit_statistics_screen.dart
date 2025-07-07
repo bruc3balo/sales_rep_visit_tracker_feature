@@ -5,6 +5,7 @@ import 'package:sales_rep_visit_tracker_feature/domain/models/aggregation_models
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/components/loader.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view/activity_heatmap_stats.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view/today_visit_stats.dart';
+import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view/top_activities_stats.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view/top_customers_stats.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/view_visit_statistics/view/visit_pie_chart.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/core/ui/extensions/extensions.dart';
@@ -68,6 +69,13 @@ class ViewVisitStatisticsScreen extends StatelessWidget {
 
                 case StatisticType.top5Customers:
                   return TopNCustomerStatistics(
+                    topN: statisticsViewModel.topN,
+                    state: statisticsViewModel.topNCustomersState,
+                    calculateRemoteStatistics: statisticsViewModel.calculateCompletedVisitsStatistics,
+                  );
+
+                  case StatisticType.top5Activities:
+                  return TopNActivityStatistics(
                     topN: statisticsViewModel.topN,
                     state: statisticsViewModel.topNCustomersState,
                     calculateRemoteStatistics: statisticsViewModel.calculateCompletedVisitsStatistics,
@@ -341,6 +349,60 @@ class TopNCustomerStatistics extends StatelessWidget {
             Expanded(
               child: TopCustomersStats(
                 stats: stats.customer,
+              ),
+            ),
+            ListTile(
+              title: Text("Last Calculated"),
+              subtitle: Text(DateTime.now().humanReadable),
+              trailing: IconButton(
+                onPressed: calculateRemoteStatistics,
+                icon: Icon(Icons.refresh),
+              ),
+            ),
+          ],
+        );
+    }
+  }
+}
+
+class TopNActivityStatistics extends StatelessWidget {
+  const TopNActivityStatistics({
+    required this.topN,
+    required this.state,
+    required this.calculateRemoteStatistics,
+    super.key,
+  });
+
+  final int topN;
+  final CompletedVisitStatisticsState state;
+  final Function() calculateRemoteStatistics;
+
+  @override
+  Widget build(BuildContext context) {
+    var state = this.state;
+    switch (state) {
+      case LoadingCompletedStatistics():
+        return InfiniteLoader();
+
+      case LoadedCompletedStatistics():
+        var stats = state.stats;
+
+        if (stats == null) {
+          return IconButton(
+            onPressed: calculateRemoteStatistics,
+            icon: Icon(Icons.refresh),
+          );
+        }
+
+        return Flex(
+          direction: Axis.vertical,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: TopActivitiesStats(
+                stats: stats.activity,
+                n: topN,
               ),
             ),
             ListTile(

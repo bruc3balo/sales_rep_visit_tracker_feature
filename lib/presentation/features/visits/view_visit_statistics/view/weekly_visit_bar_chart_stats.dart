@@ -45,6 +45,14 @@ class WeeklyVisitsBarChart extends StatelessWidget {
             barGroups: barGroups,
             titlesData: FlTitlesData(
               leftTitles: AxisTitles(
+                axisNameWidget: Text(
+                  "Visit count",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
+                axisNameSize: 22,
                 sideTitles: SideTitles(
                   showTitles: true,
                   getTitlesWidget: (value, _) => Text(
@@ -52,12 +60,20 @@ class WeeklyVisitsBarChart extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
-                      color: Colors.black,
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                 ),
               ),
               bottomTitles: AxisTitles(
+                axisNameWidget: Text(
+                  "Day of week",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                ),
+                axisNameSize: 22,
                 sideTitles: SideTitles(
                   showTitles: true,
                   getTitlesWidget: (value, _) {

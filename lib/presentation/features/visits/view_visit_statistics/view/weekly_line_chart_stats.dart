@@ -81,6 +81,10 @@ class WeeklyVisitsLineChart extends StatelessWidget {
                 lineBarsData: lineBars,
                 titlesData: FlTitlesData(
                   bottomTitles: AxisTitles(
+                    axisNameWidget: Text(
+                      "Day of week",
+                      style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.secondary),
+                    ),
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, _) {
@@ -94,6 +98,10 @@ class WeeklyVisitsLineChart extends StatelessWidget {
                     ),
                   ),
                   leftTitles: AxisTitles(
+                    axisNameWidget: Text(
+                      "Visit count",
+                      style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.secondary),
+                    ),
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, _) => Text(value.toInt().toString(), style: const TextStyle(fontSize: 10)),

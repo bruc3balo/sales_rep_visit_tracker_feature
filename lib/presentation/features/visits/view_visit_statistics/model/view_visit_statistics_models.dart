@@ -52,6 +52,7 @@ enum StatisticType {
   totalStatusDistribution(label: "Total status distribution"),
   top5Customers(label: "Top 5 customers"),
   activityHeatMap(label: "Activity heat map"),
+  top5Activities(label: "Top 5 activities"),
   todayVisits(label: "Today's visits");
 
   final String label;

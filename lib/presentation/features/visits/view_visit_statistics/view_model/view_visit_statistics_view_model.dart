@@ -40,11 +40,12 @@ class ViewVisitStatisticsViewModel extends ChangeNotifier {
         _getLocalVisitStatisticsUseCase = getLocalVisitStatisticsUseCase,
         _getRemoteDailyVisitStatisticsUseCase = getRemoteDailyVisitStatisticsUseCase,
         _getRemoteWeeklyVisitStatisticsUseCase = getRemoteWeeklyVisitStatisticsUseCase {
-    getLocalVisitStatusStatistics();
-    calculateRemoteVisitStatusStatistics();
-    calculateWeeklyVisitStatusStatistics();
-    calculateCompletedVisitsStatistics();
-    calculateDailyVisitStatusStatistics();
+    Future.wait([
+      getLocalVisitStatusStatistics(),
+      calculateWeeklyVisitStatusStatistics(),
+      calculateCompletedVisitsStatistics(),
+      calculateDailyVisitStatusStatistics(),
+    ]);
   }
 
   DailyStatisticsState get dailyStatusState => _dailyStatusState;
@@ -102,7 +103,6 @@ class ViewVisitStatisticsViewModel extends ChangeNotifier {
           break;
         case SuccessResult<VisitStatisticsModel>():
           _visitStatusState = LoadedVisitStatistics(stats: statsResults.data);
-
           break;
       }
     } finally {
@@ -177,5 +177,4 @@ class ViewVisitStatisticsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
 }
