@@ -55,12 +55,12 @@ void main() {
       expect(result is SuccessResult<UnSyncedLocalVisit?>, true);
     });
 
-    test('setLocalVisit returns hash', () async {
+    test('setLocalVisit returns success', () async {
       when(() => crud.setLocalVisit(visit: any(named: 'visit')))
-          .thenAnswer((_) async => SuccessResult(data: hash));
+          .thenAnswer((_) async => SuccessResult(data: null));
 
       final result = await crud.setLocalVisit(visit: visit);
-      expect(result is SuccessResult<LocalVisitHash>, true);
+      expect(result is SuccessResult<void>, true);
     });
 
     test('getUnsyncedLocalVisits returns list', () async {
