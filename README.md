@@ -56,6 +56,10 @@ For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
 13. fluttertoast: ^8.2.10
 14. fl_chart: ^0.71.0
 15. dots_indicator: ^4.0.1
+16. flutter_secure_storage: ^9.2.4
+17. logger: ^2.6.0
+18. flutter_native_splash: ^2.4.4
+19. loading_animation_widget: ^1.3.0
 
 # N/B
 * Dart code indenture used is **150** **_Each line communicates something_**
@@ -107,4 +111,17 @@ Splash screen
 Icons
 ```bash
   flutter pub run flutter_launcher_icons
+```
+
+
+# CI/CD
+
+Tag the commit
+```bash
+    git tag v.*
+```
+
+Push the tag to the remote repo
+```bash
+    git push origin v.*
 ```
