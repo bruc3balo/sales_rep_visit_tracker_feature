@@ -39,6 +39,93 @@ You may **not**:
 
 For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
 
+## Screenshots
+
+# Screenshots
+
+<details>
+  <summary><strong>Visits</strong></summary>
+
+- **Past Visits**
+    - ![Dark Mode](./docs/images/past_visits_dark_mode.png "Past Visits Dark Mode")
+    - ![Light Mode](./docs/images/past_visits_light_mode.png "Past Visits Light Mode")
+
+- **Today's Visits**
+    - ![Dark Mode](./docs/images/todays_visit_dark_mode.png "Today's Visit Dark Mode")
+    - ![Light Mode](./docs/images/todays_visit_light_mode.png "Today's Visit Light Mode")
+
+- **Filter Visits**
+    - ![Dark Mode](./docs/images/filter_visit_dark_mode.png "Filter Visit Dark Mode")
+    - ![Light Mode](./docs/images/filter_visits_light_mode.png "Filter Visits Light Mode")
+
+- **Exit Confirmation**
+    - ![Dark Mode](./docs/images/exit_confirmation.png "Exit Confirmation Dark Mode")
+    - ![Light Mode](./docs/images/exit_confirmation_light_mode.png "Exit Confirmation Light Mode")
+</details>
+
+---
+
+<details>
+  <summary><strong>Activities</strong></summary>
+
+- **Activity Heat Map**
+    - ![Dark Mode](./docs/images/activity_heat_map_dark_mode.png "Activity Heat Map Dark Mode")
+    - ![Light Mode](./docs/images/activity_heat_map_light_mode.png "Activity Heat Map Light Mode")
+
+- **Top 5 Activities**
+    - ![Dark Mode](./docs/images/top_5_activities_dark_mode.png "Top 5 Activities Dark Mode")
+    - ![Light Mode](./docs/images/top_5_activities_light_mode.png "Top 5 Activities Light Mode")
+
+- **New Activity**
+    - ![Dark Mode](./docs/images/new_activity_dark_mode.png "New Activity Dark Mode")
+    - ![Light Mode](./docs/images/new_activity_light_mode.png "New Activity Light Mode")
+
+- **Delete/Edit Activity**
+    - ![Delete - Dark](./docs/images/delete_activity_dark_mode.png "Delete Activity Dark Mode")
+    - ![Delete Dismiss - Light](./docs/images/delete_dismiss_activity_light_mode.png "Delete Dismiss Activity Light Mode")
+    - ![Deleting - Light](./docs/images/deleting_activity_light_mode.png "Deleting Activity Light Mode")
+    - ![Edit Dismiss - Dark](./docs/images/edit_dismiss_activity_dark_mode.png "Edit Dismiss Activity Dark Mode")
+    - ![Edit Dismiss - Light](./docs/images/edit_dismiss_activity_light_mode.png "Edit Dismiss Activity Light Mode")
+</details>
+
+---
+
+<details>
+  <summary><strong>Customers</strong></summary>
+
+- **Customer Management (Light Mode)**
+    - ![Video](./docs/images/customer_management_light_mode.mp4 "Customer Management Light Mode")
+
+- **Customers**
+    - ![Dark Mode](./docs/images/customers_dark_mode.png "Customers Dark Mode")
+    - ![Light Mode](./docs/images/customers_light_mode.png "Customers Light Mode")
+
+- **New Customer**
+    - ![Dark Mode](./docs/images/new_customer_dark_mode.png "New Customer Dark Mode")
+    - ![Light Mode](./docs/images/new_customer_light_mode.png "New Customer Light Mode")
+
+- **Top 5 Customers**
+    - ![Dark Mode](./docs/images/top_5_customers_dark_mode.png "Top 5 Customers Dark Mode")
+    - ![Light Mode](./docs/images/top_5_customers_light_mode.png "Top 5 Customers Light Mode")
+</details>
+
+---
+
+<details>
+  <summary><strong>7-Day Summary</strong></summary>
+
+- **Visits & Status**
+    - ![Visits - Dark](./docs/images/last_7_days_visit_dark_mode.png "Last 7 Days Visit Dark Mode")
+    - ![Status - Dark](./docs/images/last_7_days_status_dark_mode.png "Last 7 Days Status Dark Mode")
+    - ![Status - Light](./docs/images/last_7_days_statys_light_mode.png "Last 7 Days Status Light Mode")
+    - ![Summary - Light](./docs/images/last_7_days_light_mode.png "Last 7 Days Light Mode")
+
+- **Total Status Distribution**
+    - ![Dark Mode](./docs/images/total_status_distribution_dark_mode.png "Total Status Distribution Dark Mode")
+    - ![Light Mode](./docs/images/total_status_distribution_light_mode.png "Total Status Distribution Light Mode")
+</details>
+
+
 # Dependencies used
 
 1. Dart (3.6.0)
@@ -95,13 +182,16 @@ HIVE_ENCRYPTION_KEY_NAME=${HIVE_ENCRYPTION_KEY_NAME}
 ```
 
 # CI/CD
+Tag the commit
 ```bash
-    git tag v.1.0
+    git tag v.*
 ```
 
+Push the tag to the remote repo
 ```bash
-    git push origin v.1.0
+    git push origin v.*
 ```
+
 
 Splash screen
 ```bash
@@ -114,14 +204,5 @@ Icons
 ```
 
 
-# CI/CD
 
-Tag the commit
-```bash
-    git tag v.*
-```
 
-Push the tag to the remote repo
-```bash
-    git push origin v.*
-```
