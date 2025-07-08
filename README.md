@@ -41,26 +41,24 @@ For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
 
 ## Screenshots
 
-# Screenshots
-
 <details>
   <summary><strong>Visits</strong></summary>
 
 - **Past Visits**
-    - ![Dark Mode](./docs/images/past_visits_dark_mode.png "Past Visits Dark Mode")
-    - ![Light Mode](./docs/images/past_visits_light_mode.png "Past Visits Light Mode")
+    - <img src="./docs/images/past_visits_dark_mode.png" alt="Past Visits Dark Mode" width="25%" />
+    - <img src="./docs/images/past_visits_light_mode.png" alt="Past Visits Light Mode" width="25%" />
 
 - **Today's Visits**
-    - ![Dark Mode](./docs/images/todays_visit_dark_mode.png "Today's Visit Dark Mode")
-    - ![Light Mode](./docs/images/todays_visit_light_mode.png "Today's Visit Light Mode")
+    - <img src="./docs/images/todays_visit_dark_mode.png" alt="Today's Visit Dark Mode" width="25%" />
+    - <img src="./docs/images/todays_visit_light_mode.png" alt="Today's Visit Light Mode" width="25%" />
 
 - **Filter Visits**
-    - ![Dark Mode](./docs/images/filter_visit_dark_mode.png "Filter Visit Dark Mode")
-    - ![Light Mode](./docs/images/filter_visits_light_mode.png "Filter Visits Light Mode")
+    - <img src="./docs/images/filter_visit_dark_mode.png" alt="Filter Visit Dark Mode" width="25%" />
+    - <img src="./docs/images/filter_visits_light_mode.png" alt="Filter Visits Light Mode" width="25%" />
 
 - **Exit Confirmation**
-    - ![Dark Mode](./docs/images/exit_confirmation.png "Exit Confirmation Dark Mode")
-    - ![Light Mode](./docs/images/exit_confirmation_light_mode.png "Exit Confirmation Light Mode")
+    - <img src="./docs/images/exit_confirmation.png" alt="Exit Confirmation Dark Mode" width="25%" />
+    - <img src="./docs/images/exit_confirmation_light_mode.png" alt="Exit Confirmation Light Mode" width="25%" />
 </details>
 
 ---
@@ -69,23 +67,23 @@ For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
   <summary><strong>Activities</strong></summary>
 
 - **Activity Heat Map**
-    - ![Dark Mode](./docs/images/activity_heat_map_dark_mode.png "Activity Heat Map Dark Mode")
-    - ![Light Mode](./docs/images/activity_heat_map_light_mode.png "Activity Heat Map Light Mode")
+    - <img src="./docs/images/activity_heat_map_dark_mode.png" alt="Activity Heat Map Dark Mode" width="25%" />
+    - <img src="./docs/images/activity_heat_map_light_mode.png" alt="Activity Heat Map Light Mode" width="25%" />
 
 - **Top 5 Activities**
-    - ![Dark Mode](./docs/images/top_5_activities_dark_mode.png "Top 5 Activities Dark Mode")
-    - ![Light Mode](./docs/images/top_5_activities_light_mode.png "Top 5 Activities Light Mode")
+    - <img src="./docs/images/top_5_activities_dark_mode.png" alt="Top 5 Activities Dark Mode" width="25%" />
+    - <img src="./docs/images/top_5_activities_light_mode.png" alt="Top 5 Activities Light Mode" width="25%" />
 
 - **New Activity**
-    - ![Dark Mode](./docs/images/new_activity_dark_mode.png "New Activity Dark Mode")
-    - ![Light Mode](./docs/images/new_activity_light_mode.png "New Activity Light Mode")
+    - <img src="./docs/images/new_activity_dark_mode.png" alt="New Activity Dark Mode" width="25%" />
+    - <img src="./docs/images/new_activity_light_mode.png" alt="New Activity Light Mode" width="25%" />
 
 - **Delete/Edit Activity**
-    - ![Delete - Dark](./docs/images/delete_activity_dark_mode.png "Delete Activity Dark Mode")
-    - ![Delete Dismiss - Light](./docs/images/delete_dismiss_activity_light_mode.png "Delete Dismiss Activity Light Mode")
-    - ![Deleting - Light](./docs/images/deleting_activity_light_mode.png "Deleting Activity Light Mode")
-    - ![Edit Dismiss - Dark](./docs/images/edit_dismiss_activity_dark_mode.png "Edit Dismiss Activity Dark Mode")
-    - ![Edit Dismiss - Light](./docs/images/edit_dismiss_activity_light_mode.png "Edit Dismiss Activity Light Mode")
+    - <img src="./docs/images/delete_activity_dark_mode.png" alt="Delete Activity Dark Mode" width="25%" />
+    - <img src="./docs/images/delete_dismiss_activity_light_mode.png" alt="Delete Dismiss Activity Light Mode" width="25%" />
+    - <img src="./docs/images/deleting_activity_light_mode.png" alt="Deleting Activity Light Mode" width="25%" />
+    - <img src="./docs/images/edit_dismiss_activity_dark_mode.png" alt="Edit Dismiss Activity Dark Mode" width="25%" />
+    - <img src="./docs/images/edit_dismiss_activity_light_mode.png" alt="Edit Dismiss Activity Light Mode" width="25%" />
 </details>
 
 ---
@@ -94,19 +92,19 @@ For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
   <summary><strong>Customers</strong></summary>
 
 - **Customer Management (Light Mode)**
-    - ![Video](./docs/images/customer_management_light_mode.mp4 "Customer Management Light Mode")
+    - <video src="./docs/images/customer_management_light_mode.mp4" width="25%" controls>Customer Management Light Mode</video>
 
 - **Customers**
-    - ![Dark Mode](./docs/images/customers_dark_mode.png "Customers Dark Mode")
-    - ![Light Mode](./docs/images/customers_light_mode.png "Customers Light Mode")
+    - <img src="./docs/images/customers_dark_mode.png" alt="Customers Dark Mode" width="25%" />
+    - <img src="./docs/images/customers_light_mode.png" alt="Customers Light Mode" width="25%" />
 
 - **New Customer**
-    - ![Dark Mode](./docs/images/new_customer_dark_mode.png "New Customer Dark Mode")
-    - ![Light Mode](./docs/images/new_customer_light_mode.png "New Customer Light Mode")
+    - <img src="./docs/images/new_customer_dark_mode.png" alt="New Customer Dark Mode" width="25%" />
+    - <img src="./docs/images/new_customer_light_mode.png" alt="New Customer Light Mode" width="25%" />
 
 - **Top 5 Customers**
-    - ![Dark Mode](./docs/images/top_5_customers_dark_mode.png "Top 5 Customers Dark Mode")
-    - ![Light Mode](./docs/images/top_5_customers_light_mode.png "Top 5 Customers Light Mode")
+    - <img src="./docs/images/top_5_customers_dark_mode.png" alt="Top 5 Customers Dark Mode" width="25%" />
+    - <img src="./docs/images/top_5_customers_light_mode.png" alt="Top 5 Customers Light Mode" width="25%" />
 </details>
 
 ---
@@ -115,14 +113,14 @@ For other uses, please contact [**Bruce Omukoko**](https://bruc3balo.github.io)
   <summary><strong>7-Day Summary</strong></summary>
 
 - **Visits & Status**
-    - ![Visits - Dark](./docs/images/last_7_days_visit_dark_mode.png "Last 7 Days Visit Dark Mode")
-    - ![Status - Dark](./docs/images/last_7_days_status_dark_mode.png "Last 7 Days Status Dark Mode")
-    - ![Status - Light](./docs/images/last_7_days_statys_light_mode.png "Last 7 Days Status Light Mode")
-    - ![Summary - Light](./docs/images/last_7_days_light_mode.png "Last 7 Days Light Mode")
+    - <img src="./docs/images/last_7_days_visit_dark_mode.png" alt="Last 7 Days Visit Dark Mode" width="25%" />
+    - <img src="./docs/images/last_7_days_status_dark_mode.png" alt="Last 7 Days Status Dark Mode" width="25%" />
+    - <img src="./docs/images/last_7_days_statys_light_mode.png" alt="Last 7 Days Status Light Mode" width="25%" />
+    - <img src="./docs/images/last_7_days_light_mode.png" alt="Last 7 Days Light Mode" width="25%" />
 
 - **Total Status Distribution**
-    - ![Dark Mode](./docs/images/total_status_distribution_dark_mode.png "Total Status Distribution Dark Mode")
-    - ![Light Mode](./docs/images/total_status_distribution_light_mode.png "Total Status Distribution Light Mode")
+    - <img src="./docs/images/total_status_distribution_dark_mode.png" alt="Total Status Distribution Dark Mode" width="25%" />
+    - <img src="./docs/images/total_status_distribution_light_mode.png" alt="Total Status Distribution Light Mode" width="25%" />
 </details>
 
 
