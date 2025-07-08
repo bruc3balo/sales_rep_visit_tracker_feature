@@ -45,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      onPopInvokedWithResult: (_, __) {
-        showDialog(
+      onPopInvokedWithResult: (_, __) async {
+        return showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(

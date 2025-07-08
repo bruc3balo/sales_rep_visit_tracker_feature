@@ -1,6 +1,6 @@
 import 'package:sales_rep_visit_tracker_feature/data/utils/extensions.dart';
 
-class Customer {
+class Customer implements Comparable<Customer>{
   final int id;
   final String name;
   final DateTime createdAt;
@@ -26,9 +26,16 @@ class Customer {
       'createdAt': createdAt.toIso8601String(),
     };
   }
+
+  @override
+  int compareTo(Customer other) {
+    final createdAtComparison = createdAt.compareTo(other.createdAt);
+    if (createdAtComparison != 0) return createdAtComparison;
+    return id.compareTo(other.id);
+  }
 }
 
-class Activity {
+class Activity implements Comparable<Activity>{
   final int id;
   final String description;
   final DateTime createdAt;
@@ -38,6 +45,17 @@ class Activity {
     required this.description,
     required this.createdAt,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Activity &&
+              runtimeType == other.runtimeType &&
+              id == other.id &&
+              createdAt == other.createdAt;
+
+  @override
+  int get hashCode => id.hashCode ^ createdAt.hashCode;
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
@@ -53,6 +71,13 @@ class Activity {
       'description': description,
       'createdAt': createdAt.toIso8601String(),
     };
+  }
+
+  @override
+  int compareTo(Activity other) {
+    final createdAtComparison = createdAt.compareTo(other.createdAt);
+    if (createdAtComparison != 0) return createdAtComparison;
+    return id.compareTo(other.id);
   }
 }
 

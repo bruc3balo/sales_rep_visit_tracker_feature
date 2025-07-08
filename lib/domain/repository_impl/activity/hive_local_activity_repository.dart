@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain_local_mapper.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
@@ -8,6 +10,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalActivityRepository extends LocalActivityRepository {
   final LocalActivityCrud _localActivityCrud;
+  final StreamController<Activity> _onActivitySetController = StreamController.broadcast();
 
   HiveLocalActivityRepository({
     required LocalActivityCrud localActivityCrud,
@@ -45,7 +48,17 @@ class HiveLocalActivityRepository extends LocalActivityRepository {
     required Activity activity,
   }) async {
     AppLog.I.i(_tag, "setLocalActivity(activity: ${activity.id})");
-    return await _localActivityCrud.setLocalActivity(activity: activity.toLocal);
+    var result = await _localActivityCrud.setLocalActivity(activity: activity.toLocal);
+
+    switch (result) {
+      case ErrorResult<void>():
+        break;
+      case SuccessResult<void>():
+        _onActivitySetController.add(activity);
+        break;
+    }
+
+    return result;
   }
 
   @override
@@ -53,9 +66,19 @@ class HiveLocalActivityRepository extends LocalActivityRepository {
     required List<Activity> activities,
   }) async {
     AppLog.I.i(_tag, "setLocalActivities(activities count: ${activities.length})");
-    return await _localActivityCrud.setLocalActivities(
+    var result = await _localActivityCrud.setLocalActivities(
       activities: activities.map((e) => e.toLocal).toList(),
     );
+
+    switch (result) {
+      case ErrorResult<void>():
+        break;
+      case SuccessResult<void>():
+        activities.forEach(_onActivitySetController.add);
+        break;
+    }
+
+    return result;
   }
 
   @override
@@ -110,4 +133,7 @@ class HiveLocalActivityRepository extends LocalActivityRepository {
         return SuccessResult(data: result.data.map((a) => a.toDomain).toList());
     }
   }
+
+  @override
+  Stream<Activity> get onActivitySetStream => _onActivitySetController.stream;
 }

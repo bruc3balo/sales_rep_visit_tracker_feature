@@ -14,6 +14,9 @@ class ViewLocalCustomersUseCase {
     required LocalCustomerRepository localCustomerRepository,
   }) : _localCustomerRepository = localCustomerRepository;
 
+
+  Stream<Customer> get customerSetStream => _localCustomerRepository.onCustomerSetStream;
+
   Future<TaskResult<List<Customer>>> execute({
     required int page,
     required int pageSize,

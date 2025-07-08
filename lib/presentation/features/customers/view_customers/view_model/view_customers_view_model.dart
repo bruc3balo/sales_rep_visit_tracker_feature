@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/repositories/customer/remote_customer_repository.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/connectivity_service.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
 import 'package:sales_rep_visit_tracker_feature/domain/use_cases/customer/delete_customer_use_case.dart';
@@ -18,12 +19,13 @@ class ViewCustomersViewModel extends ChangeNotifier {
   final ViewLocalCustomersUseCase _localCustomersUseCase;
   final DeleteCustomerUseCase _deleteCustomerUseCase;
   final ConnectivityService _connectivityService;
+  late final StreamSubscription<Customer> _customerSubscription;
+
   int _localPage = 0;
   int _remotePage = 0;
   static final int _pageSize = 20;
-  final SplayTreeSet<Customer> _customers = SplayTreeSet(
-    (a, b) => a.id.compareTo(b.id),
-  );
+  static final _tag = "ViewCustomersViewModel";
+  final SplayTreeSet<Customer> _customers = SplayTreeSet();
   ViewCustomersState _itemsState = LoadedViewCustomerState();
   DeleteCustomerState _deleteState = InitialDeleteCustomerState();
 
@@ -37,6 +39,7 @@ class ViewCustomersViewModel extends ChangeNotifier {
         _connectivityService = connectivityService,
         _deleteCustomerUseCase = deleteCustomerUseCase {
     loadMoreItems();
+    _subscribeToCustomerUpdates();
   }
 
   ViewCustomersState get itemsState => _itemsState;
@@ -138,7 +141,6 @@ class ViewCustomersViewModel extends ChangeNotifier {
           GlobalToastMessage().add(SuccessMessage(message: result.message));
           break;
       }
-
     } finally {
       _deleteState = InitialDeleteCustomerState();
       notifyListeners();
@@ -151,5 +153,25 @@ class ViewCustomersViewModel extends ChangeNotifier {
     _remotePage = 0;
     _customers.clear();
     loadMoreItems();
+  }
+
+  void _subscribeToCustomerUpdates() {
+    AppLog.I.d(_tag, "Subscribing to local customer updates");
+    _customerSubscription = _localCustomersUseCase.customerSetStream.listen((customer) {
+      _customers.removeWhere((c) => c.id == customer.id);
+      _customers.add(customer);
+      notifyListeners();
+    });
+  }
+
+  void _unSubscribeFromCustomerUpdates() {
+    AppLog.I.d(_tag, "Unsubscribing from local customer updates");
+    _customerSubscription.cancel();
+  }
+
+  @override
+  void dispose() {
+    _unSubscribeFromCustomerUpdates();
+    super.dispose();
   }
 }

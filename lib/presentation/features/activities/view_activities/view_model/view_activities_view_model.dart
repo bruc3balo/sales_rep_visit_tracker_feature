@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/services/connectivity/connectivity_service.dart';
+import 'package:sales_rep_visit_tracker_feature/data/utils/app_log.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/exception_utils.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 import 'package:sales_rep_visit_tracker_feature/data/utils/toast_message.dart';
@@ -18,13 +19,14 @@ class ViewActivitiesViewModel extends ChangeNotifier {
   final ViewLocalActivitiesUseCase _localActivitiesUseCase;
   final ConnectivityService _connectivityService;
   final DeleteActivityUseCase _deleteActivityUseCase;
+  late final StreamSubscription<Activity> _activityUpdatesSubscription;
 
   int _remotePage = 0;
   int _localPage = 0;
+  static final _tag = "ViewActivitiesViewModel";
   static final int _pageSize = 20;
-  final SplayTreeSet<Activity> _activities = SplayTreeSet(
-    (a, b) => a.id.compareTo(b.id),
-  );
+  final SplayTreeSet<Activity> _activities = SplayTreeSet();
+
   ViewActivitiesState _itemsState = LoadedViewActivitiesState();
   DeleteActivityState _deleteState = InitialDeleteActivityState();
 
@@ -33,22 +35,23 @@ class ViewActivitiesViewModel extends ChangeNotifier {
     required ViewLocalActivitiesUseCase localActivitiesUseCase,
     required DeleteActivityUseCase deleteActivityUseCase,
     required ConnectivityService connectivityService,
-  }) : _remoteActivitiesUseCase = remoteActivitiesUseCase,
+  })  : _remoteActivitiesUseCase = remoteActivitiesUseCase,
         _localActivitiesUseCase = localActivitiesUseCase,
         _deleteActivityUseCase = deleteActivityUseCase,
         _connectivityService = connectivityService {
     loadMoreItems();
+    _subscribeToActivityUpdates();
   }
 
   ViewActivitiesState get itemsState => _itemsState;
 
   DeleteActivityState get deleteState => _deleteState;
-  
+
   List<Activity> get activities => UnmodifiableListView(_activities);
 
   Future<void> loadMoreItems() async {
     bool hasConnection = await _connectivityService.hasInternetConnection();
-    if(hasConnection) {
+    if (hasConnection) {
       _loadMoreRemoteItems();
     } else {
       _loadMoreLocalItems();
@@ -63,21 +66,18 @@ class ViewActivitiesViewModel extends ChangeNotifier {
       notifyListeners();
 
       var activityResult = await _remoteActivitiesUseCase.execute(
-          page: _remotePage, pageSize: _pageSize, order: "created_at.desc"
+        page: _remotePage,
+        pageSize: _pageSize,
+        order: "created_at.desc",
       );
 
       switch (activityResult) {
         case ErrorResult<List<Activity>>():
           GlobalToastMessage().add(ErrorMessage(message: activityResult.error));
-
-          if(FailureType.network == activityResult.failure) {
-            _remotePage = 0;
-          }
-
           break;
         case SuccessResult<List<Activity>>():
           _activities.addAll(activityResult.data);
-          if(activityResult.data.length >= _pageSize) _remotePage++;
+          if (activityResult.data.length >= _pageSize) _remotePage++;
           break;
       }
     } finally {
@@ -94,7 +94,8 @@ class ViewActivitiesViewModel extends ChangeNotifier {
       notifyListeners();
 
       var activityResult = await _localActivitiesUseCase.execute(
-          page: _localPage, pageSize: _pageSize,
+        page: _localPage,
+        pageSize: _pageSize,
       );
 
       switch (activityResult) {
@@ -104,7 +105,7 @@ class ViewActivitiesViewModel extends ChangeNotifier {
           break;
         case SuccessResult<List<Activity>>():
           _activities.addAll(activityResult.data);
-          if(activityResult.data.length >= _pageSize) _localPage++;
+          if (activityResult.data.length >= _pageSize) _localPage++;
           break;
       }
     } finally {
@@ -129,11 +130,10 @@ class ViewActivitiesViewModel extends ChangeNotifier {
       notifyListeners();
 
       var result = await _deleteActivityUseCase.execute(
-          activityId: activity.id,
+        activityId: activity.id,
       );
 
-      switch(result) {
-
+      switch (result) {
         case ErrorResult<void>():
           GlobalToastMessage().add(ErrorMessage(message: result.error));
           break;
@@ -143,12 +143,10 @@ class ViewActivitiesViewModel extends ChangeNotifier {
           GlobalToastMessage().add(SuccessMessage(message: result.message));
           break;
       }
-
     } finally {
       _deleteState = InitialDeleteActivityState();
       notifyListeners();
     }
-
   }
 
   Future<void> refresh() async {
@@ -159,4 +157,23 @@ class ViewActivitiesViewModel extends ChangeNotifier {
     loadMoreItems();
   }
 
+  void _subscribeToActivityUpdates() {
+    AppLog.I.d(_tag, "Subscribing to local activity updates");
+    _activityUpdatesSubscription = _localActivitiesUseCase.activityUpdateStream.listen((activity) {
+      _activities.removeWhere((e) => e.id == activity.id);
+      _activities.add(activity);
+      notifyListeners();
+    });
+  }
+
+  void _unSubscribeFromActivityUpdates() {
+    AppLog.I.d(_tag, "Unsubscribing from local activity updates");
+    _activityUpdatesSubscription.cancel();
+  }
+
+  @override
+  void dispose() {
+    _unSubscribeFromActivityUpdates();
+    super.dispose();
+  }
 }

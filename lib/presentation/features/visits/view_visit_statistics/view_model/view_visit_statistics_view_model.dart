@@ -81,6 +81,7 @@ class ViewVisitStatisticsViewModel extends ChangeNotifier {
           break;
         case SuccessResult<VisitStatisticsModel?>():
           _visitStatusState = LoadedVisitStatistics(stats: statsResults.data);
+          if(statsResults.data == null) calculateRemoteVisitStatusStatistics();
           break;
       }
     } finally {

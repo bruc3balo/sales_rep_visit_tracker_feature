@@ -51,21 +51,29 @@ class ViewVisitsScreen extends StatelessWidget {
                 replacement: Center(
                   child: Text("Go online to see past visits"),
                 ),
-                child: ListView.builder(
-                  itemCount: itemCount,
-                  itemBuilder: (context, index) {
-                    if (index >= visits.length) {
+                child: Visibility(
+                  visible: itemCount > 0,
+                  replacement: Center(
+                    child: Text(
+                      "Nothing to see here. Try something else",
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  child: ListView.builder(
+                    itemCount: itemCount,
+                    itemBuilder: (context, index) {
+                      if (index >= visits.length) {
+                        // Show InfiniteLoader if still loading
+                        if (isLoading && index == visits.length) return InfiniteLoader();
 
-                      // Show InfiniteLoader if still loading
-                      if (isLoading && index == visits.length) return InfiniteLoader();
+                        // Otherwise, show bottom spacer
+                        return const SizedBox(height: 120);
+                      }
 
-                      // Otherwise, show bottom spacer
-                      return const SizedBox(height: 120);
-                    }
-
-                    var visit = visits[index];
-                    return VisitTile(visit: visit);
-                  },
+                      var visit = visits[index];
+                      return VisitTile(visit: visit);
+                    },
+                  ),
                 ),
               ),
             ),

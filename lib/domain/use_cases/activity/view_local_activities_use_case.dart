@@ -13,6 +13,9 @@ class ViewLocalActivitiesUseCase {
     required LocalActivityRepository localActivityRepository,
   }) : _localActivityRepository = localActivityRepository;
 
+
+  Stream<Activity> get activityUpdateStream => _localActivityRepository.onActivitySetStream;
+
   Future<TaskResult<List<Activity>>> execute({
     required int page,
     required int pageSize,

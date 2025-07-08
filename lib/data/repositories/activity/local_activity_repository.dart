@@ -4,6 +4,8 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 abstract class LocalActivityRepository {
 
+  Stream<Activity> get onActivitySetStream;
+
   Future<TaskResult<void>> setLocalActivity({
     required Activity activity,
   });

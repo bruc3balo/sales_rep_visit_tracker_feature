@@ -18,7 +18,6 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/customers/
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/add_visit/view/add_visit_screen.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/update_unsynced_visit/model/update_unsynced_visit_models.dart';
 import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/update_unsynced_visit/view_model/update_unsynced_visit_view_model.dart';
-import 'package:sales_rep_visit_tracker_feature/presentation/routing/routes.dart';
 
 class UpdateUnsyncedVisitScreen extends StatefulWidget {
   const UpdateUnsyncedVisitScreen({
@@ -37,6 +36,7 @@ class UpdateUnsyncedVisitScreen extends StatefulWidget {
 }
 
 class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
+
   late final ValueNotifier<CustomerRef?> customerNotifier = ValueNotifier(
     widget.updateUnsyncedVisitViewModel.originalVisit.customer,
   );
@@ -68,16 +68,16 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
       appBar: AppBar(
         title: Text("Update Visit"),
       ),
-      body: ListenableBuilder(
-        listenable: widget.updateUnsyncedVisitViewModel,
-        builder: (_, __) {
-          var state = widget.updateUnsyncedVisitViewModel.state;
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: ListenableBuilder(
+          listenable: widget.updateUnsyncedVisitViewModel,
+          builder: (_, __) {
+            var state = widget.updateUnsyncedVisitViewModel.state;
 
-          switch (state) {
-            case InitialUpdateUnsyncedVisitState():
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: ListView(
+            switch (state) {
+              case InitialUpdateUnsyncedVisitState():
+                return ListView(
                   children: [
                     // Customer search
                     ValueListenableBuilder(
@@ -168,6 +168,9 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                           },
                           onAdd: (a) {
                             if (activityIds.contains(a.id)) return;
+
+                            //Due to filtering on selectedActivities
+                            widget.updateUnsyncedVisitViewModel.originalVisit.activityMap.putIfAbsent(a.id, ()=> a.toRef);
                             activitiesNotifier.value = List.from([...activityIds, a.id]);
                           },
                           selectedActivities:
@@ -236,27 +239,27 @@ class _UpdateUnsyncedVisitScreenState extends State<UpdateUnsyncedVisitScreen> {
                       child: const Text("Update"),
                     )
                   ],
-                ),
-              );
+                );
 
-            case LoadingUpdateUnsyncedVisitState():
-              return InfiniteLoader();
+              case LoadingUpdateUnsyncedVisitState():
+                return InfiniteLoader();
 
-            case CompletedUpdateUnsyncedVisitState():
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text("Visit updated", textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: Navigator.of(context).pop,
-                    child: const Text("Back"),
-                  )
-                ],
-              );
-          }
-        },
+              case CompletedUpdateUnsyncedVisitState():
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text("Visit updated", textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: Navigator.of(context).pop,
+                      child: const Text("Back"),
+                    )
+                  ],
+                );
+            }
+          },
+        ),
       ),
     );
   }

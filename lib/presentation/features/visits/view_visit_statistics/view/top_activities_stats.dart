@@ -16,7 +16,7 @@ class TopActivitiesStats extends StatelessWidget {
   final topN = stats.statistics.entries
       .map((entry) => MapEntry(entry.key, entry.value.length))
       .toList()
-    ..sort((a, b) => b.value.compareTo(a.value)); // Sort descending by count
+    ..sort((a, b) => b.value.compareTo(a.value));
   return topN.take(n).toList();
 }
 
@@ -24,11 +24,10 @@ class TopActivitiesStats extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: topNList().toList().asMap().entries.map((entry) {
-        final index = entry.key + 1; // 1-based index
+        final itemNumber = entry.key + 1;
         final e = entry.value;
-
         return ListTile(
-          leading: Text(index.toString()),
+          leading: Text(itemNumber.toString()),
           title: Text(e.key.description),
           trailing: CircleAvatar(
             child: Text(e.value.toString()),
@@ -37,4 +36,5 @@ class TopActivitiesStats extends StatelessWidget {
       }).toList(),
     );
   }
+
 }

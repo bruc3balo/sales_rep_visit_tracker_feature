@@ -44,114 +44,123 @@ class ViewCustomersScreen extends StatelessWidget {
           },
           child: RefreshIndicator(
             onRefresh: () => viewCustomersViewModel.refresh(),
-            child: ListView.builder(
-              itemCount: itemCount + 1, // One extra for the SizedBox
-              itemBuilder: (context, index) {
-                if (index >= customers.length) {
-                  // Show InfiniteLoader if still loading
-                  if (isLoading && index == customers.length) return InfiniteLoader();
+            child: Visibility(
+              visible: itemCount > 0,
+              replacement: Center(
+                child: Text(
+                  "Nothing to see here",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              child: ListView.builder(
+                itemCount: itemCount + 1, // One extra for the SizedBox
+                itemBuilder: (context, index) {
+                  if (index >= customers.length) {
+                    // Show InfiniteLoader if still loading
+                    if (isLoading && index == customers.length) return InfiniteLoader();
 
-                  // Otherwise, show bottom spacer
-                  return const SizedBox(height: 120);
-                }
+                    // Otherwise, show bottom spacer
+                    return const SizedBox(height: 120);
+                  }
 
-                var customer = customers[index];
+                  var customer = customers[index];
 
-                if (deleteState is LoadingDeleteCustomerState && deleteState.customer.id == customer.id) {
-                  return const Icon(
-                    Icons.auto_delete_outlined,
-                    color: Colors.red,
-                  );
-                }
+                  if (deleteState is LoadingDeleteCustomerState && deleteState.customer.id == customer.id) {
+                    return const Icon(
+                      Icons.auto_delete_outlined,
+                      color: Colors.red,
+                    );
+                  }
 
-                return Dismissible(
-                  key: ValueKey(customer.id),
-                  onDismissed: (d) {
-                    switch (d) {
-                      case DismissDirection.endToStart:
-                        viewCustomersViewModel.deleteCustomer(customer: customer);
-                        break;
-                      default:
-                        break;
-                    }
-                  },
-                  confirmDismiss: (d) async {
-                    switch (d) {
-                      case DismissDirection.endToStart:
-                        return await showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text(
-                                    'Delete Customer',
-                                    textAlign: TextAlign.center,
+                  return Dismissible(
+                    key: ValueKey(customer.id),
+                    onDismissed: (d) {
+                      switch (d) {
+                        case DismissDirection.endToStart:
+                          viewCustomersViewModel.deleteCustomer(customer: customer);
+                          break;
+                        default:
+                          break;
+                      }
+                    },
+                    confirmDismiss: (d) async {
+                      switch (d) {
+                        case DismissDirection.endToStart:
+                          return await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text(
+                                      'Delete Customer',
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    content: Text(
+                                      "Confirm deletion of '${customer.name}'",
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.secondary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(false),
+                                        child: const Text('No'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        child: const Text('Yes'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ) ??
+                              false;
+
+                        case DismissDirection.startToEnd:
+                          var updatedCustomer = await showDialog<Customer?>(
+                            context: context,
+                            builder: (context) {
+                              return EditCustomerScreen(
+                                editCustomerViewModel: EditCustomerViewModel(
+                                  customer: customer,
+                                  updateCustomerUseCase: UpdateCustomerUseCase(
+                                    remoteCustomerRepository: remoteCustomerRepository,
+                                    localCustomerRepository: localCustomerRepository,
                                   ),
-                                  content: Text(
-                                    "Confirm deletion of '${customer.name}'",
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.secondary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context).pop(false),
-                                      child: const Text('No'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop(true);
-                                      },
-                                      child: const Text('Yes'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ) ??
-                            false;
-
-                      case DismissDirection.startToEnd:
-                        var updatedCustomer = await showDialog<Customer?>(
-                          context: context,
-                          builder: (context) {
-                            return EditCustomerScreen(
-                              editCustomerViewModel: EditCustomerViewModel(
-                                customer: customer,
-                                updateCustomerUseCase: UpdateCustomerUseCase(
-                                  remoteCustomerRepository: remoteCustomerRepository,
-                                  localCustomerRepository: localCustomerRepository,
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                        if (updatedCustomer != null) {
-                          viewCustomersViewModel.updateItem(updatedCustomer);
-                        }
-                        return false;
+                              );
+                            },
+                          );
+                          if (updatedCustomer != null) {
+                            viewCustomersViewModel.updateItem(updatedCustomer);
+                          }
+                          return false;
 
-                      default:
-                        return false;
-                    }
-                  },
-                  background: Container(
-                    color: Theme.of(context).colorScheme.primary,
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.edit, color: Colors.white),
-                  ),
-                  secondaryBackground: Container(
-                    color: Colors.red,
-                    alignment: Alignment.centerRight,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: const Icon(Icons.delete, color: Colors.white),
-                  ),
-                  child: CustomerListTile(
-                    customer: customer,
-                  ),
-                );
-              },
+                        default:
+                          return false;
+                      }
+                    },
+                    background: Container(
+                      color: Theme.of(context).colorScheme.primary,
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.edit, color: Colors.white),
+                    ),
+                    secondaryBackground: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+                    child: CustomerListTile(
+                      customer: customer,
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         );

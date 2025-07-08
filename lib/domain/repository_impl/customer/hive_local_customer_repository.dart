@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:sales_rep_visit_tracker_feature/data/models/domain/domain_models.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/domain_local_mapper.dart';
 import 'package:sales_rep_visit_tracker_feature/data/models/local/local_models.dart';
@@ -8,6 +10,7 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 class HiveLocalCustomerRepository extends LocalCustomerRepository {
   final LocalCustomerCrud _localCustomerCrud;
+  final StreamController<Customer> _onCustomerSetController = StreamController.broadcast();
 
   HiveLocalCustomerRepository({
     required LocalCustomerCrud localCustomerCrud,
@@ -46,7 +49,6 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
           message: results.message,
         );
     }
-
   }
 
   @override
@@ -77,7 +79,17 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
     required Customer customer,
   }) async {
     AppLog.I.i(_tag, "setLocalCustomer(id: ${customer.id}, name: ${customer.name})");
-    return await _localCustomerCrud.setLocalCustomer(customer: customer.toLocal);
+
+    var result = await _localCustomerCrud.setLocalCustomer(customer: customer.toLocal);
+    switch (result) {
+      case ErrorResult<void>():
+        break;
+      case SuccessResult<void>():
+        _onCustomerSetController.add(customer);
+        break;
+    }
+
+    return result;
   }
 
   @override
@@ -117,8 +129,22 @@ class HiveLocalCustomerRepository extends LocalCustomerRepository {
     required List<Customer> customer,
   }) async {
     AppLog.I.i(_tag, "setLocalCustomers(count: ${customer.length})");
-    return await _localCustomerCrud.setLocalCustomers(
+
+    var result = await _localCustomerCrud.setLocalCustomers(
       customers: customer.map((c) => c.toLocal).toList(),
     );
+
+    switch (result) {
+      case ErrorResult<void>():
+        break;
+      case SuccessResult<void>():
+        customer.forEach(_onCustomerSetController.add);
+        break;
+    }
+
+    return result;
   }
+
+  @override
+  Stream<Customer> get onCustomerSetStream => _onCustomerSetController.stream;
 }

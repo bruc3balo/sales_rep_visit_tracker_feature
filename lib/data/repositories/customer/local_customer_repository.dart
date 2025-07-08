@@ -4,6 +4,8 @@ import 'package:sales_rep_visit_tracker_feature/data/utils/task_result.dart';
 
 abstract class LocalCustomerRepository {
 
+  Stream<Customer> get onCustomerSetStream;
+
   Future<TaskResult<void>> setLocalCustomer({required Customer customer});
 
   Future<TaskResult<void>> setLocalCustomers({required List<Customer> customer});

@@ -16,85 +16,89 @@ class EditActivityScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
 
-      child: ListenableBuilder(
-        listenable: editActivityViewModel,
-        builder: (_, __) {
-          var state = editActivityViewModel.state;
-            switch(state) {
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListenableBuilder(
+          listenable: editActivityViewModel,
+          builder: (_, __) {
+            var state = editActivityViewModel.state;
+              switch(state) {
 
 
-              case InitialEditActivityState():
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
+                case InitialEditActivityState():
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
 
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Update activity",
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        title: Text("Update description"),
-                        subtitle: TextFormField(
-                          controller: descriptionController..text = state.activity.description,
-                          decoration: InputDecoration(
-                            hintText: state.activity.description,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Update activity",
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),
-                    ),
 
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          String description = descriptionController.text;
-                          if(description.isEmpty) return;
-
-                          editActivityViewModel.editActivity(description);
-                        },
-                        child: Text("Update"),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListTile(
+                          title: Text("Update description"),
+                          subtitle: TextFormField(
+                            controller: descriptionController..text = state.activity.description,
+                            decoration: InputDecoration(
+                              hintText: state.activity.description,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
 
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: TextButton(
-                        onPressed: Navigator.of(context).pop,
-                        child: Text("Close", style: TextStyle(color: Colors.red),),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            String description = descriptionController.text;
+                            if(description.isEmpty) return;
+
+                            editActivityViewModel.editActivity(description);
+                          },
+                          child: Text("Update"),
+                        ),
                       ),
-                    ),
 
-                  ],
-                );
-              case LoadingEditActivityState():
-                return InfiniteLoader();
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextButton(
+                          onPressed: Navigator.of(context).pop,
+                          child: Text("Close", style: TextStyle(color: Colors.red),),
+                        ),
+                      ),
 
-              case SuccessEditActivityState():
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text("'${state.activity.description}' updated",
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(state.activity),
-                      child: Text("Close"),
-                    ),
-                  ],
-                );
-            }
-        }
+                    ],
+                  );
+                case LoadingEditActivityState():
+                  return Wrap(children: [InfiniteLoader()]);
+
+                case SuccessEditActivityState():
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text("'${state.activity.description}' updated",
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(state.activity),
+                        child: Text("Close"),
+                      ),
+                    ],
+                  );
+              }
+          }
+        ),
       ),
     );
   }

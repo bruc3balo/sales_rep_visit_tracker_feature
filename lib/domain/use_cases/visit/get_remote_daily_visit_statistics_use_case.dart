@@ -25,8 +25,8 @@ class GetRemoteDailyVisitStatisticsUseCase {
       var visitResponse = await _visitRepository.getVisits(
         page: page++,
         pageSize: pageSize,
-        fromDateInclusive: DateTime.now().copyWith(hour: 0),
-        toDateInclusive: DateTime.now().copyWith(hour: 24),
+        fromDateInclusive: DateTime.now().copyWith(hour: 0, minute: 00),
+        toDateInclusive: DateTime.now().copyWith(hour: 23, minute: 59),
       );
 
       switch (visitResponse) {

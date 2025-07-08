@@ -12,7 +12,7 @@ import 'package:sales_rep_visit_tracker_feature/presentation/features/visits/upd
 class UpdateUnsyncedVisitViewModel extends ChangeNotifier {
   final UpdateUnsyncedVisitUseCase _updateUnsyncedVisitUseCase;
   UpdateUnsyncedVisitState _state = InitialUpdateUnsyncedVisitState();
-  final UnsyncedVisitAggregate _originalVisit;
+  UnsyncedVisitAggregate _originalVisit;
 
   UpdateUnsyncedVisitViewModel({
     required UpdateUnsyncedVisitUseCase updateUnsyncedVisitUseCase,
